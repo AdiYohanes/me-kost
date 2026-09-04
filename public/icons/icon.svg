@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#05b85c" />
+      <stop offset="100%" stop-color="#038240" />
+    </linearGradient>
+    <linearGradient id="roofGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#e8f8ef" />
+    </linearGradient>
+    <filter id="dropShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#024d26" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  
+  <!-- Rounded Base Background (App Icon Squircle) -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)"/>
+  
+  <!-- Decorative Accent Circle -->
+  <circle cx="256" cy="256" r="190" fill="#ffffff" opacity="0.08" />
+
+  <!-- House Building Body & Roof -->
+  <g filter="url(#dropShadow)">
+    <!-- Roof Triangular Shape -->
+    <path d="M256 120 L136 226 C130 231 127 238 128 245 C129 253 135 259 143 259 L168 259 L168 372 C168 383 177 392 188 392 L324 392 C335 392 344 383 344 372 L344 259 L369 259 C377 259 383 253 384 245 C385 238 382 231 376 226 Z" fill="url(#roofGrad)" />
+    
+    <!-- Door / Payment Receipt Notch -->
+    <rect x="224" y="278" width="64" height="114" rx="12" fill="#04A552" />
+    
+    <!-- Checkmark Badge on Building Door to symbolize verified/paid -->
+    <circle cx="256" cy="326" r="18" fill="#ffffff" />
+    <path d="M249 326 L254 331 L264 321" fill="none" stroke="#04A552" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+    
+    <!-- Chimney / Modern accent -->
+    <rect x="306" y="160" width="26" height="46" rx="6" fill="#e8f8ef" />
+  </g>
+</svg>
