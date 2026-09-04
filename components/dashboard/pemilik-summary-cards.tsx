@@ -14,14 +14,17 @@ export function formatRupiah(amount: number): string {
 }
 
 export function PemilikSummaryCards() {
-  const { tagihanList } = usePaymentStore();
+  const { tagihanList, activePeriode } = usePaymentStore();
 
-  // Filter tagihan aktif bulan berjalan (September 2026 / bulan 9, tahun 2026)
+  const currentBulan = activePeriode?.bulan ?? 9;
+  const currentTahun = activePeriode?.tahun ?? 2026;
+  const currentLabel = activePeriode?.periodeBulan ?? "Sep 2026";
+
+  // Filter tagihan aktif periode terpilih
   const tagihanAktif = tagihanList.filter(
-    (t) => t.bulan === 9 && t.tahun === 2026
+    (t) => t.bulan === currentBulan && t.tahun === currentTahun
   );
 
-  const totalKamar = tagihanAktif.length;
   const kamarLunas = tagihanAktif.filter((t) => t.status === "LUNAS").length;
   const kamarBelumLunas = tagihanAktif.filter((t) => t.status !== "LUNAS").length;
   const perluVerifikasi = tagihanAktif.filter(
@@ -49,7 +52,7 @@ export function PemilikSummaryCards() {
               <span>Penerimaan Terkumpul</span>
             </div>
             <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/40 text-emerald-100">
-              Sep 2026
+              {currentLabel}
             </span>
           </div>
 

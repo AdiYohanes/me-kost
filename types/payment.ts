@@ -33,12 +33,15 @@ export interface Tagihan {
   metodePembayaran?: MetodePembayaran;
   buktiPembayaran?: BuktiPembayaran;
   alasanPenolakan?: string;
+  catatanPemilik?: string;
   paidAt?: string;
   verifiedAt?: string;
 }
 
 export interface PaymentState {
   tagihanList: Tagihan[];
+  activePeriode: { bulan: number; tahun: number; periodeBulan: string };
+  setActivePeriode: (periode: { bulan: number; tahun: number; periodeBulan: string }) => void;
   uploadBuktiTransfer: (
     tagihanId: string,
     imageUrl: string,
@@ -49,5 +52,12 @@ export interface PaymentState {
   approveTagihan: (tagihanId: string) => void;
   rejectTagihan: (tagihanId: string, alasan: string) => void;
   markCashTagihan: (tagihanId: string, catatan?: string) => void;
+  updateNominalTagihan: (tagihanId: string, nominalBaru: number) => void;
+  buatTagihanPeriodeBaru: (
+    bulan: number,
+    tahun: number,
+    periodeBulan: string,
+    batasBayar: string
+  ) => void;
   resetPayments: () => void;
 }

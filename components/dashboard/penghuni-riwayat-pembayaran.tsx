@@ -28,7 +28,7 @@ interface PenghuniRiwayatPembayaranProps {
 
 export function PenghuniRiwayatPembayaran({ user }: PenghuniRiwayatPembayaranProps) {
   const kamarIdentifier = user.nomorKamar || user.kamarId || "101";
-  const { tagihanList, getRiwayatTagihanByKamar } = usePaymentStore();
+  const { getRiwayatTagihanByKamar } = usePaymentStore();
   const riwayatList = getRiwayatTagihanByKamar(kamarIdentifier);
 
   const [selectedTagihan, setSelectedTagihan] = useState<Tagihan | null>(null);

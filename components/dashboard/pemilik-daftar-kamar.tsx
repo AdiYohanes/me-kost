@@ -7,8 +7,9 @@ import {
   CheckCircle2,
   Clock,
   Eye,
-  Building,
+  CalendarPlus,
   Filter,
+  Edit3,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -18,23 +19,44 @@ import { usePaymentStore } from "@/lib/store/use-payment-store";
 import { Tagihan, StatusPembayaran } from "@/types/payment";
 import { BuktiLightboxDialog } from "./bukti-lightbox-dialog";
 import { TolakBuktiDialog } from "./tolak-bukti-dialog";
+import { TandaiCashDialog } from "./tandai-cash-dialog";
+import {
+  BuatPeriodeTagihanDialog,
+  UbahTarifKamarDialog,
+} from "./kelola-tagihan-dialog";
 import { formatRupiah } from "./pemilik-summary-cards";
 
 type FilterType = "SEMUA" | StatusPembayaran;
 
 export function PemilikDaftarKamar() {
-  const { tagihanList, markCashTagihan, approveTagihan, rejectTagihan } =
-    usePaymentStore();
+  const {
+    tagihanList,
+    activePeriode,
+    markCashTagihan,
+    approveTagihan,
+    rejectTagihan,
+    updateNominalTagihan,
+    buatTagihanPeriodeBaru,
+  } = usePaymentStore();
 
   const [activeFilter, setActiveFilter] = useState<FilterType>("SEMUA");
   const [selectedTagihanForLightbox, setSelectedTagihanForLightbox] =
     useState<Tagihan | null>(null);
   const [selectedTagihanForReject, setSelectedTagihanForReject] =
     useState<Tagihan | null>(null);
+  const [selectedTagihanForCash, setSelectedTagihanForCash] =
+    useState<Tagihan | null>(null);
+  const [selectedTagihanForTarif, setSelectedTagihanForTarif] =
+    useState<Tagihan | null>(null);
+  const [isBuatPeriodeOpen, setIsBuatPeriodeOpen] = useState(false);
 
-  // Ambil tagihan aktif bulan berjalan (September 2026) dan urutkan berdasarkan nomor kamar 101 - 108
+  const currentBulan = activePeriode?.bulan ?? 9;
+  const currentTahun = activePeriode?.tahun ?? 2026;
+  const currentPeriodeLabel = activePeriode?.periodeBulan ?? "September 2026";
+
+  // Ambil tagihan aktif periode terpilih dan urutkan berdasarkan nomor kamar 101 - 108
   const tagihanAktif = tagihanList
-    .filter((t) => t.bulan === 9 && t.tahun === 2026)
+    .filter((t) => t.bulan === currentBulan && t.tahun === currentTahun)
     .sort((a, b) => parseInt(a.nomorKamar, 10) - parseInt(b.nomorKamar, 10));
 
   // Hitung jumlah tiap kategori untuk badge tab filter
@@ -52,11 +74,46 @@ export function PemilikDaftarKamar() {
     return t.status === activeFilter;
   });
 
-  const handleMarkCash = (tagihan: Tagihan) => {
-    markCashTagihan(tagihan.id);
-    toast.success(`Pembayaran Tunai Kamar ${tagihan.nomorKamar} Tercatat!`, {
-      description: `Tagihan ${tagihan.penghuniNama} berhasil ditandai Lunas (Cash).`,
+  const handleConfirmCash = (tagihanId: string, catatan?: string) => {
+    const target = tagihanList.find((t) => t.id === tagihanId);
+    markCashTagihan(tagihanId, catatan);
+    toast.success(
+      `Pembayaran Tunai Kamar ${target?.nomorKamar || ""} Tercatat!`,
+      {
+        description: `Tagihan ${target?.penghuniNama || ""} berhasil ditandai Lunas (Cash).`,
+      }
+    );
+    setSelectedTagihanForCash(null);
+  };
+
+  const handleConfirmUpdateTarif = (tagihanId: string, nominalBaru: number) => {
+    const target = tagihanList.find((t) => t.id === tagihanId);
+    updateNominalTagihan(tagihanId, nominalBaru);
+    toast.success(
+      `Tarif Kamar ${target?.nomorKamar || ""} Berhasil Diperbarui!`,
+      {
+        description: `Nominal sewa kini ${formatRupiah(nominalBaru)}.`,
+      }
+    );
+    setSelectedTagihanForTarif(null);
+  };
+
+  const handleConfirmCreatePeriode = (data: {
+    bulan: number;
+    tahun: number;
+    periodeBulan: string;
+    batasBayar: string;
+  }) => {
+    buatTagihanPeriodeBaru(
+      data.bulan,
+      data.tahun,
+      data.periodeBulan,
+      data.batasBayar
+    );
+    toast.success(`Tagihan Periode ${data.periodeBulan} Berhasil Diterbitkan!`, {
+      description: "Tagihan baru untuk 8 kamar siap ditagihkan kepada penghuni.",
     });
+    setIsBuatPeriodeOpen(false);
   };
 
   const handleApprove = (tagihan: Tagihan) => {
@@ -88,7 +145,9 @@ export function PemilikDaftarKamar() {
         return (
           <Badge variant="lunas" className="text-[10px] gap-1">
             <CheckCircle2 className="w-3 h-3" />
-            <span>Lunas {tagihan.metodePembayaran === "CASH" ? "(Tunai)" : "(Transfer)"}</span>
+            <span>
+              Lunas {tagihan.metodePembayaran === "CASH" ? "(Tunai)" : "(Transfer)"}
+            </span>
           </Badge>
         );
       case "MENUNGGU_VERIFIKASI":
@@ -106,7 +165,11 @@ export function PemilikDaftarKamar() {
         );
       case "BELUM_BAYAR":
       default:
-        return <Badge variant="belumbayar" className="text-[10px]">Belum Bayar</Badge>;
+        return (
+          <Badge variant="belumbayar" className="text-[10px]">
+            Belum Bayar
+          </Badge>
+        );
     }
   };
 
@@ -121,12 +184,24 @@ export function PemilikDaftarKamar() {
                 <span>Daftar Unit Kamar</span>
               </CardTitle>
               <p className="text-xs text-slate-500 mt-0.5">
-                Unit 101 - 108 Kost Syantika • Periode September 2026
+                Unit 101 - 108 Kost Syantika • Periode {currentPeriodeLabel}
               </p>
             </div>
-            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
-              {filteredList.length} Kamar
-            </span>
+            <div className="flex items-center gap-1.5">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setIsBuatPeriodeOpen(true)}
+                className="h-7 px-2 text-[11px] font-semibold text-emerald-700 border-emerald-300 hover:bg-emerald-50 gap-1"
+              >
+                <CalendarPlus className="w-3.5 h-3.5" />
+                <span>Periode Baru</span>
+              </Button>
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                {filteredList.length} Kamar
+              </span>
+            </div>
           </div>
 
           {/* Filter Status Pills */}
@@ -216,9 +291,19 @@ export function PemilikDaftarKamar() {
                       <p className="text-xs font-bold text-slate-900 leading-tight">
                         {tagihan.penghuniNama}
                       </p>
-                      <p className="text-[11px] text-slate-500">
-                        {formatRupiah(tagihan.nominal)} / bln
-                      </p>
+                      <div className="flex items-center gap-1 text-[11px] text-slate-500">
+                        <span>{formatRupiah(tagihan.nominal)} / bln</span>
+                        <span>•</span>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedTagihanForTarif(tagihan)}
+                          className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-emerald-700 hover:text-emerald-800 hover:underline cursor-pointer"
+                          aria-label={`Ubah Tarif Kamar ${tagihan.nomorKamar}`}
+                        >
+                          <Edit3 className="w-2.5 h-2.5" />
+                          <span>Ubah Tarif</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
 
@@ -252,11 +337,11 @@ export function PemilikDaftarKamar() {
                         type="button"
                         variant="outline"
                         size="sm"
-                        onClick={() => handleMarkCash(tagihan)}
+                        onClick={() => setSelectedTagihanForCash(tagihan)}
                         className="h-7 px-2 text-[11px] font-semibold text-emerald-700 border-emerald-300 hover:bg-emerald-50 gap-1"
                       >
                         <Banknote className="w-3 h-3 text-emerald-600" />
-                        <span>Tandai Tunai</span>
+                        <span>Tandai Lunas (Cash)</span>
                       </Button>
                     )}
                   </div>
@@ -266,6 +351,29 @@ export function PemilikDaftarKamar() {
           )}
         </CardContent>
       </Card>
+
+      {/* Modal Tandai Lunas (Cash) */}
+      <TandaiCashDialog
+        isOpen={!!selectedTagihanForCash}
+        onClose={() => setSelectedTagihanForCash(null)}
+        tagihan={selectedTagihanForCash}
+        onConfirmCash={handleConfirmCash}
+      />
+
+      {/* Modal Ubah Tarif Kamar */}
+      <UbahTarifKamarDialog
+        isOpen={!!selectedTagihanForTarif}
+        onClose={() => setSelectedTagihanForTarif(null)}
+        tagihan={selectedTagihanForTarif}
+        onConfirmUpdate={handleConfirmUpdateTarif}
+      />
+
+      {/* Modal Buat Periode Tagihan Baru */}
+      <BuatPeriodeTagihanDialog
+        isOpen={isBuatPeriodeOpen}
+        onClose={() => setIsBuatPeriodeOpen(false)}
+        onConfirmCreate={handleConfirmCreatePeriode}
+      />
 
       {/* Modal Lightbox saat dibuka dari daftar kamar */}
       <BuktiLightboxDialog

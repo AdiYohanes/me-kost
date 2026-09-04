@@ -160,25 +160,36 @@ export const usePaymentStore = create<PaymentState>()(
   persist(
     (set, get) => ({
       tagihanList: generateInitialTagihan(),
+      activePeriode: {
+        bulan: 9,
+        tahun: 2026,
+        periodeBulan: "September 2026",
+      },
+
+      setActivePeriode: (periode) => {
+        set({ activePeriode: periode });
+      },
 
       getTagihanAktifByKamar: (kamarId: string) => {
-        const { tagihanList } = get();
-        // Tagihan aktif adalah September 2026 (bulan 9, tahun 2026)
+        const { tagihanList, activePeriode } = get();
         return tagihanList.find(
-          (t) => (t.kamarId === kamarId || t.nomorKamar === kamarId) && t.bulan === 9 && t.tahun === 2026
+          (t) =>
+            (t.kamarId === kamarId || t.nomorKamar === kamarId) &&
+            t.bulan === activePeriode.bulan &&
+            t.tahun === activePeriode.tahun
         );
       },
 
       getRiwayatTagihanByKamar: (kamarId: string) => {
-        const { tagihanList } = get();
-        // Riwayat adalah tagihan sebelum bulan berjalan (bulan < 9, tahun <= 2026), diurutkan terbaru ke terlama
+        const { tagihanList, activePeriode } = get();
         return tagihanList
           .filter(
             (t) =>
               (t.kamarId === kamarId || t.nomorKamar === kamarId) &&
-              (t.tahun < 2026 || (t.tahun === 2026 && t.bulan < 9))
+              (t.tahun < activePeriode.tahun ||
+                (t.tahun === activePeriode.tahun && t.bulan < activePeriode.bulan))
           )
-          .sort((a, b) => b.bulan - a.bulan);
+          .sort((a, b) => (b.tahun !== a.tahun ? b.tahun - a.tahun : b.bulan - a.bulan));
       },
 
       uploadBuktiTransfer: (tagihanId: string, imageUrl: string, catatanPenghuni?: string) => {
@@ -203,7 +214,7 @@ export const usePaymentStore = create<PaymentState>()(
               status: "MENUNGGU_VERIFIKASI" as const,
               metodePembayaran: "TRANSFER" as const,
               buktiPembayaran: bukti,
-              alasanPenolakan: undefined, // Bersihkan alasan penolakan saat upload ulang
+              alasanPenolakan: undefined,
             };
           });
 
@@ -241,7 +252,7 @@ export const usePaymentStore = create<PaymentState>()(
         }));
       },
 
-      markCashTagihan: (tagihanId: string) => {
+      markCashTagihan: (tagihanId: string, catatan?: string) => {
         set((state) => ({
           tagihanList: state.tagihanList.map((t) =>
             t.id === tagihanId
@@ -251,6 +262,7 @@ export const usePaymentStore = create<PaymentState>()(
                   metodePembayaran: "CASH",
                   paidAt: new Date().toISOString(),
                   verifiedAt: new Date().toISOString(),
+                  catatanPemilik: catatan,
                   alasanPenolakan: undefined,
                   buktiPembayaran: undefined,
                 }
@@ -259,8 +271,60 @@ export const usePaymentStore = create<PaymentState>()(
         }));
       },
 
+      updateNominalTagihan: (tagihanId: string, nominalBaru: number) => {
+        set((state) => ({
+          tagihanList: state.tagihanList.map((t) =>
+            t.id === tagihanId ? { ...t, nominal: nominalBaru } : t
+          ),
+        }));
+      },
+
+      buatTagihanPeriodeBaru: (
+        bulan: number,
+        tahun: number,
+        periodeBulan: string,
+        batasBayar: string
+      ) => {
+        set((state) => {
+          const penghuniAccounts = MOCK_USERS.filter((u) => u.role === "PENGHUNI");
+          const newTagihan: Tagihan[] = penghuniAccounts.map((acc) => {
+            const nomorKamar = acc.nomorKamar || "101";
+            const prevTagihan = state.tagihanList.find(
+              (t) => t.nomorKamar === nomorKamar
+            );
+            const nominal = prevTagihan?.nominal || acc.tarifBulanan || 1500000;
+
+            return {
+              id: `tagihan-${nomorKamar}-${tahun}-${String(bulan).padStart(2, "0")}`,
+              kamarId: nomorKamar,
+              nomorKamar,
+              penghuniId: acc.id,
+              penghuniNama: acc.name,
+              periodeBulan,
+              tahun,
+              bulan,
+              nominal,
+              batasBayar,
+              status: "BELUM_BAYAR" as const,
+            };
+          });
+
+          return {
+            tagihanList: [...state.tagihanList, ...newTagihan],
+            activePeriode: { bulan, tahun, periodeBulan },
+          };
+        });
+      },
+
       resetPayments: () => {
-        set({ tagihanList: generateInitialTagihan() });
+        set({
+          tagihanList: generateInitialTagihan(),
+          activePeriode: {
+            bulan: 9,
+            tahun: 2026,
+            periodeBulan: "September 2026",
+          },
+        });
       },
     }),
     {

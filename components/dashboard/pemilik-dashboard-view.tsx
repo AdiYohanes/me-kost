@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ShieldCheck, TrendingUp, Sparkles, Building2 } from "lucide-react";
+import { ShieldCheck, Building2 } from "lucide-react";
 import {
   Card,
   CardHeader,
@@ -11,15 +11,37 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { UserSession } from "@/types/auth";
+import { usePaymentStore } from "@/lib/store/use-payment-store";
 import { PemilikSummaryCards } from "./pemilik-summary-cards";
 import { PemilikVerifikasiAntrean } from "./pemilik-verifikasi-antrean";
 import { PemilikDaftarKamar } from "./pemilik-daftar-kamar";
+import { PengaturanProfilView } from "./pengaturan-profil-view";
 
 interface PemilikDashboardViewProps {
   user: UserSession;
+  activeTab?: string;
+  onNavigateTab?: (tab: string) => void;
 }
 
-export function PemilikDashboardView({ user }: PemilikDashboardViewProps) {
+export function PemilikDashboardView({
+  user,
+  activeTab = "ringkasan",
+}: PemilikDashboardViewProps) {
+  const { activePeriode } = usePaymentStore();
+  const currentPeriodeLabel = activePeriode?.periodeBulan || "September 2026";
+
+  if (activeTab === "pengaturan") {
+    return <PengaturanProfilView user={user} />;
+  }
+
+  if (activeTab === "kamar") {
+    return (
+      <div className="space-y-4 animate-in fade-in duration-300">
+        <PemilikDaftarKamar />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4 animate-in fade-in duration-300">
       {/* Welcome Banner Card */}
@@ -39,7 +61,7 @@ export function PemilikDashboardView({ user }: PemilikDashboardViewProps) {
             Selamat Datang, {user.name}
           </CardTitle>
           <CardDescription className="text-xs text-slate-600">
-            Pantau ringkasan keuangan dan verifikasi bukti pembayaran sewa 8 kamar Kost Syantika untuk periode September 2026.
+            Pantau ringkasan keuangan dan verifikasi bukti pembayaran sewa 8 kamar Kost Syantika untuk periode {currentPeriodeLabel}.
           </CardDescription>
         </CardHeader>
 
@@ -54,7 +76,7 @@ export function PemilikDashboardView({ user }: PemilikDashboardViewProps) {
               </span>
             </div>
             <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/60">
-              Sep 2026
+              {currentPeriodeLabel}
             </span>
           </div>
         </CardContent>

@@ -7,10 +7,6 @@ import {
   XCircle,
   Eye,
   Calendar,
-  Sparkles,
-  DoorClosed,
-  FileText,
-  User,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -23,16 +19,23 @@ import { TolakBuktiDialog } from "./tolak-bukti-dialog";
 import { formatRupiah } from "./pemilik-summary-cards";
 
 export function PemilikVerifikasiAntrean() {
-  const { tagihanList, approveTagihan, rejectTagihan } = usePaymentStore();
+  const { tagihanList, activePeriode, approveTagihan, rejectTagihan } =
+    usePaymentStore();
 
   const [selectedTagihanForLightbox, setSelectedTagihanForLightbox] =
     useState<Tagihan | null>(null);
   const [selectedTagihanForReject, setSelectedTagihanForReject] =
     useState<Tagihan | null>(null);
 
+  const currentBulan = activePeriode?.bulan ?? 9;
+  const currentTahun = activePeriode?.tahun ?? 2026;
+
   // Ambil seluruh tagihan aktif yang berstatus MENUNGGU_VERIFIKASI
   const antreanVerifikasi = tagihanList.filter(
-    (t) => t.status === "MENUNGGU_VERIFIKASI" && t.bulan === 9 && t.tahun === 2026
+    (t) =>
+      t.status === "MENUNGGU_VERIFIKASI" &&
+      t.bulan === currentBulan &&
+      t.tahun === currentTahun
   );
 
   const handleApprove = (tagihan: Tagihan) => {

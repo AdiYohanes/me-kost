@@ -11,14 +11,36 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { UserSession } from "@/types/auth";
+import { usePaymentStore } from "@/lib/store/use-payment-store";
 import { PenghuniTagihanCard } from "@/components/dashboard/penghuni-tagihan-card";
 import { PenghuniRiwayatPembayaran } from "@/components/dashboard/penghuni-riwayat-pembayaran";
+import { PengaturanProfilView } from "@/components/dashboard/pengaturan-profil-view";
 
 interface PenghuniDashboardViewProps {
   user: UserSession;
+  activeTab?: string;
+  onNavigateTab?: (tab: string) => void;
 }
 
-export function PenghuniDashboardView({ user }: PenghuniDashboardViewProps) {
+export function PenghuniDashboardView({
+  user,
+  activeTab = "tagihan",
+}: PenghuniDashboardViewProps) {
+  const { activePeriode } = usePaymentStore();
+  const currentPeriodeLabel = activePeriode?.periodeBulan || "September 2026";
+
+  if (activeTab === "pengaturan") {
+    return <PengaturanProfilView user={user} />;
+  }
+
+  if (activeTab === "riwayat") {
+    return (
+      <div className="space-y-4 animate-in fade-in duration-300">
+        <PenghuniRiwayatPembayaran user={user} />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4 animate-in fade-in duration-300">
       {/* Greeting & Room Card */}
@@ -30,7 +52,10 @@ export function PenghuniDashboardView({ user }: PenghuniDashboardViewProps) {
               <DoorClosed className="w-3.5 h-3.5" />
               Kamar {user.nomorKamar}
             </span>
-            <Badge variant="outline" className="text-[10px] border-emerald-300 text-emerald-800">
+            <Badge
+              variant="outline"
+              className="text-[10px] border-emerald-300 text-emerald-800"
+            >
               Penghuni Aktif
             </Badge>
           </div>
@@ -45,7 +70,7 @@ export function PenghuniDashboardView({ user }: PenghuniDashboardViewProps) {
           <div className="flex items-center gap-2 p-2.5 bg-white/90 rounded-xl border border-emerald-100/80 text-xs text-slate-700">
             <Calendar className="w-4 h-4 text-emerald-600 shrink-0" />
             <span>
-              Periode Sewa Aktif: <strong>September 2026</strong>
+              Periode Sewa Aktif: <strong>{currentPeriodeLabel}</strong>
             </span>
           </div>
         </CardContent>

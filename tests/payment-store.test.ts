@@ -59,4 +59,67 @@ describe("usePaymentStore", () => {
     expect(updated?.alasanPenolakan).toBeUndefined();
     expect(updated?.buktiPembayaran?.imageUrl).toBe(mockBase64);
   });
+
+  it("dapat menandai lunas tunai (markCashTagihan) dengan metode CASH, waktu pelunasan, dan catatan pemilik", () => {
+    const tagihan101 = usePaymentStore.getState().getTagihanAktifByKamar("101");
+    expect(tagihan101?.status).toBe("BELUM_BAYAR");
+
+    usePaymentStore
+      .getState()
+      .markCashTagihan(tagihan101!.id, "Diterima tunai di ruang pengelola");
+
+    const updated = usePaymentStore.getState().getTagihanAktifByKamar("101");
+    expect(updated?.status).toBe("LUNAS");
+    expect(updated?.metodePembayaran).toBe("CASH");
+    expect(updated?.paidAt).toBeDefined();
+    expect(updated?.verifiedAt).toBeDefined();
+    expect(updated?.catatanPemilik).toBe("Diterima tunai di ruang pengelola");
+  });
+
+  it("dapat mengubah nominal tagihan kamar tertentu (updateNominalTagihan)", () => {
+    const tagihan101 = usePaymentStore.getState().getTagihanAktifByKamar("101");
+    expect(tagihan101?.nominal).toBe(1500000);
+
+    usePaymentStore.getState().updateNominalTagihan(tagihan101!.id, 1650000);
+
+    const updated = usePaymentStore.getState().getTagihanAktifByKamar("101");
+    expect(updated?.nominal).toBe(1650000);
+  });
+
+  it("dapat membuat tagihan periode bulan baru untuk seluruh kamar (buatTagihanPeriodeBaru)", () => {
+    usePaymentStore
+      .getState()
+      .buatTagihanPeriodeBaru(10, 2026, "Oktober 2026", "10 Okt 2026");
+
+    const { tagihanList } = usePaymentStore.getState();
+    const tagihanOktober = tagihanList.filter(
+      (t) => t.bulan === 10 && t.tahun === 2026
+    );
+
+    // Harus terbuat untuk seluruh 8 kamar
+    expect(tagihanOktober.length).toBe(8);
+    tagihanOktober.forEach((t) => {
+      expect(t.status).toBe("BELUM_BAYAR");
+      expect(t.periodeBulan).toBe("Oktober 2026");
+      expect(t.batasBayar).toBe("10 Okt 2026");
+    });
+  });
+
+  it("dapat mengembalikan seluruh state ke kondisi seed awal melalui resetPayments", () => {
+    // Ubah status dan nominal
+    const tagihan101 = usePaymentStore.getState().getTagihanAktifByKamar("101");
+    usePaymentStore.getState().markCashTagihan(tagihan101!.id, "Catatan test");
+    usePaymentStore.getState().updateNominalTagihan(tagihan101!.id, 2000000);
+
+    expect(usePaymentStore.getState().getTagihanAktifByKamar("101")?.status).toBe("LUNAS");
+
+    // Lakukan reset
+    usePaymentStore.getState().resetPayments();
+
+    const reset101 = usePaymentStore.getState().getTagihanAktifByKamar("101");
+    expect(reset101?.status).toBe("BELUM_BAYAR");
+    expect(reset101?.nominal).toBe(1500000);
+    expect(reset101?.catatanPemilik).toBeUndefined();
+  });
 });
+
