@@ -43,7 +43,7 @@ interface PenghuniTagihanCardProps {
 
 export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
   const kamarIdentifier = user.nomorKamar || user.kamarId || "101";
-  const { getTagihanAktifByKamar, uploadBuktiTransfer } = usePaymentStore();
+  const { tagihanList, getTagihanAktifByKamar, uploadBuktiTransfer } = usePaymentStore();
   const tagihan = getTagihanAktifByKamar(kamarIdentifier);
 
   const fileInputRef = useRef<HTMLInputElement>(null);

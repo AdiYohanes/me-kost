@@ -4,12 +4,12 @@
 
 **Blocked by:** 03: Tampilan Penghuni Tagihan dan Upload Bukti
 
-**Status:** ready-for-agent
+**Status:** ready-for-human
 
-- [ ] Kartu ringkasan metrik menampilkan total kamar lunas, total kamar belum lunas, dan total penerimaan sewa bulan berjalan
-- [ ] Daftar kamar menampilkan seluruh unit Kamar (101-108) dengan filter status (Semua, Lunas, Belum Bayar, Menunggu Verifikasi)
-- [ ] Antrean verifikasi bukti transfer menampilkan kartu Bukti Pembayaran yang masuk dari penghuni yang berstatus Menunggu Verifikasi
-- [ ] Tersedia modal lightbox untuk memperbesar dan melihat foto Bukti Pembayaran dalam ukuran penuh beserta detail nominal dan waktu unggah
-- [ ] Tombol Setujui (Approve) mengubah Status Pembayaran menjadi Lunas (metode TRANSFER) dan mencatat waktu verifikasi
-- [ ] Tombol Tolak (Reject) membuka modal konfirmasi yang mewajibkan input Alasan Penolakan dan mengubah Status Pembayaran menjadi Ditolak
-- [ ] Perubahan status langsung tercermin secara reaktif di dashboard Penghuni
+- [x] Kartu ringkasan metrik menampilkan total kamar lunas, total kamar belum lunas, dan total penerimaan sewa bulan berjalan
+- [x] Daftar kamar menampilkan seluruh unit Kamar (101-108) dengan filter status (Semua, Lunas, Belum Bayar, Menunggu Verifikasi)
+- [x] Antrean verifikasi bukti transfer menampilkan kartu Bukti Pembayaran yang masuk dari penghuni yang berstatus Menunggu Verifikasi
+- [x] Tersedia modal lightbox untuk memperbesar dan melihat foto Bukti Pembayaran dalam ukuran penuh beserta detail nominal dan waktu unggah
+- [x] Tombol Setujui (Approve) mengubah Status Pembayaran menjadi Lunas (metode TRANSFER) dan mencatat waktu verifikasi
+- [x] Tombol Tolak (Reject) membuka modal konfirmasi yang mewajibkan input Alasan Penolakan dan mengubah Status Pembayaran menjadi Ditolak
+- [x] Perubahan status langsung tercermin secara reaktif di dashboard Penghuni

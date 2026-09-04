@@ -1,6 +1,6 @@
 import React from "react";
 import { describe, it, expect, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import { PenghuniDashboardView } from "@/components/dashboard/penghuni-dashboard-view";
 import { usePaymentStore } from "@/lib/store/use-payment-store";
 import { UserSession } from "@/types/auth";
@@ -136,5 +136,59 @@ describe("PenghuniDashboardView - Tiket #03 Kriteria Lengkap", () => {
 
     const viewReceiptButtons = screen.getAllByRole("button", { name: /Lihat Bukti/i });
     expect(viewReceiptButtons.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("8. Perubahan status dari aksi Pemilik Kost (Approve atau Reject) langsung tercermin secara reaktif di dashboard Penghuni", async () => {
+    // Kamar 102 awalnya Menunggu Verifikasi
+    const mockPenghuni102: UserSession = {
+      id: "usr-102",
+      username: "102",
+      name: "Siti Nurhaliza",
+      role: "PENGHUNI",
+      nomorKamar: "102",
+      tipeKamar: "Kamar Standard Lt. 1",
+      tarifBulanan: 1300000,
+    };
+
+    const { unmount } = render(<PenghuniDashboardView user={mockPenghuni102} />);
+    expect(screen.getByText("Menunggu Verifikasi")).toBeInTheDocument();
+
+    // Pemilik Kost menyetujui tagihan kamar 102
+    const tagihan102 = usePaymentStore.getState().getTagihanAktifByKamar("102");
+    act(() => {
+      usePaymentStore.getState().approveTagihan(tagihan102!.id);
+    });
+
+    // Di tampilan Penghuni langsung berubah menjadi Lunas
+    await waitFor(() => {
+      expect(screen.getAllByText("Lunas").length).toBeGreaterThanOrEqual(1);
+      expect(screen.getByText(/Tagihan Periode Ini Telah Lunas/i)).toBeInTheDocument();
+    });
+
+    unmount();
+
+    // Uji skenario Reject: Kamar 107 ditolak Pemilik Kost
+    const mockPenghuni107: UserSession = {
+      id: "usr-107",
+      username: "107",
+      name: "Dewi Lestari",
+      role: "PENGHUNI",
+      nomorKamar: "107",
+      tipeKamar: "Kamar Deluxe Lt. 2",
+      tarifBulanan: 1500000,
+    };
+
+    render(<PenghuniDashboardView user={mockPenghuni107} />);
+    expect(screen.getByText("Menunggu Verifikasi")).toBeInTheDocument();
+
+    const tagihan107 = usePaymentStore.getState().getTagihanAktifByKamar("107");
+    act(() => {
+      usePaymentStore.getState().rejectTagihan(tagihan107!.id, "Struk tidak valid dan terpotong.");
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("Ditolak")).toBeInTheDocument();
+      expect(screen.getByText(/Struk tidak valid dan terpotong\./i)).toBeInTheDocument();
+    });
   });
 });
