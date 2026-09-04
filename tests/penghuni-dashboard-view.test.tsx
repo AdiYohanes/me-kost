@@ -1,0 +1,140 @@
+import React from "react";
+import { describe, it, expect, beforeEach } from "vitest";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { PenghuniDashboardView } from "@/components/dashboard/penghuni-dashboard-view";
+import { usePaymentStore } from "@/lib/store/use-payment-store";
+import { UserSession } from "@/types/auth";
+
+const mockPenghuni101: UserSession = {
+  id: "usr-101",
+  username: "101",
+  name: "Rizky Ramadhan",
+  role: "PENGHUNI",
+  nomorKamar: "101",
+  tipeKamar: "Kamar Deluxe Lt. 1",
+  tarifBulanan: 1500000,
+  phone: "0812-9876-101",
+};
+
+const mockPenghuni104: UserSession = {
+  id: "usr-104",
+  username: "104",
+  name: "Dimas Anggara",
+  role: "PENGHUNI",
+  nomorKamar: "104",
+  tipeKamar: "Kamar Standard Lt. 1",
+  tarifBulanan: 1300000,
+  phone: "0812-9876-104",
+};
+
+describe("PenghuniDashboardView - Tiket #03 Kriteria Lengkap", () => {
+  beforeEach(() => {
+    localStorage.clear();
+    usePaymentStore.getState().resetPayments();
+  });
+
+  it("1. Header Penghuni menampilkan nomor Kamar, nama Penghuni, dan tipe kamar", () => {
+    render(<PenghuniDashboardView user={mockPenghuni101} />);
+
+    expect(screen.getByText(/Kamar 101/i)).toBeInTheDocument();
+    expect(screen.getByText(/Halo, Rizky Ramadhan/i)).toBeInTheDocument();
+    expect(screen.getByText(/Kamar Deluxe Lt\. 1/i)).toBeInTheDocument();
+  });
+
+  it("2. Kartu Tagihan aktif menampilkan periode, nominal sewa terformat, batas bayar, dan badge Status Pembayaran", () => {
+    render(<PenghuniDashboardView user={mockPenghuni101} />);
+
+    expect(screen.getAllByText(/September 2026/i).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/Rp 1\.500\.000/i).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/10 Sep 2026/i).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText("Belum Bayar")).toBeInTheDocument();
+  });
+
+  it("3 & 4. Pengunggahan bukti transfer mengonversi Base64, menyimpan ke state lokal persisten, dan mengubah status ke Menunggu Verifikasi", async () => {
+    render(<PenghuniDashboardView user={mockPenghuni101} />);
+
+    // Buka upload
+    const uploadBtn = screen.getByRole("button", { name: /Unggah Bukti Transfer/i });
+    fireEvent.click(uploadBtn);
+
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    expect(fileInput).toBeInTheDocument();
+
+    const file = new File(["dummy transfer"], "bukti-transfer.png", { type: "image/png" });
+    const mockBase64 = "data:image/png;base64,mockValidBase64TransferReceipt";
+
+    const originalFileReader = window.FileReader;
+    class MockFileReader {
+      result: string = "";
+      onload: ((this: FileReader, ev: ProgressEvent<FileReader>) => void) | null = null;
+      readAsDataURL() {
+        this.result = mockBase64;
+        if (this.onload) {
+          this.onload.call(this as unknown as FileReader, {} as ProgressEvent<FileReader>);
+        }
+      }
+    }
+    window.FileReader = MockFileReader as unknown as typeof FileReader;
+
+    fireEvent.change(fileInput, { target: { files: [file] } });
+
+    // Pratinjau instan muncul
+    await waitFor(() => {
+      const previewImg = screen.getByAltText(/Pratinjau Bukti Pembayaran/i);
+      expect(previewImg).toBeInTheDocument();
+      expect(previewImg).toHaveAttribute("src", mockBase64);
+    });
+
+    // Kirim bukti transfer
+    const submitBtn = screen.getByRole("button", { name: /Kirim Bukti Pembayaran/i });
+    fireEvent.click(submitBtn);
+
+    // Verifikasi perubahan status di tampilan & di store Zustand
+    await waitFor(() => {
+      expect(screen.getByText("Menunggu Verifikasi")).toBeInTheDocument();
+      expect(screen.getByText(/Sedang Ditinjau Pemilik Kost/i)).toBeInTheDocument();
+    });
+
+    const storedTagihan = usePaymentStore.getState().getTagihanAktifByKamar("101");
+    expect(storedTagihan?.status).toBe("MENUNGGU_VERIFIKASI");
+    expect(storedTagihan?.buktiPembayaran?.imageUrl).toBe(mockBase64);
+
+    window.FileReader = originalFileReader;
+  });
+
+  it("5. Tombol Bayar Tunai membuka dialog panduan pembayaran tunai dan kontak langsung ke Pemilik Kost", () => {
+    render(<PenghuniDashboardView user={mockPenghuni101} />);
+
+    const tunaiBtn = screen.getByRole("button", { name: /Informasi Bayar Tunai/i });
+    fireEvent.click(tunaiBtn);
+
+    expect(screen.getByText(/Panduan Pembayaran Tunai/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Ibu Hj\. Syantika/i).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText(/0812-3456-7890/i)).toBeInTheDocument();
+  });
+
+  it("6. Jika status Ditolak, Penghuni melihat kartu peringatan berisi Alasan Penolakan dan tombol unggah ulang", () => {
+    render(<PenghuniDashboardView user={mockPenghuni104} />);
+
+    expect(screen.getByText("Ditolak")).toBeInTheDocument();
+    expect(screen.getByText(/Alasan Penolakan dari Pemilik Kost/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Foto bukti transfer buram dan nominal terpotong/i)
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Unggah Ulang Bukti Transfer/i })).toBeInTheDocument();
+  });
+
+  it("7. Bagian riwayat pembayaran menampilkan daftar tagihan bulan-bulan sebelumnya beserta status dan thumbnail bukti", () => {
+    render(<PenghuniDashboardView user={mockPenghuni101} />);
+
+    expect(screen.getByText(/Riwayat Pembayaran/i)).toBeInTheDocument();
+    expect(screen.getByText("Agustus 2026")).toBeInTheDocument();
+    expect(screen.getByText("Juli 2026")).toBeInTheDocument();
+
+    const badges = screen.getAllByText("Lunas");
+    expect(badges.length).toBeGreaterThanOrEqual(2);
+
+    const viewReceiptButtons = screen.getAllByRole("button", { name: /Lihat Bukti/i });
+    expect(viewReceiptButtons.length).toBeGreaterThanOrEqual(1);
+  });
+});
