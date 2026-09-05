@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS public.tagihan (
     periode_label TEXT NOT NULL,
     periode_mulai DATE NOT NULL,
     periode_selesai DATE NOT NULL,
-    batas_bayar DATE NOT NULL,
+    tanggal_jatuh_tempo DATE NOT NULL,
     nominal INTEGER NOT NULL,
     status TEXT NOT NULL DEFAULT 'BELUM_BAYAR' 
         CHECK (status IN ('BELUM_BAYAR', 'MENUNGGU_VERIFIKASI', 'LUNAS', 'DITOLAK', 'MENUNGGAK')),
@@ -66,7 +66,7 @@ CREATE INDEX IF NOT EXISTS idx_users_email ON public.users(email);
 CREATE INDEX IF NOT EXISTS idx_users_kamar ON public.users(kamar_id);
 CREATE INDEX IF NOT EXISTS idx_tagihan_kamar ON public.tagihan(kamar_id);
 CREATE INDEX IF NOT EXISTS idx_tagihan_status ON public.tagihan(status);
-CREATE INDEX IF NOT EXISTS idx_tagihan_batas_bayar ON public.tagihan(batas_bayar);
+CREATE INDEX IF NOT EXISTS idx_tagihan_jatuh_tempo ON public.tagihan(tanggal_jatuh_tempo);
 CREATE INDEX IF NOT EXISTS idx_bukti_tagihan ON public.bukti_pembayaran(tagihan_id);
 
 -- 7. KEAMANAN: ROW LEVEL SECURITY (RLS)
@@ -86,11 +86,15 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Policies untuk `kamar`
-CREATE POLICY "kamar_read_all_authenticated"
+-- Policies untuk `kamar`:
+-- Penghuni hanya bisa membaca data kamar miliknya sendiri; Pemilik bisa membaca seluruh kamar.
+CREATE POLICY "kamar_read_self_or_pemilik"
     ON public.kamar FOR SELECT
     TO authenticated
-    USING (true);
+    USING (
+        public.is_pemilik() OR 
+        id = (SELECT kamar_id FROM public.users WHERE id = auth.uid())
+    );
 
 CREATE POLICY "kamar_all_pemilik"
     ON public.kamar FOR ALL
@@ -120,7 +124,8 @@ CREATE POLICY "users_delete_pemilik"
     TO authenticated
     USING (public.is_pemilik());
 
--- Policies untuk `tagihan`
+-- Policies untuk `tagihan`:
+-- Penghuni hanya bisa membaca tagihan untuk kamarnya; Pemilik memiliki hak penuh.
 CREATE POLICY "tagihan_read_self_or_pemilik"
     ON public.tagihan FOR SELECT
     TO authenticated
@@ -135,17 +140,8 @@ CREATE POLICY "tagihan_all_pemilik"
     USING (public.is_pemilik())
     WITH CHECK (public.is_pemilik());
 
-CREATE POLICY "tagihan_penghuni_update_upload"
-    ON public.tagihan FOR UPDATE
-    TO authenticated
-    USING (
-        kamar_id = (SELECT kamar_id FROM public.users WHERE id = auth.uid())
-    )
-    WITH CHECK (
-        kamar_id = (SELECT kamar_id FROM public.users WHERE id = auth.uid())
-    );
-
--- Policies untuk `bukti_pembayaran`
+-- Policies untuk `bukti_pembayaran`:
+-- Penghuni hanya bisa melihat bukti miliknya; unggah hanya diperbolehkan pada tagihan yang belum lunas
 CREATE POLICY "bukti_read_self_or_pemilik"
     ON public.bukti_pembayaran FOR SELECT
     TO authenticated
@@ -165,10 +161,28 @@ CREATE POLICY "bukti_insert_penghuni_or_pemilik"
         tagihan_id IN (
             SELECT id FROM public.tagihan 
             WHERE kamar_id = (SELECT kamar_id FROM public.users WHERE id = auth.uid())
+              AND status IN ('BELUM_BAYAR', 'DITOLAK', 'MENUNGGAK')
         )
     );
 
--- 8. BUCKET SUPABASE STORAGE: bukti-pembayaran
+-- 8. TRIGGER OTOMATIS: Transisi Status Tagihan Saat Bukti Diunggah
+CREATE OR REPLACE FUNCTION public.handle_bukti_pembayaran_insert()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE public.tagihan
+    SET status = 'MENUNGGU_VERIFIKASI'
+    WHERE id = NEW.tagihan_id;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS trg_bukti_pembayaran_inserted ON public.bukti_pembayaran;
+CREATE TRIGGER trg_bukti_pembayaran_inserted
+    AFTER INSERT ON public.bukti_pembayaran
+    FOR EACH ROW
+    EXECUTE FUNCTION public.handle_bukti_pembayaran_insert();
+
+-- 9. BUCKET SUPABASE STORAGE: bukti-pembayaran
 INSERT INTO storage.buckets (id, name, public)
 VALUES ('bukti-pembayaran', 'bukti-pembayaran', true)
 ON CONFLICT (id) DO NOTHING;
@@ -182,16 +196,3 @@ CREATE POLICY "storage_select_public"
     ON storage.objects FOR SELECT
     TO public
     USING (bucket_id = 'bukti-pembayaran');
-
--- 9. SEED DATA AWAL KAMAR 101 - 108
-INSERT INTO public.kamar (nomor_kamar, tipe_kamar, tarif_bulanan, status_hunian, tanggal_masuk, tanggal_jatuh_tempo)
-VALUES
-    ('101', 'Kamar Deluxe Lt. 1', 1500000, 'TERISI', '2026-09-01', 1),
-    ('102', 'Kamar Standard Lt. 1', 1300000, 'TERISI', '2026-09-05', 5),
-    ('103', 'Kamar Deluxe Lt. 1', 1500000, 'TERISI', '2026-09-10', 10),
-    ('104', 'Kamar Standard Lt. 1', 1300000, 'TERISI', '2026-09-15', 15),
-    ('105', 'Kamar VIP Lt. 2', 1800000, 'TERISI', '2026-09-18', 18),
-    ('106', 'Kamar Standard Lt. 2', 1300000, 'KOSONG', NULL, 1),
-    ('107', 'Kamar Deluxe Lt. 2', 1500000, 'TERISI', '2026-09-22', 22),
-    ('108', 'Kamar VIP Lt. 2', 1800000, 'TERISI', '2026-09-25', 25)
-ON CONFLICT (nomor_kamar) DO NOTHING;
