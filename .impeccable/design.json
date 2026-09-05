@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-05T07:31:00.000Z",
+  "title": "Design System: Kost Syantika",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Syantika Emerald",
+        "canonical": "#04A552",
+        "tonalRamp": ["#02381B", "#035E2E", "#038E46", "#04A552", "#18B864", "#4ADE80", "#BBF7D0", "#E8F8EF"]
+      },
+      "accent-amber": {
+        "role": "secondary",
+        "displayName": "Amber Alert",
+        "canonical": "#F59E0B",
+        "tonalRamp": ["#451A03", "#78350F", "#B45309", "#D97706", "#F59E0B", "#FBBF24", "#FDE68A", "#FEF3C7"]
+      },
+      "accent-rose": {
+        "role": "tertiary",
+        "displayName": "Crimson Rose",
+        "canonical": "#E11D48",
+        "tonalRamp": ["#4C0519", "#881337", "#BE123C", "#E11D48", "#F43F5E", "#FB7185", "#FECDD3", "#FFE4E6"]
+      },
+      "neutral-bg": {
+        "role": "neutral",
+        "displayName": "Slate Canvas",
+        "canonical": "#F8FAFC",
+        "tonalRamp": ["#020617", "#0F172A", "#334155", "#64748B", "#94A3B8", "#CBD5E1", "#E2E8F0", "#F8FAFC"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Header utama dan ringkasan nominal besar." },
+      "headline": { "displayName": "Headline", "purpose": "Judul kartu dan nama seksi antrean." },
+      "title": { "displayName": "Title", "purpose": "Nama penghuni dan judul dialog." },
+      "body": { "displayName": "Body", "purpose": "Teks deskripsi, catatan penghuni, dan informasi instruksi." },
+      "label": { "displayName": "Label", "purpose": "Badge status, nomor kamar, tombol aksi, dan navigasi bawah." }
+    },
+    "shadows": [
+      {
+        "name": "card-shadow",
+        "value": "0 4px 20px -2px rgba(4, 165, 82, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.04)",
+        "purpose": "Bayangan ambient lembut untuk kartu di atas kanvas Slate-50."
+      },
+      {
+        "name": "card-elevated",
+        "value": "0 10px 25px -3px rgba(4, 165, 82, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+        "purpose": "Bayangan kartu aktif disentuh atau lembar dialog modal."
+      },
+      {
+        "name": "nav-shelf",
+        "value": "0 -4px 20px rgba(0, 0, 0, 0.04)",
+        "purpose": "Bayangan pemisah bilah navigasi bawah dari konten halaman."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-spring-press",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Respon taktil micro-scale saat tombol ditekan (scale 0.98)."
+      },
+      {
+        "name": "ease-fade-smooth",
+        "value": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Transisi warna status dan hover interaktif."
+      }
+    ],
+    "breakpoints": [
+      { "name": "mobile-max", "value": "448px" },
+      { "name": "sm", "value": "640px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Tombol aksi verifikasi atau konfirmasi utama.",
+      "html": "<button class=\"ds-btn-primary\">Setujui Pembayaran</button>",
+      "css": ".ds-btn-primary { background: #04A552; color: #ffffff; height: 44px; padding: 0 16px; border-radius: 12px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 600; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(4, 165, 82, 0.25); transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1); } .ds-btn-primary:hover { background: #038E46; transform: translateY(-1px); } .ds-btn-primary:active { transform: scale(0.98); background: #037A3C; }"
+    },
+    {
+      "name": "Destructive Button",
+      "kind": "button",
+      "refersTo": "button-destructive",
+      "description": "Tombol aksi tolak bukti transfer penghuni.",
+      "html": "<button class=\"ds-btn-destructive\">Tolak Bukti</button>",
+      "css": ".ds-btn-destructive { background: #FFE4E6; color: #9F1239; height: 40px; padding: 0 16px; border-radius: 12px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 12px; font-weight: 700; border: 1px solid rgba(225, 29, 72, 0.2); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all 0.15s ease; } .ds-btn-destructive:hover { background: #FECDD3; } .ds-btn-destructive:active { transform: scale(0.98); }"
+    },
+    {
+      "name": "Status Badge Lunas",
+      "kind": "chip",
+      "refersTo": "badge-lunas",
+      "description": "Lencana penanda tagihan telah terverifikasi lunas.",
+      "html": "<span class=\"ds-badge-lunas\">Lunas</span>",
+      "css": ".ds-badge-lunas { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 9999px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 12px; font-weight: 600; background: #E8F8EF; color: #04A552; border: 1px solid rgba(4, 165, 82, 0.2); }"
+    },
+    {
+      "name": "Status Badge Pending",
+      "kind": "chip",
+      "refersTo": "badge-pending",
+      "description": "Lencana antrean bukti pembayaran menunggu verifikasi.",
+      "html": "<span class=\"ds-badge-pending\">Menunggu Verifikasi</span>",
+      "css": ".ds-badge-pending { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 8px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 12px; font-weight: 600; background: #FEF3C7; color: #92400E; border: 1px solid rgba(245, 158, 11, 0.3); }"
+    },
+    {
+      "name": "Card Container",
+      "kind": "card",
+      "refersTo": "card-surface",
+      "description": "Kontainer dasar berlatar putih dengan bayangan ambient emerald lembut.",
+      "html": "<div class=\"ds-card\"><h4 class=\"ds-card-title\">Kamar 101</h4><p class=\"ds-card-text\">Rp 1.200.000 / bulan</p></div>",
+      "css": ".ds-card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 20px; box-shadow: 0 4px 20px -2px rgba(4, 165, 82, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.04); font-family: 'Plus Jakarta Sans', sans-serif; } .ds-card-title { margin: 0 0 4px 0; font-size: 16px; font-weight: 700; color: #0F172A; } .ds-card-text { margin: 0; font-size: 14px; color: #64748B; }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input-text",
+      "description": "Bidang input teks formulir dengan ring fokus emerald.",
+      "html": "<input class=\"ds-input\" placeholder=\"Masukkan catatan pembayaran...\" />",
+      "css": ".ds-input { height: 44px; width: 100%; border-radius: 12px; border: 1px solid #E2E8F0; background: #FFFFFF; padding: 0 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #0F172A; outline: none; transition: border-color 0.15s, box-shadow 0.15s; } .ds-input:focus { border-color: #04A552; box-shadow: 0 0 0 3px rgba(4, 165, 82, 0.15); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Modern Clean Fintech",
+    "overview": "Kost Syantika menerapkan bahasa visual Modern Clean Fintech yang dirancang khusus untuk kenyamanan perangkat genggam (mobile-first). Antarmuka memadukan latar kanvas netral yang tenang dengan aksen Syantika Emerald yang segar, menciptakan rasa aman, transparan, dan teratur dalam setiap tahapan transaksi sewa kamar kost. Pendekatan estetika ini menolak secara tegas tampilan formulir birokratis abu-abu, tabel spreadsheet kaku yang padat, serta spanduk promosi komersial yang berisik. Seluruh pengalaman dioptimalkan untuk kecepatan pemindaian data finansial, peninjauan bukti transfer, dan tindakan verifikasi dengan satu tangan tanpa friksi kognitif.",
+    "keyCharacteristics": [
+      "Ergonomi kontrol ramah jempol (thumb-friendly minimum tinggi 40–44px dengan micro-scale saat ditekan)",
+      "Palet Syantika Emerald yang segar dengan kontras rasio tinggi yang memenuhi standar WCAG",
+      "Elevasi bertingkat lembut (ambient tinted glow) di atas kanvas Slate-50 yang bersih",
+      "Status badge bernuansa halus (soft-tinted) yang informatif tanpa membebani hirarki visual kartu",
+      "Kepatuhan total terhadap terminologi domain resmi Kost Syantika"
+    ],
+    "rules": [
+      {
+        "name": "The Emerald Reserve Rule",
+        "body": "Warna Syantika Emerald (#04A552) dikhususkan murni untuk aksi sukses atau afirmatif (Setujui, Bayar, Status Lunas, Sesi Aktif) dan tidak pernah dipakai untuk elemen netral, latar umum, atau dekorasi pasif semata.",
+        "section": "colors"
+      },
+      {
+        "name": "The Scan-First Metric Rule",
+        "body": "Nominal rupiah dan nomor kamar wajib berbobot tegas (font-bold atau font-black) dengan posisi konsisten agar verifikator dapat mencocokkan nominal dalam waktu kurang dari 1 detik.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tinted Atmosphere Rule",
+        "body": "Bayangan elevasi kartu menggunakan dispersi warna emerald tipis (6%–10% opacity) yang memancarkan kesan segar, meniadakan bayangan hitam legam pekat yang membuat UI terasa kusam.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do sediakan target sentuh minimal 40px (h-10) hingga 44px (h-11) untuk seluruh tombol aksi utama guna kenyamanan navigasi satu jempol.",
+      "Do tampilkan nominal uang menggunakan utilitas formatRupiah dengan bobot font-bold atau font-black.",
+      "Do wajibkan pengisian Alasan Penolakan saat Pemilik Kost menolak bukti transfer penghuni.",
+      "Do pertahankan selektor pengujian Vitest (Antrean Verifikasi Bukti, Setujui, Tolak, Lihat Bukti) pada setiap perombakan visual."
+    ],
+    "donts": [
+      "Don't gunakan warna primer Emerald untuk elemen pasif, teks biasa, atau status netral (The Emerald Reserve Rule).",
+      "Don't menduplikasi nomor kamar dan nama dalam badge tebal yang bertumpuk dalam satu baris.",
+      "Don't memakai bayangan hitam pekat (heavy black drop shadow) yang membuat UI ponsel terasa kusam dan berat.",
+      "Don't melanggar batas terminologi domain resmi di CONTEXT.md dengan memakai kata seperti Admin, Tenant, Room, Invoice, atau Bill."
+    ]
+  }
+}
