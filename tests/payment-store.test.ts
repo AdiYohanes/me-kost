@@ -121,5 +121,115 @@ describe("usePaymentStore", () => {
     expect(reset101?.nominal).toBe(1500000);
     expect(reset101?.catatanPemilik).toBeUndefined();
   });
+
+  describe("Manajemen Kamar & Siklus Hidup Penghuni (Issue 03)", () => {
+    it("menginisialisasi 8 kamar fisik dengan status hunian default TERISI", () => {
+      const { kamarList } = usePaymentStore.getState();
+      expect(kamarList.length).toBe(8);
+      expect(kamarList[0].nomorKamar).toBe("101");
+      expect(kamarList[0].statusHunian).toBe("TERISI");
+      expect(kamarList[0].penghuni?.nama).toBe("Rizky Ramadhan");
+      expect(kamarList[7].nomorKamar).toBe("108");
+    });
+
+    it("dapat melepaskan penghuni keluar kost (keluarkanPenghuni - soft disconnect) dengan membatalkan tagihan aktif", () => {
+      // Kamar 101 awalnya terisi dan memiliki tagihan aktif September 2026
+      expect(usePaymentStore.getState().getTagihanAktifByKamar("101")).toBeDefined();
+
+      usePaymentStore.getState().keluarkanPenghuni({
+        kamarId: "101",
+        batalkanTagihanAktif: true,
+      });
+
+      const { kamarList, tagihanList } = usePaymentStore.getState();
+      const kamar101 = kamarList.find((k) => k.nomorKamar === "101");
+
+      // Status kamar menjadi KOSONG dan data penghuni dikosongkan
+      expect(kamar101?.statusHunian).toBe("KOSONG");
+      expect(kamar101?.penghuni).toBeNull();
+      expect(kamar101?.tanggalMasuk).toBeUndefined();
+
+      // Tagihan aktif September (Belum Bayar) dihapus
+      const tagihanAktif101 = usePaymentStore.getState().getTagihanAktifByKamar("101");
+      expect(tagihanAktif101).toBeUndefined();
+
+      // Riwayat tagihan Agustus 2026 yang LUNAS tetap utuh dengan nama penghuni tersimpan
+      const riwayatAgustus = tagihanList.find(
+        (t) => t.nomorKamar === "101" && t.bulan === 8 && t.tahun === 2026
+      );
+      expect(riwayatAgustus).toBeDefined();
+      expect(riwayatAgustus?.penghuniNama).toBe("Rizky Ramadhan");
+      expect(riwayatAgustus?.status).toBe("LUNAS");
+    });
+
+    it("dapat melepaskan penghuni keluar kost dengan mempertahankan tagihan aktif sebagai arsip tunggakan", () => {
+      usePaymentStore.getState().keluarkanPenghuni({
+        kamarId: "101",
+        batalkanTagihanAktif: false, // Pertahankan arsip
+      });
+
+      const { kamarList } = usePaymentStore.getState();
+      const kamar101 = kamarList.find((k) => k.nomorKamar === "101");
+      expect(kamar101?.statusHunian).toBe("KOSONG");
+
+      // Tagihan September tetap ada sebagai arsip
+      const tagihanAktif101 = usePaymentStore.getState().getTagihanAktifByKamar("101");
+      expect(tagihanAktif101).toBeDefined();
+      expect(tagihanAktif101?.penghuniNama).toBe("Rizky Ramadhan");
+    });
+
+    it("dapat mendaftarkan anak kost baru pada kamar kosong (+ Tambah Penghuni) dan otomatis menyetel tanggal jatuh tempo", () => {
+      // 1. Kosongkan kamar 105 terlebih dahulu
+      usePaymentStore.getState().keluarkanPenghuni({
+        kamarId: "105",
+        batalkanTagihanAktif: true,
+      });
+
+      expect(
+        usePaymentStore.getState().kamarList.find((k) => k.nomorKamar === "105")
+          ?.statusHunian
+      ).toBe("KOSONG");
+
+      // 2. Tambah penghuni baru dengan tanggal masuk 18 September 2026
+      usePaymentStore.getState().tambahPenghuni({
+        kamarId: "105",
+        nama: "Dewi Putri S.",
+        email: "dewi.putri@gmail.com",
+        telepon: "0812-9988-7766",
+        tanggalMasuk: "2026-09-18",
+      });
+
+      const { kamarList } = usePaymentStore.getState();
+      const kamar105 = kamarList.find((k) => k.nomorKamar === "105");
+
+      // Kamar menjadi TERISI
+      expect(kamar105?.statusHunian).toBe("TERISI");
+      expect(kamar105?.penghuni?.nama).toBe("Dewi Putri S.");
+      expect(kamar105?.penghuni?.email).toBe("dewi.putri@gmail.com");
+      expect(kamar105?.penghuni?.telepon).toBe("0812-9988-7766");
+      expect(kamar105?.tanggalMasuk).toBe("2026-09-18");
+
+      // Tanggal jatuh tempo otomatis mengikuti tanggal masuk (18)
+      expect(kamar105?.tanggalJatuhTempo).toBe(18);
+
+      // Tagihan aktif otomatis diterbitkan untuk penghuni baru
+      const tagihanAktif105 = usePaymentStore.getState().getTagihanAktifByKamar("105");
+      expect(tagihanAktif105).toBeDefined();
+      expect(tagihanAktif105?.penghuniNama).toBe("Dewi Putri S.");
+      expect(tagihanAktif105?.status).toBe("BELUM_BAYAR");
+      expect(tagihanAktif105?.batasBayar).toContain("18");
+    });
+
+    it("dapat memperbarui email Google terdaftar penghuni pada kartu kamar (ubahEmailPenghuni)", () => {
+      usePaymentStore.getState().ubahEmailPenghuni("102", "siti.baru@gmail.com");
+
+      const kamar102 = usePaymentStore
+        .getState()
+        .kamarList.find((k) => k.nomorKamar === "102");
+
+      expect(kamar102?.penghuni?.email).toBe("siti.baru@gmail.com");
+    });
+  });
 });
+
 

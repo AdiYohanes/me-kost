@@ -85,7 +85,7 @@ export function BuktiLightboxDialog({
               </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200/60 text-[11px]">
+            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200/60 text-xs">
               <div className="flex items-center gap-1 text-slate-600">
                 <User className="w-3.5 h-3.5 text-slate-400" />
                 <span className="truncate">{tagihan.penghuniNama}</span>
@@ -97,7 +97,7 @@ export function BuktiLightboxDialog({
             </div>
 
             {buktiPembayaran.catatanPenghuni && (
-              <div className="p-2.5 bg-white rounded-lg border border-slate-100 text-[11px] text-slate-600 flex items-start gap-1.5">
+              <div className="p-2.5 bg-white rounded-lg border border-slate-100 text-xs text-slate-600 flex items-start gap-1.5">
                 <FileText className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
                 <p className="italic">
                   &ldquo;{buktiPembayaran.catatanPenghuni}&rdquo;

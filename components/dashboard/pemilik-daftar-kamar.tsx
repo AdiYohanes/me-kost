@@ -10,6 +10,9 @@ import {
   CalendarPlus,
   Filter,
   Edit3,
+  UserPlus,
+  UserMinus,
+  Mail,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -17,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { usePaymentStore } from "@/lib/store/use-payment-store";
 import { Tagihan, StatusPembayaran } from "@/types/payment";
+import { Kamar, TambahPenghuniInput } from "@/types/kamar";
 import { BuktiLightboxDialog } from "./bukti-lightbox-dialog";
 import { TolakBuktiDialog } from "./tolak-bukti-dialog";
 import { TandaiCashDialog } from "./tandai-cash-dialog";
@@ -24,12 +28,16 @@ import {
   BuatPeriodeTagihanDialog,
   UbahTarifKamarDialog,
 } from "./kelola-tagihan-dialog";
+import { TambahPenghuniDialog } from "./tambah-penghuni-dialog";
+import { UbahEmailDialog } from "./ubah-email-dialog";
+import { KeluarkanPenghuniDialog } from "./keluarkan-penghuni-dialog";
 import { formatRupiah } from "./pemilik-summary-cards";
 
-type FilterType = "SEMUA" | StatusPembayaran;
+type FilterType = "SEMUA" | StatusPembayaran | "KOSONG";
 
 export function PemilikDaftarKamar() {
   const {
+    kamarList,
     tagihanList,
     activePeriode,
     markCashTagihan,
@@ -37,6 +45,9 @@ export function PemilikDaftarKamar() {
     rejectTagihan,
     updateNominalTagihan,
     buatTagihanPeriodeBaru,
+    tambahPenghuni,
+    ubahEmailPenghuni,
+    keluarkanPenghuni,
   } = usePaymentStore();
 
   const [activeFilter, setActiveFilter] = useState<FilterType>("SEMUA");
@@ -50,28 +61,57 @@ export function PemilikDaftarKamar() {
     useState<Tagihan | null>(null);
   const [isBuatPeriodeOpen, setIsBuatPeriodeOpen] = useState(false);
 
+  // Modal State untuk Manajemen Kamar (Issue 03)
+  const [selectedKamarForTambah, setSelectedKamarForTambah] =
+    useState<Kamar | null>(null);
+  const [selectedKamarForEmail, setSelectedKamarForEmail] =
+    useState<Kamar | null>(null);
+  const [selectedKamarForKeluarkan, setSelectedKamarForKeluarkan] =
+    useState<Kamar | null>(null);
+
   const currentBulan = activePeriode?.bulan ?? 9;
   const currentTahun = activePeriode?.tahun ?? 2026;
   const currentPeriodeLabel = activePeriode?.periodeBulan ?? "September 2026";
 
-  // Ambil tagihan aktif periode terpilih dan urutkan berdasarkan nomor kamar 101 - 108
-  const tagihanAktif = tagihanList
+  // Urutkan kamar fisik secara numerik (101, 102, dst.)
+  const sortedKamarList = [...(kamarList || [])].sort(
+    (a, b) => parseInt(a.nomorKamar, 10) - parseInt(b.nomorKamar, 10)
+  );
+
+  // Map tagihan aktif bulan berjalan per nomor kamar
+  const tagihanAktifMap = new Map<string, Tagihan>();
+  tagihanList
     .filter((t) => t.bulan === currentBulan && t.tahun === currentTahun)
-    .sort((a, b) => parseInt(a.nomorKamar, 10) - parseInt(b.nomorKamar, 10));
+    .forEach((t) => tagihanAktifMap.set(t.nomorKamar, t));
 
   // Hitung jumlah tiap kategori untuk badge tab filter
-  const countLunas = tagihanAktif.filter((t) => t.status === "LUNAS").length;
-  const countBelumBayar = tagihanAktif.filter(
-    (t) => t.status === "BELUM_BAYAR"
-  ).length;
-  const countPending = tagihanAktif.filter(
-    (t) => t.status === "MENUNGGU_VERIFIKASI"
-  ).length;
-  const countDitolak = tagihanAktif.filter((t) => t.status === "DITOLAK").length;
+  let countLunas = 0;
+  let countBelumBayar = 0;
+  let countPending = 0;
+  let countDitolak = 0;
+  let countKosong = 0;
 
-  const filteredList = tagihanAktif.filter((t) => {
+  sortedKamarList.forEach((kamar) => {
+    if (kamar.statusHunian === "KOSONG") {
+      countKosong++;
+    } else {
+      const tagihan = tagihanAktifMap.get(kamar.nomorKamar);
+      if (tagihan) {
+        if (tagihan.status === "LUNAS") countLunas++;
+        else if (tagihan.status === "BELUM_BAYAR") countBelumBayar++;
+        else if (tagihan.status === "MENUNGGU_VERIFIKASI") countPending++;
+        else if (tagihan.status === "DITOLAK") countDitolak++;
+      }
+    }
+  });
+
+  const filteredList = sortedKamarList.filter((kamar) => {
     if (activeFilter === "SEMUA") return true;
-    return t.status === activeFilter;
+    if (activeFilter === "KOSONG") return kamar.statusHunian === "KOSONG";
+    if (kamar.statusHunian === "KOSONG") return false;
+
+    const tagihan = tagihanAktifMap.get(kamar.nomorKamar);
+    return tagihan?.status === activeFilter;
   });
 
   const handleConfirmCash = (tagihanId: string, catatan?: string) => {
@@ -111,7 +151,7 @@ export function PemilikDaftarKamar() {
       data.batasBayar
     );
     toast.success(`Tagihan Periode ${data.periodeBulan} Berhasil Diterbitkan!`, {
-      description: "Tagihan baru untuk 8 kamar siap ditagihkan kepada penghuni.",
+      description: "Tagihan baru untuk seluruh kamar siap ditagihkan.",
     });
     setIsBuatPeriodeOpen(false);
   };
@@ -139,11 +179,59 @@ export function PemilikDaftarKamar() {
     }
   };
 
-  const renderBadgeStatus = (tagihan: Tagihan) => {
+  // Handlers Manajemen Kamar
+  const handleConfirmTambahPenghuni = (data: TambahPenghuniInput) => {
+    tambahPenghuni(data);
+    const target = sortedKamarList.find((k) => k.id === data.kamarId);
+    toast.success(
+      `Penghuni Kamar ${target?.nomorKamar || ""} Berhasil Didaftarkan!`,
+      {
+        description: `${data.nama} telah ditautkan dan tagihan periode berjalan diterbitkan.`,
+      }
+    );
+    setSelectedKamarForTambah(null);
+  };
+
+  const handleConfirmUbahEmail = (kamarId: string, emailBaru: string) => {
+    ubahEmailPenghuni(kamarId, emailBaru);
+    const target = sortedKamarList.find((k) => k.id === kamarId);
+    toast.success(
+      `Email Google Kamar ${target?.nomorKamar || ""} Berhasil Diperbarui!`,
+      {
+        description: `Akun anak kost kini terhubung dengan email: ${emailBaru}`,
+      }
+    );
+    setSelectedKamarForEmail(null);
+  };
+
+  const handleConfirmKeluarkan = (
+    kamarId: string,
+    batalkanTagihanAktif: boolean
+  ) => {
+    const target = sortedKamarList.find((k) => k.id === kamarId);
+    keluarkanPenghuni({ kamarId, batalkanTagihanAktif });
+    toast.success(
+      `Penghuni Kamar ${target?.nomorKamar || ""} Berhasil Dikeluarkan`,
+      {
+        description:
+          "Status kamar kini Kosong (Soft Disconnect). Seluruh riwayat pembukuan masa lalu tetap aman.",
+      }
+    );
+    setSelectedKamarForKeluarkan(null);
+  };
+
+  const renderBadgeStatus = (tagihan?: Tagihan) => {
+    if (!tagihan) {
+      return (
+        <Badge variant="outline" className="text-xs font-medium text-zinc-500">
+          Belum Ada Tagihan
+        </Badge>
+      );
+    }
     switch (tagihan.status) {
       case "LUNAS":
         return (
-          <Badge variant="lunas" className="text-[10px] gap-1">
+          <Badge variant="lunas" className="text-xs font-medium gap-1">
             <CheckCircle2 className="w-3 h-3" />
             <span>
               Lunas {tagihan.metodePembayaran === "CASH" ? "(Tunai)" : "(Transfer)"}
@@ -152,21 +240,21 @@ export function PemilikDaftarKamar() {
         );
       case "MENUNGGU_VERIFIKASI":
         return (
-          <Badge variant="pending" className="text-[10px] gap-1">
+          <Badge variant="pending" className="text-xs font-medium gap-1">
             <Clock className="w-3 h-3" />
             <span>Menunggu Verifikasi</span>
           </Badge>
         );
       case "DITOLAK":
         return (
-          <Badge variant="ditolak" className="text-[10px]">
+          <Badge variant="ditolak" className="text-xs font-medium">
             Ditolak
           </Badge>
         );
       case "BELUM_BAYAR":
       default:
         return (
-          <Badge variant="belumbayar" className="text-[10px]">
+          <Badge variant="belumbayar" className="text-xs font-medium">
             Belum Bayar
           </Badge>
         );
@@ -179,12 +267,12 @@ export function PemilikDaftarKamar() {
         <CardHeader className="p-4 sm:p-5 pb-3.5 border-b border-zinc-100">
           <div className="flex items-center justify-between gap-2">
             <div>
-              <CardTitle className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-700 flex items-center gap-1.5">
-                <Users className="w-3.5 h-3.5 text-zinc-700" />
+              <CardTitle className="text-sm font-bold text-zinc-900 flex items-center gap-1.5">
+                <Users className="w-4 h-4 text-zinc-700" />
                 <span>Daftar Unit Kamar</span>
               </CardTitle>
-              <p className="text-[11px] font-mono text-zinc-500 mt-0.5">
-                Unit 101 - 108 Kost Syantika • Periode {currentPeriodeLabel}
+              <p className="text-xs text-zinc-500 mt-0.5">
+                Periode {currentPeriodeLabel}
               </p>
             </div>
             <div className="flex items-center gap-2 shrink-0">
@@ -198,7 +286,7 @@ export function PemilikDaftarKamar() {
                 <CalendarPlus className="w-3.5 h-3.5 text-emerald-600" />
                 <span>Periode Baru</span>
               </Button>
-              <span className="text-[11px] font-mono font-medium px-2 py-0.5 rounded bg-zinc-100 text-zinc-700 border border-zinc-200">
+              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-md bg-zinc-100 text-zinc-700 border border-zinc-200 tabular-nums">
                 {filteredList.length} Kamar
               </span>
             </div>
@@ -215,7 +303,7 @@ export function PemilikDaftarKamar() {
                   : "bg-zinc-50 text-zinc-600 hover:bg-zinc-100 border-zinc-200/80"
               }`}
             >
-              Semua ({tagihanAktif.length})
+              Semua ({sortedKamarList.length})
             </button>
 
             <button
@@ -267,6 +355,20 @@ export function PemilikDaftarKamar() {
                 Ditolak ({countDitolak})
               </button>
             )}
+
+            {countKosong > 0 && (
+              <button
+                type="button"
+                onClick={() => setActiveFilter("KOSONG")}
+                className={`px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors cursor-pointer border ${
+                  activeFilter === "KOSONG"
+                    ? "bg-slate-700 text-white border-slate-700 font-semibold"
+                    : "bg-zinc-50 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 border-zinc-200"
+                }`}
+              >
+                Kosong ({countKosong})
+              </button>
+            )}
           </div>
         </CardHeader>
 
@@ -277,80 +379,253 @@ export function PemilikDaftarKamar() {
               <p>Tidak ada kamar dengan filter status ini.</p>
             </div>
           ) : (
-            filteredList.map((tagihan) => (
-              <div
-                key={tagihan.id}
-                className="p-3 sm:p-3.5 rounded-lg bg-white border border-zinc-200 hover:border-zinc-300 transition-colors space-y-2.5"
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2.5">
-                    <span className="w-8 h-8 rounded bg-zinc-900 text-white font-mono font-bold text-xs flex items-center justify-center shrink-0">
-                      {tagihan.nomorKamar}
-                    </span>
-                    <div>
-                      <p className="text-xs font-bold text-zinc-950 leading-tight">
-                        {tagihan.penghuniNama}
-                      </p>
-                      <div className="flex items-center gap-1.5 text-[11px] text-zinc-500 mt-0.5">
-                        <span className="font-mono tabular-nums">{formatRupiah(tagihan.nominal)} / bln</span>
-                        <span>•</span>
-                        <button
-                          type="button"
-                          onClick={() => setSelectedTagihanForTarif(tagihan)}
-                          className="inline-flex items-center gap-0.5 text-[10px] font-medium text-emerald-700 hover:text-emerald-800 hover:underline cursor-pointer"
-                          aria-label={`Ubah Tarif Kamar ${tagihan.nomorKamar}`}
+            filteredList.map((kamar) => {
+              const tagihan = tagihanAktifMap.get(kamar.nomorKamar);
+              const isTerisi = kamar.statusHunian === "TERISI";
+
+              // Tampilan Kamar KOSONG
+              if (!isTerisi) {
+                return (
+                  <div
+                    key={kamar.id}
+                    className="p-3 sm:p-3.5 rounded-lg bg-zinc-50/70 border border-dashed border-zinc-300 hover:border-zinc-400 transition-colors space-y-2.5"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-8 h-8 rounded-lg bg-zinc-200 text-zinc-700 font-bold text-xs flex items-center justify-center shrink-0 tabular-nums">
+                          {kamar.nomorKamar}
+                        </span>
+                        <div>
+                          <p className="text-sm font-bold text-zinc-800 leading-tight">
+                            Kamar {kamar.nomorKamar} (Kosong)
+                          </p>
+                          <div className="flex items-center gap-1.5 text-xs text-zinc-500 mt-0.5">
+                            <span>{kamar.tipeKamar}</span>
+                            <span>•</span>
+                            <span className="tabular-nums font-medium">
+                              {formatRupiah(kamar.tarifBulanan)} / bln
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col items-end gap-1 shrink-0">
+                        <Badge
+                          variant="secondary"
+                          className="text-xs font-semibold text-zinc-600 bg-zinc-200/80 border border-zinc-300"
                         >
-                          <Edit3 className="w-2.5 h-2.5" />
-                          <span>Ubah Tarif</span>
-                        </button>
+                          Kosong
+                        </Badge>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2 border-t border-zinc-200/60 text-xs">
+                      <span className="text-xs text-zinc-500 font-normal">
+                        Kamar siap disewakan
+                      </span>
+
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={() => setSelectedKamarForTambah(kamar)}
+                        aria-label={`Tambah Penghuni Kamar ${kamar.nomorKamar}`}
+                        className="h-7.5 px-3 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 rounded-md cursor-pointer shadow-xs"
+                      >
+                        <UserPlus className="w-3.5 h-3.5" />
+                        <span>+ Tambah Penghuni</span>
+                      </Button>
+                    </div>
+                  </div>
+                );
+              }
+
+              // Tampilan Kamar TERISI
+              const penghuniNama =
+                kamar.penghuni?.nama || tagihan?.penghuniNama || "Penghuni";
+              const penghuniEmail = kamar.penghuni?.email;
+              const nominalSewa = tagihan?.nominal || kamar.tarifBulanan;
+              const batasBayarText =
+                tagihan?.batasBayar ||
+                `${kamar.tanggalJatuhTempo} ${currentPeriodeLabel}`;
+
+              return (
+                <div
+                  key={kamar.id}
+                  className="p-3 sm:p-3.5 rounded-lg bg-white border border-zinc-200 hover:border-zinc-300 transition-colors space-y-2.5"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2.5">
+                      <span className="w-8 h-8 rounded-lg bg-zinc-900 text-white font-bold text-xs flex items-center justify-center shrink-0 tabular-nums">
+                        {kamar.nomorKamar}
+                      </span>
+                      <div>
+                        <p className="text-sm font-bold text-zinc-950 leading-tight">
+                          {penghuniNama}
+                        </p>
+                        <div className="flex items-center gap-1.5 text-xs text-zinc-500 mt-0.5">
+                          <span className="tabular-nums font-medium">
+                            {formatRupiah(nominalSewa)} / bln
+                          </span>
+                          <span>•</span>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setSelectedTagihanForTarif(
+                                tagihan || {
+                                  id: `tagihan-${kamar.nomorKamar}`,
+                                  kamarId: kamar.id,
+                                  nomorKamar: kamar.nomorKamar,
+                                  penghuniId: kamar.penghuni?.id || "",
+                                  penghuniNama,
+                                  periodeBulan: currentPeriodeLabel,
+                                  tahun: currentTahun,
+                                  bulan: currentBulan,
+                                  nominal: nominalSewa,
+                                  batasBayar: batasBayarText,
+                                  status: "BELUM_BAYAR",
+                                }
+                              )
+                            }
+                            className="inline-flex items-center gap-0.5 text-xs font-semibold text-emerald-700 hover:text-emerald-800 hover:underline cursor-pointer"
+                            aria-label={`Ubah Tarif Kamar ${kamar.nomorKamar}`}
+                          >
+                            <Edit3 className="w-2.5 h-2.5" />
+                            <span>Ubah Tarif</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col items-end gap-1 shrink-0">
+                      <div className="flex items-center gap-1.5">
+                        <Badge
+                          variant="outline"
+                          className="text-xs font-medium text-emerald-700 bg-emerald-50 border-emerald-200"
+                        >
+                          Terisi
+                        </Badge>
+                        {renderBadgeStatus(tagihan)}
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex flex-col items-end gap-1 shrink-0">
-                    {renderBadgeStatus(tagihan)}
+                  {/* Info Email Google & Aksi Cepat Ubah Email */}
+                  <div className="flex items-center justify-between text-xs text-zinc-600 bg-zinc-50/80 px-2.5 py-1.5 rounded-md border border-zinc-100">
+                    <div className="flex items-center gap-1.5 truncate">
+                      <Mail className="w-3 h-3 text-zinc-400 shrink-0" />
+                      <span className="truncate text-zinc-600">
+                        {penghuniEmail || "Belum ada email Google"}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedKamarForEmail(kamar)}
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 hover:text-emerald-800 hover:underline shrink-0 ml-2 cursor-pointer"
+                      aria-label={`Ubah Email Kamar ${kamar.nomorKamar}`}
+                    >
+                      <Edit3 className="w-2.5 h-2.5" />
+                      <span>Ubah Email</span>
+                    </button>
                   </div>
-                </div>
 
-                {/* Baris Aksi Kontekstual */}
-                <div className="flex items-center justify-between pt-2 border-t border-zinc-100 text-[11px]">
-                  <span className="text-[10px] font-mono text-zinc-400">
-                    Jatuh tempo: {tagihan.batasBayar}
-                  </span>
+                  {/* Baris Aksi Kontekstual */}
+                  <div className="flex items-center justify-between pt-2 border-t border-zinc-100 text-xs">
+                    <span className="text-xs text-zinc-400 font-normal">
+                      Jatuh tempo: {batasBayarText}
+                    </span>
 
-                  <div className="flex items-center gap-2">
-                    {tagihan.status === "MENUNGGU_VERIFIKASI" && (
+                    <div className="flex items-center gap-2">
+                      {tagihan?.status === "MENUNGGU_VERIFIKASI" && (
+                        <Button
+                          type="button"
+                          size="sm"
+                          onClick={() => setSelectedTagihanForLightbox(tagihan)}
+                          className="h-7.5 px-2.5 text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-white gap-1 rounded-md cursor-pointer"
+                        >
+                          <Eye className="w-3 h-3" />
+                          <span>Periksa Bukti</span>
+                        </Button>
+                      )}
+
+                      {(!tagihan ||
+                        tagihan.status === "BELUM_BAYAR" ||
+                        tagihan.status === "DITOLAK") && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            setSelectedTagihanForCash(
+                              tagihan || {
+                                id: `tagihan-${kamar.nomorKamar}`,
+                                kamarId: kamar.id,
+                                nomorKamar: kamar.nomorKamar,
+                                penghuniId: kamar.penghuni?.id || "",
+                                penghuniNama,
+                                periodeBulan: currentPeriodeLabel,
+                                tahun: currentTahun,
+                                bulan: currentBulan,
+                                nominal: nominalSewa,
+                                batasBayar: batasBayarText,
+                                status: "BELUM_BAYAR",
+                              }
+                            )
+                          }
+                          className="h-7.5 px-2.5 text-xs font-medium text-zinc-800 border-zinc-200 hover:bg-zinc-50 gap-1.5 rounded-md cursor-pointer"
+                        >
+                          <Banknote className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>Tandai Lunas (Cash)</span>
+                        </Button>
+                      )}
+
                       <Button
                         type="button"
+                        variant="ghost"
                         size="sm"
-                        onClick={() => setSelectedTagihanForLightbox(tagihan)}
-                        className="h-7.5 px-2.5 text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-white gap-1 rounded-md cursor-pointer"
+                        onClick={() => setSelectedKamarForKeluarkan(kamar)}
+                        className="h-7.5 px-2 text-xs font-medium text-rose-600 hover:bg-rose-50 hover:text-rose-700 gap-1 rounded-md cursor-pointer"
+                        aria-label={`Keluarkan Penghuni Kamar ${kamar.nomorKamar}`}
                       >
-                        <Eye className="w-3 h-3" />
-                        <span>Periksa Bukti</span>
+                        <UserMinus className="w-3 h-3" />
+                        <span>Keluarkan Penghuni</span>
                       </Button>
-                    )}
-
-                    {(tagihan.status === "BELUM_BAYAR" ||
-                      tagihan.status === "DITOLAK") && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setSelectedTagihanForCash(tagihan)}
-                        className="h-7.5 px-2.5 text-xs font-medium text-zinc-800 border-zinc-200 hover:bg-zinc-50 gap-1.5 rounded-md cursor-pointer"
-                      >
-                        <Banknote className="w-3.5 h-3.5 text-emerald-600" />
-                        <span>Tandai Lunas (Cash)</span>
-                      </Button>
-                    )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </CardContent>
       </Card>
+
+      {/* Modal Tambah Penghuni Baru */}
+      <TambahPenghuniDialog
+        isOpen={!!selectedKamarForTambah}
+        onClose={() => setSelectedKamarForTambah(null)}
+        kamar={selectedKamarForTambah}
+        onConfirm={handleConfirmTambahPenghuni}
+      />
+
+      {/* Modal Ubah Email Google Penghuni */}
+      <UbahEmailDialog
+        isOpen={!!selectedKamarForEmail}
+        onClose={() => setSelectedKamarForEmail(null)}
+        kamar={selectedKamarForEmail}
+        onConfirm={handleConfirmUbahEmail}
+      />
+
+      {/* Modal Konfirmasi Keluarkan Penghuni (Soft Disconnect) */}
+      <KeluarkanPenghuniDialog
+        isOpen={!!selectedKamarForKeluarkan}
+        onClose={() => setSelectedKamarForKeluarkan(null)}
+        kamar={selectedKamarForKeluarkan}
+        tagihanAktif={
+          selectedKamarForKeluarkan
+            ? tagihanAktifMap.get(selectedKamarForKeluarkan.nomorKamar)
+            : null
+        }
+        onConfirm={handleConfirmKeluarkan}
+      />
 
       {/* Modal Tandai Lunas (Cash) */}
       <TandaiCashDialog

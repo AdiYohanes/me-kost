@@ -38,8 +38,15 @@ export interface Tagihan {
   verifiedAt?: string;
 }
 
+import {
+  Kamar,
+  TambahPenghuniInput,
+  KeluarkanPenghuniInput,
+} from "./kamar";
+
 export interface PaymentState {
   tagihanList: Tagihan[];
+  kamarList: Kamar[];
   activePeriode: { bulan: number; tahun: number; periodeBulan: string };
   setActivePeriode: (periode: { bulan: number; tahun: number; periodeBulan: string }) => void;
   uploadBuktiTransfer: (
@@ -59,5 +66,9 @@ export interface PaymentState {
     periodeBulan: string,
     batasBayar: string
   ) => void;
+  tambahPenghuni: (input: TambahPenghuniInput) => void;
+  ubahEmailPenghuni: (kamarId: string, emailBaru: string) => void;
+  keluarkanPenghuni: (input: KeluarkanPenghuniInput) => void;
   resetPayments: () => void;
 }
+

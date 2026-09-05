@@ -35,21 +35,21 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
         <div className="space-y-0.5">
           <div className="flex items-center gap-1.5">
             <h1 className="text-sm font-black tracking-tight text-zinc-950 leading-none">
-              Kost Syantika
+              Me Kost
             </h1>
             {isPemilik ? (
-              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-mono font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
                 <ShieldCheck className="w-3 h-3 text-emerald-600" />
                 <span>Pemilik Kost</span>
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-mono font-bold bg-zinc-100 text-zinc-800 border border-zinc-200">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold bg-zinc-100 text-zinc-800 border border-zinc-200">
                 <DoorClosed className="w-3 h-3 text-zinc-600" />
                 <span>Kamar {user.nomorKamar}</span>
               </span>
             )}
           </div>
-          <p className="text-xs text-zinc-500 font-medium truncate max-w-[170px] sm:max-w-[220px]">
+          <p className="text-xs text-zinc-500 font-normal truncate max-w-[170px] sm:max-w-[220px]">
             {user.name}
           </p>
         </div>

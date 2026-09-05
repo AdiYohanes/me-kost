@@ -21,53 +21,37 @@ describe("HomePage", () => {
     localStorage.clear();
   });
 
-  it("merender homepage untuk pengunjung belum login dengan carousel dan tombol CTA", () => {
+  it("merender homepage untuk pengunjung belum login dengan Logo Me Kost dan tombol CTA Login", () => {
     render(<HomePage />);
 
-    // Memeriksa identitas nama kost & lokasi
-    expect(screen.getByRole("heading", { name: "Kost Syantika" })).toBeInTheDocument();
-    expect(screen.getByText("Jl. Melati No. 15")).toBeInTheDocument();
+    // Memeriksa identitas nama Syantika Kost
+    expect(screen.getByRole("heading", { name: "Syantika Kost" })).toBeInTheDocument();
 
-    // Memeriksa konten slide carousel aktif awal
-    expect(screen.getByText("Fasad Modern Tropis")).toBeInTheDocument();
-    expect(screen.getByText("8 Unit Kamar Terawat")).toBeInTheDocument();
+    // Memeriksa Logo Me Kost
+    const logoImg = screen.getByAltText("Logo Me Kost");
+    expect(logoImg).toBeInTheDocument();
 
-    // Memeriksa kartu CTA dan tombol masuk
-    expect(screen.getByRole("button", { name: /masuk ke akun sekarang/i })).toBeInTheDocument();
+    // Memeriksa tombol CTA Login
+    expect(screen.getByRole("button", { name: /^login$/i })).toBeInTheDocument();
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
 
-  it("menampilkan UI loading dan berpindah ke /login saat tombol CTA diklik", async () => {
+  it("menampilkan UI loading dan berpindah ke /login saat tombol CTA Login diklik", async () => {
     render(<HomePage />);
 
-    const ctaButton = screen.getByRole("button", { name: /masuk ke akun sekarang/i });
+    const ctaButton = screen.getByRole("button", { name: /^login$/i });
     fireEvent.click(ctaButton);
 
     // Memeriksa overlay status loading muncul
     expect(screen.getByRole("status")).toBeInTheDocument();
-    expect(screen.getByText(/menyiapkan sesi login kost syantika.../i)).toBeInTheDocument();
+    expect(screen.getByText(/menyiapkan sesi login me kost.../i)).toBeInTheDocument();
 
     // Memeriksa setelah transisi memanggil router.push("/login")
     await waitFor(
       () => {
         expect(mockPush).toHaveBeenCalledWith("/login");
       },
-      { timeout: 1000 }
-    );
-  });
-
-  it("berpindah ke /login saat tombol Masuk pada header diklik", async () => {
-    render(<HomePage />);
-
-    const headerMasukButton = screen.getByRole("button", { name: /^masuk$/i });
-    fireEvent.click(headerMasukButton);
-
-    expect(screen.getByRole("status")).toBeInTheDocument();
-    await waitFor(
-      () => {
-        expect(mockPush).toHaveBeenCalledWith("/login");
-      },
-      { timeout: 1000 }
+      { timeout: 2000 }
     );
   });
 
@@ -81,4 +65,3 @@ describe("HomePage", () => {
     });
   });
 });
-

@@ -1,5 +1,5 @@
 ---
-name: Kost Syantika
+name: Me Kost
 description: High-Density Architectural Ledger design system for precision boarding house rent management.
 colors:
   primary: "#059669"
@@ -109,13 +109,13 @@ components:
     padding: "6px 12px"
 ---
 
-# Design System: Kost Syantika
+# Design System: Me Kost
 
 ## Overview
 
 **Creative North Star: "High-Density Architectural Ledger"**
 
-Kost Syantika mengadopsi identitas visual baru bertajuk High-Density Architectural Ledger. Desain ini menggantikan gaya rounded fintech santai dengan estetika buku besar arsitektural yang berdisiplin tinggi, monokromatik terstruktur, dan berfokus mutlak pada keterbacaan data numerik serta verifikasi transaksi yang cepat.
+Me Kost mengadopsi identitas visual baru bertajuk High-Density Architectural Ledger. Desain ini menggantikan gaya rounded fintech santai dengan estetika buku besar arsitektural yang berdisiplin tinggi, monokromatik terstruktur, dan berfokus mutlak pada keterbacaan data numerik serta verifikasi transaksi yang cepat.
 
 Estetika ini mereduksi elemen dekoratif, gradien warna tebal, serta bayangan membulat. Sebagai gantinya, sistem menggunakan garis hairline 1px presisi, penataan kisi grid rapat (*high-density*), perataan angka tabular monospaced, serta aksen warna fungsional tunggal (Signal Emerald) yang hanya menyala saat terjadi verifikasi atau aksi afirmatif penting.
 
@@ -153,21 +153,21 @@ Palet didominasi oleh skala monokromatik abu-abu netral dengan aksen warna sinya
 
 **Display Font:** Plus Jakarta Sans (`var(--font-jakarta)`, dengan fallback `sans-serif`)
 **Body Font:** Plus Jakarta Sans (`var(--font-jakarta)`, dengan fallback `sans-serif`)
-**Label & Tabular Font:** Plus Jakarta Sans / Monospace (`tabular-nums`)
+**Tabular Font:** Plus Jakarta Sans dengan `tabular-nums` untuk angka dan mata uang
 
-**Character:** Tipografi fungsional, tegas, dan berbobot seimbang dengan dukungan perataan angka tabular yang akurat untuk pembacaan nominal sewa dan tanggal.
+**Character:** Tipografi modern, bersih, proporsional, dan humanis dengan dukungan Plus Jakarta Sans via `@theme` Tailwind CSS v4. Keterbacaan data keuangan dioptimalkan menggunakan perataan angka tabular (`tabular-nums`).
 
 ### Hierarchy
-- **Display** (800 / ExtraBold, `1.25rem` / 20px, line-height `1.2`): Ringkasan total penerimaan kas dan metrik utama.
-- **Headline** (700 / Bold, `1rem` / 16px, line-height `1.3`): Judul modul, nama seksi antrean verifikasi, dan judul dialog.
-- **Title** (700 / Bold, `0.875rem` / 14px, line-height `1.35`): Nama penghuni, nomor kamar, dan baris judul tagihan.
-- **Body** (400 / Regular, `0.8125rem` / 13px, line-height `1.45`): Catatan bukti penghuni, rincian fasilitas kamar, dan pesan konfirmasi.
-- **Label** (600 / SemiBold, `0.75rem` / 12px, line-height `1.3`): Status pembayaran, tanggal unggah, navigasi, dan tombol aksi.
-- **Caption** (500 / Medium, `0.6875rem` / 11px, line-height `1.3`): Metadata transaksi, timestamp unggah, dan tanggal jatuh tempo.
-- **Nano** (600 / SemiBold, `0.625rem` / 10px, line-height `1.2`): Counter badge antrean dan label status mikro.
+- **Display** (800 / ExtraBold, `1.5rem` - `1.875rem`, line-height `1.2`): Ringkasan total penerimaan kas dan nominal sewa bulanan utama.
+- **Headline** (700 / Bold, `1rem` / 16px, line-height `1.3`): Judul modul, kartu tagihan, antrean verifikasi, dan judul dialog.
+- **Title** (700 / Bold, `0.875rem` / 14px, line-height `1.35`): Nama penghuni, nomor kamar, dan baris judul data.
+- **Body** (400-500 / Regular-Medium, `0.75rem` - `0.875rem` / 12px - 14px, line-height `1.5`): Teks deskripsi, catatan bukti penghuni, dan informasi dialog.
+- **Label / Badges** (600 / SemiBold, `0.75rem` / 12px, line-height `1.3`): Lencana status pembayaran, tab navigasi, dan tombol aksi.
+- **Caption** (400-500 / Regular-Medium, `0.75rem` / 12px, line-height `1.3`): Timestamp unggah, tanggal jatuh tempo, dan metadata transaksi.
 
 ### Named Rules
-**The Tabular Precision Rule.** Seluruh angka nominal rupiah, persentase keterisian, dan tanggal transaksi wajib menggunakan fitur `tabular-nums` atau monospaced agar kolom angka selalu sejajar secara vertikal.
+**The Tabular Precision Rule.** Seluruh nominal rupiah, persentase pelunasan, dan tanggal transaksi wajib menggunakan fitur `tabular-nums` agar kolom angka selalu sejajar secara vertikal.
+**The Clean Sans Rule.** Seluruh judul modul, deskripsi, lencana status, dan tombol menggunakan `font-sans` murni (Plus Jakarta Sans) tanpa monospace tiruan untuk menjaga estetika modern, bersih, dan konsisten.
 
 ## Layout
 

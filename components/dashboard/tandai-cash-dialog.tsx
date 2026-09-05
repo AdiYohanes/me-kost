@@ -81,7 +81,7 @@ function TandaiCashForm({
           className="text-xs font-semibold text-slate-800 flex items-center justify-between"
         >
           <span>Catatan Penerimaan Uang Tunai (Opsional)</span>
-          <span className="text-[10px] text-slate-400 font-normal">
+          <span className="text-xs text-slate-400 font-normal tabular-nums">
             {catatan.length} karakter
           </span>
         </label>
@@ -93,8 +93,8 @@ function TandaiCashForm({
           placeholder="Contoh: Diterima uang pas di ruang pengelola kost"
           className="w-full text-xs p-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all resize-none placeholder:text-slate-400 text-slate-800 bg-white"
         />
-        <p className="text-[10px] text-slate-400 leading-tight">
-          Metode pembayaran akan disimpan sebagai CASH dan waktu pelunasan otomatis dicatat.
+        <p className="text-xs text-slate-500 leading-relaxed">
+          Metode pembayaran dicatat sebagai CASH dan status tagihan langsung Lunas.
         </p>
       </div>
 

@@ -106,13 +106,13 @@ export function BottomNav({ role, activeTab, onTabChange }: BottomNavProps) {
                   }`}
                 />
                 {tab.badge !== null && (
-                  <span className="absolute -top-1 -right-2 px-1 min-w-[15px] h-3.5 rounded-full bg-amber-500 text-[10px] font-bold text-white font-mono tabular-nums flex items-center justify-center">
+                  <span className="absolute -top-1 -right-2 px-1 min-w-[15px] h-3.5 rounded-full bg-amber-500 text-[10px] font-bold text-white tabular-nums flex items-center justify-center">
                     {tab.badge}
                   </span>
                 )}
               </div>
               <span
-                className={`text-[10px] tracking-tight mt-0.5 ${
+                className={`text-xs tracking-tight mt-0.5 ${
                   isActive ? "text-zinc-950 font-semibold" : "text-zinc-400 group-hover:text-zinc-600"
                 }`}
               >

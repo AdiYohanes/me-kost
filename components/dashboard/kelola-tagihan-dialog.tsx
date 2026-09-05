@@ -157,7 +157,7 @@ function BuatPeriodeForm({
 
       <div className="p-3 rounded-xl bg-emerald-50/70 border border-emerald-100/80 flex items-start gap-2 text-xs text-emerald-900">
         <Building2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-        <div className="text-[11px] leading-relaxed">
+        <div className="text-xs leading-relaxed">
           Tagihan baru akan otomatis digenerate untuk <strong>8 unit kamar aktif</strong> (Kamar 101 - 108) dengan status awal <strong>Belum Bayar</strong> menggunakan tarif sewa terkini.
         </div>
       </div>
@@ -265,7 +265,7 @@ function UbahTarifForm({
         >
           <span>Nominal Tagihan Baru (Rp)</span>
           {isValid && (
-            <span className="text-[11px] font-bold text-emerald-700">
+            <span className="text-xs font-bold text-emerald-700 tabular-nums">
               {formatRupiah(parsedNominal)}
             </span>
           )}
@@ -280,7 +280,7 @@ function UbahTarifForm({
           placeholder="Contoh: 1600000"
           className="w-full text-xs h-10 p-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all font-semibold text-slate-800 bg-white"
         />
-        <p className="text-[10px] text-slate-400 leading-tight">
+        <p className="text-xs text-slate-500 leading-relaxed">
           Nominal ini akan memperbarui tagihan periode berjalan dan periode tagihan berikutnya.
         </p>
       </div>

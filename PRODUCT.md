@@ -14,7 +14,7 @@ web
 Aplikasi PWA manajemen pembayaran sewa kamar kost bulanan (mobile-first) yang menyederhanakan alur penagihan sewa, konfirmasi pembayaran, dan verifikasi bukti transfer antara Penghuni dan Pemilik Kost secara instan, transparan, dan bebas repot tanpa ketergantungan backend eksternal pada tahap saat ini.
 
 ## Positioning
-Berbeda dari aplikasi manajemen properti umum yang rumit, kaku, dan lambat, Kost Syantika menghadirkan pengalaman secepat aplikasi chat dengan UI Modern Clean Fintech yang teroptimasi untuk perangkat mobile, fokus murni pada lifecycle penagihan dan verifikasi bukti sewa bulanan berbasis client-side persist store.
+Berbeda dari aplikasi manajemen properti umum yang rumit, kaku, dan lambat, Me Kost menghadirkan pengalaman secepat aplikasi chat dengan UI Modern Clean Fintech yang teroptimasi untuk perangkat mobile, fokus murni pada lifecycle penagihan dan verifikasi bukti sewa bulanan berbasis client-side persist store.
 
 ## Operating Context
 - Digunakan melalui smartphone (PWA standalone di browser mobile) oleh Penghuni sesaat setelah mentransfer uang sewa untuk melampirkan tangkapan layar bukti transfer dan catatan opsional.
@@ -28,7 +28,7 @@ Berbeda dari aplikasi manajemen properti umum yang rumit, kaku, dan lambat, Kost
 - **Domain Language Ketat**: Wajib mematuhi `CONTEXT.md` (`Pemilik Kost`, `Penghuni`, `Kamar`, `Tagihan`, `Bukti Pembayaran`, `Status Pembayaran`, `Metode Pembayaran`, `Alasan Penolakan`). Dilarang menggunakan sinonim asing/generik (Admin, Tenant, Room, Invoice, Receipt, dsb.).
 
 ## Brand Commitments
-- **Identitas Produk**: Kost Syantika.
+- **Identitas Produk**: Me Kost.
 - **Estetika Visual**: Modern Clean Fintech, palet primer emerald (`#04A552`), latar slate lembut (`bg-slate-50`), aksen amber untuk nomor kamar dan antrean, rose untuk penolakan, serta tipografi Plus Jakarta Sans.
 - **Ergonomi**: Mobile-first, kontrol ramah jempol (*thumb-friendly* minimal tinggi 40px / `h-10`), soft badges, dan navigasi bawah (bottom navigation) yang ringkas.
 

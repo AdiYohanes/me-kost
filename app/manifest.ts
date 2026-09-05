@@ -2,9 +2,9 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Kost Syantika",
-    short_name: "Syantika",
-    description: "Aplikasi Manajemen Pembayaran Kost Syantika",
+    name: "Me Kost",
+    short_name: "Me Kost",
+    description: "Aplikasi Manajemen Pembayaran Me Kost",
     start_url: "/",
     id: "/",
     display: "standalone",

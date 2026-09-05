@@ -19,14 +19,14 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Kost Syantika - Manajemen Pembayaran Kost",
+  title: "Me Kost - Manajemen Pembayaran Kost",
   description:
-    "Aplikasi Manajemen Pembayaran Kost Syantika berbasis web mobile-first PWA.",
-  applicationName: "Kost Syantika",
+    "Aplikasi Manajemen Pembayaran Me Kost berbasis web mobile-first PWA.",
+  applicationName: "Me Kost",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Kost Syantika",
+    title: "Me Kost",
   },
   formatDetection: {
     telephone: false,
@@ -55,7 +55,7 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Kost Syantika" />
+        <meta name="apple-mobile-web-app-title" content="Me Kost" />
       </head>
       <body className="min-h-full flex flex-col font-sans bg-zinc-50 text-zinc-950">
         {children}

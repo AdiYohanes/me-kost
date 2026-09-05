@@ -66,13 +66,13 @@ export function PemilikVerifikasiAntrean() {
       <Card className="card-shadow border-zinc-200 bg-white overflow-hidden">
         <CardHeader className="p-4 sm:p-5 pb-3.5 border-b border-zinc-100">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-700 flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-amber-600" />
+            <CardTitle className="text-sm font-bold text-zinc-900 flex items-center gap-1.5">
+              <Clock className="w-4 h-4 text-amber-600" />
               <span>Antrean Verifikasi Bukti</span>
             </CardTitle>
             <Badge
               variant={antreanVerifikasi.length > 0 ? "pending" : "outline"}
-              className="text-[11px] font-mono tabular-nums px-2 py-0.5"
+              className="text-xs font-medium tabular-nums px-2.5 py-0.5"
             >
               {antreanVerifikasi.length > 0
                 ? `${antreanVerifikasi.length} Menunggu`
@@ -91,7 +91,7 @@ export function PemilikVerifikasiAntrean() {
               <p className="text-xs font-bold text-zinc-900">
                 Semua Bukti Telah Diverifikasi
               </p>
-              <p className="text-[11px] text-zinc-500 max-w-[240px] mt-1">
+              <p className="text-xs text-zinc-500 max-w-[240px] mt-1">
                 Tidak ada bukti transfer baru yang menunggu persetujuan Anda saat ini.
               </p>
             </div>
@@ -119,14 +119,14 @@ export function PemilikVerifikasiAntrean() {
                     {/* Header Item: Kamar, Nama, Waktu, Nominal */}
                     <div className="flex items-start justify-between gap-2.5">
                       <div className="flex items-start gap-2.5 min-w-0">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-bold bg-zinc-100 text-zinc-900 border border-zinc-200 shrink-0">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-zinc-100 text-zinc-900 border border-zinc-200 shrink-0 tabular-nums">
                           Kamar {tagihan.nomorKamar}
                         </span>
                         <div className="min-w-0">
-                          <h4 className="text-xs font-bold text-zinc-950 leading-snug truncate">
+                          <h4 className="text-sm font-bold text-zinc-950 leading-snug truncate">
                             {tagihan.penghuniNama}
                           </h4>
-                          <p className="text-[11px] text-zinc-500 flex items-center gap-1 mt-0.5 font-mono">
+                          <p className="text-xs text-zinc-500 flex items-center gap-1 mt-0.5">
                             <Calendar className="w-3 h-3 text-zinc-400 shrink-0" />
                             <span>Unggah: {formattedUploadTime}</span>
                           </p>
@@ -134,10 +134,10 @@ export function PemilikVerifikasiAntrean() {
                       </div>
 
                       <div className="text-right shrink-0">
-                        <span className="text-xs sm:text-sm font-mono font-bold text-zinc-950 block tabular-nums">
+                        <span className="text-sm font-bold text-zinc-950 block tabular-nums">
                           {formatRupiah(tagihan.nominal)}
                         </span>
-                        <span className="text-[10px] text-zinc-400 font-medium">
+                        <span className="text-xs text-zinc-400 font-medium">
                           Sewa Bulanan
                         </span>
                       </div>
@@ -165,11 +165,11 @@ export function PemilikVerifikasiAntrean() {
 
                       <div className="text-xs text-zinc-600 flex-1 min-w-0">
                         {tagihan.buktiPembayaran?.catatanPenghuni ? (
-                          <p className="line-clamp-2 italic text-zinc-700 font-normal leading-relaxed text-[11px]">
+                          <p className="line-clamp-2 italic text-zinc-700 font-normal leading-relaxed text-xs">
                             &ldquo;{tagihan.buktiPembayaran.catatanPenghuni}&rdquo;
                           </p>
                         ) : (
-                          <p className="text-zinc-400 text-[11px] italic">
+                          <p className="text-zinc-400 text-xs italic">
                             Tidak ada catatan tambahan dari penghuni.
                           </p>
                         )}
@@ -178,7 +178,7 @@ export function PemilikVerifikasiAntrean() {
                           variant="link"
                           size="sm"
                           onClick={() => setSelectedTagihanForLightbox(tagihan)}
-                          className="h-auto p-0 text-[11px] text-emerald-700 font-medium hover:text-emerald-800 gap-1 mt-1 cursor-pointer inline-flex items-center"
+                          className="h-auto p-0 text-xs text-emerald-700 font-medium hover:text-emerald-800 gap-1 mt-1 cursor-pointer inline-flex items-center"
                         >
                           <Eye className="w-3 h-3" />
                           <span>Lihat Bukti Ukuran Penuh</span>

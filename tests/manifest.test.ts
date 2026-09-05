@@ -8,8 +8,8 @@ describe("Web App Manifest Configuration", () => {
     expect(fs.existsSync(manifestPath)).toBe(true);
 
     const content = JSON.parse(fs.readFileSync(manifestPath, "utf-8"));
-    expect(content.name).toBe("Kost Syantika");
-    expect(content.short_name).toBe("Syantika");
+    expect(content.name).toBe("Me Kost");
+    expect(content.short_name).toBe("Me Kost");
     expect(content.display).toBe("standalone");
     expect(content.start_url).toBe("/");
     expect(content.theme_color).toBe("#04A552");

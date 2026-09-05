@@ -51,7 +51,7 @@ export function PemilikSummaryCards() {
               Penerimaan Terkumpul
             </span>
           </div>
-          <span className="text-xs font-mono font-bold px-2 py-0.5 rounded border border-zinc-200 bg-zinc-50 text-zinc-700">
+          <span className="text-xs font-semibold px-2.5 py-0.5 rounded-md border border-zinc-200 bg-zinc-50 text-zinc-700 tabular-nums">
             {currentLabel}
           </span>
         </div>
@@ -61,7 +61,7 @@ export function PemilikSummaryCards() {
             <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-zinc-950 tabular-nums">
               {formatRupiah(totalPenerimaan)}
             </h2>
-            <span className="text-xs font-bold font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/70 shrink-0">
+            <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/70 shrink-0 tabular-nums">
               {percentage}% Lunas
             </span>
           </div>

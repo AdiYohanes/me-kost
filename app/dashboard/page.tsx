@@ -19,7 +19,7 @@ function DashboardContent() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 flex flex-col items-center justify-start px-4 pb-32 sm:px-6 safe-top">
+    <main className="min-h-screen bg-zinc-50 flex flex-col items-center justify-start px-4 pb-32 sm:px-6 safe-top">
       <div className="w-full max-w-md flex flex-col space-y-6">
         {/* Top App Bar & Profile Header */}
         <DashboardHeader user={user} />
@@ -40,8 +40,8 @@ function DashboardContent() {
         )}
 
         {/* Footer info */}
-        <footer className="text-center py-6 text-[11px] text-slate-400">
-          <p>Kost Syantika PWA © 2026 • Terkoneksi Sesi Lokal</p>
+        <footer className="text-center py-6 text-xs text-zinc-400">
+          <p>Me Kost PWA © 2026 • Terkoneksi Sesi Lokal</p>
         </footer>
 
         {/* Mobile-first Bottom Navigation */}

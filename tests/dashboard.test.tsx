@@ -65,10 +65,10 @@ describe("DashboardPage & Unified Guard", () => {
     render(<DashboardPage />);
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /keluar/i })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /^keluar$/i })).toBeInTheDocument();
     });
 
-    const logoutBtn = screen.getByRole("button", { name: /keluar/i });
+    const logoutBtn = screen.getByRole("button", { name: /^keluar$/i });
     fireEvent.click(logoutBtn);
 
     await waitFor(() => {
