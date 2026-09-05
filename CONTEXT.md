@@ -25,7 +25,7 @@ Gambar foto atau tangkapan layar transfer bank/e-wallet yang diunggah oleh Pengh
 _Avoid_: Struk, Resi, Receipt, Slip
 
 **Status Pembayaran**:
-Status tahapan tagihan: Belum Bayar, Menunggu Verifikasi, Lunas, dan Ditolak.
+Status tahapan tagihan: Belum Bayar, Menunggu Verifikasi, Lunas, Ditolak, dan Menunggak (melewati tanggal jatuh tempo).
 _Avoid_: Payment State, Kondisi Tagihan
 
 **Metode Pembayaran**:
@@ -35,3 +35,16 @@ _Avoid_: Channel Bayar, Cara Bayar
 **Alasan Penolakan**:
 Catatan penjelasan dari Pemilik Kost saat menolak Bukti Pembayaran yang tidak valid agar Penghuni dapat memperbaiki bukti transfer.
 _Avoid_: Reject Note, Komentar Error
+
+**Tanggal Jatuh Tempo**:
+Tanggal batas akhir pembayaran sewa kamar bulanan yang dihitung secara mandiri berdasarkan tanggal masuk masing-masing Penghuni.
+_Avoid_: Due Date, Deadline, Tanggal Tagih
+
+**Pengingat Jatuh Tempo**:
+Pemberitahuan atau peringatan dini (tiga hari sebelum tanggal jatuh tempo) kepada Penghuni terkait tagihan sewa yang akan jatuh tempo.
+_Avoid_: Reminder, Notifikasi Tagihan, Alert
+
+**Status Hunian**:
+Kondisi ketersediaan kamar, yaitu Terisi (ditempati Penghuni aktif) atau Kosong (siap disewakan kepada penghuni baru).
+_Avoid_: Room Status, Ketersediaan
+

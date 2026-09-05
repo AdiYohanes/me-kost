@@ -1,21 +1,24 @@
 # Desain Arsitektur Backend Serverless: Supabase + Next.js (Kost Syantika)
 
 * **Tanggal**: 2026-09-05
-* **Status**: Disetujui (Approved)
+* **Status**: Disetujui & Dimatangkan (Approved via Grill-with-Docs)
 * **Konteks Domain**: [CONTEXT.md](file:///c:/Users/USER/Documents/ai-native/kost-syantika/CONTEXT.md)
+* **Keputusan Terkait**: [ADR 0002](file:///c:/Users/USER/Documents/ai-native/kost-syantika/docs/adr/0002-independent-billing-cycle-and-supabase-backend.md)
 * **Target Pengguna**: Pemilik Kost & Penghuni (< 30 kamar kost)
 
 ---
 
 ## 1. Ringkasan & Tujuan
 
-Aplikasi Kost Syantika saat ini beroperasi dengan mock store sisi klien (Zustand + LocalStorage). Untuk memungkinkan penggunaan nyata multi-perangkat (Penghuni mengunggah bukti pembayaran di HP masing-masing dan Pemilik Kost memverifikasinya di HP Pemilik), dibutuhkan media penyimpanan awan bersama.
+Aplikasi Kost Syantika beralih dari prototipe client-side mock store menuju aplikasi siap pakai di dunia nyata yang berjalan multi-perangkat (Penghuni mengunggah bukti pembayaran di HP masing-masing dan Pemilik Kost memverifikasinya di HP Pemilik).
 
-Keputusan arsitektur yang disepakati adalah **Backend-as-a-Service (BaaS) menggunakan Supabase** yang dikombinasikan dengan **hosting frontend di Vercel**. Pola ini menghilangkan kebutuhan membangun dan memelihara server backend kustom, dengan total biaya operasional **Rp 0 / bulan (100% Free Tier)** untuk kapasitas < 30 kamar kost.
+Arsitektur yang disepakati adalah **Backend-as-a-Service (BaaS) Supabase + Vercel Frontend Hosting**. Sistem mengusung **Siklus Tagihan Mandiri per Kamar** (sesuai tanggal masuk masing-masing anak kost), penerbitan tagihan **H-7**, pengingat jatuh tempo **H-3**, status **Menunggak** jika terlambat, serta UI yang super halus (*smooth*) berbasis **Optimistic UI + Supabase Realtime + TanStack Query**.
+
+Total biaya operasional: **Rp 0 / bulan (100% Free Tier untuk < 30 kamar)**.
 
 ---
 
-## 2. Arsitektur Tingkat Tinggi
+## 2. Arsitektur Tingkat Tinggi & Strategi "Smooth UI"
 
 ```
 [ HP Penghuni (PWA) ]              [ HP Pemilik Kost (PWA) ]
@@ -23,7 +26,13 @@ Keputusan arsitektur yang disepakati adalah **Backend-as-a-Service (BaaS) menggu
         ▼                                      ▼
 ┌───────────────────────────────────────────────────────────┐
 │               Frontend Next.js (Hosted di Vercel)          │
+│  ┌─────────────────────────┬───────────────────────────┐  │
+│  │   TanStack Query Cache  │  Optimistic UI Updates    │  │
+│  │   (Buka app instan <50ms│ (Respon klik tanpa lag)   │  │
+│  └─────────────────────────┴───────────────────────────┘  │
 └─────────────────────────────┬─────────────────────────────┘
+                              │
+                    WebSocket Realtime & REST
                               │
                               ▼
 ┌───────────────────────────────────────────────────────────┐
@@ -39,18 +48,12 @@ Keputusan arsitektur yang disepakati adalah **Backend-as-a-Service (BaaS) menggu
 └───────────────────────────────────────────────────────────┘
 ```
 
-### Keuntungan & Biaya (Kapasitas < 30 Kamar)
-1. **Hosting Frontend**: Vercel Hobby Tier (Gratis selamanya, HTTPS otomatis, PWA standalone).
-2. **Database & API**: Supabase Free Tier (Kapasitas 500 MB — mencukupi ribuan baris tagihan selama bertahun-tahun).
-3. **Storage Bukti Pembayaran**: Supabase Storage 1 GB (dengan kompresi WebP ~150 KB/foto, mampu menampung >6.000 bukti transfer atau setara >15 tahun operasional).
-4. **Total Biaya**: **Rp 0 / bulan**.
-
 ---
 
-## 3. Skema Basis Data (PostgreSQL)
+## 3. Skema Basis Data (PostgreSQL di Supabase)
 
 ### 3.1 Tabel `kamar`
-Menyimpan identitas fisik kamar kost dan tarif dasarnya.
+Menyimpan identitas fisik kamar kost, tarif dasar, tanggal masuk, dan siklus tanggal jatuh tempo.
 ```sql
 CREATE TABLE public.kamar (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -58,12 +61,15 @@ CREATE TABLE public.kamar (
     tipe_kamar TEXT NOT NULL,
     tarif_bulanan INTEGER NOT NULL,
     status_hunian TEXT NOT NULL DEFAULT 'KOSONG' CHECK (status_hunian IN ('TERISI', 'KOSONG')),
+    tanggal_masuk DATE,                               -- Tanggal mulai sewa penghuni aktif
+    tanggal_jatuh_tempo SMALLINT NOT NULL DEFAULT 1  -- Tanggal 1-31 siklus bulanan kamar
+        CHECK (tanggal_jatuh_tempo BETWEEN 1 AND 31),
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 ```
 
 ### 3.2 Tabel `users`
-Menyimpan profil pengguna yang terikat dengan identitas `auth.users` Supabase.
+Menyimpan identitas pengguna yang terhubung ke `auth.users` Supabase.
 ```sql
 CREATE TABLE public.users (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -72,27 +78,29 @@ CREATE TABLE public.users (
     email TEXT NOT NULL UNIQUE,
     telepon TEXT,
     kamar_id UUID REFERENCES public.kamar(id) ON DELETE SET NULL,
+    status TEXT NOT NULL DEFAULT 'AKTIF' CHECK (status IN ('AKTIF', 'NONAKTIF')),
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 ```
 
 ### 3.3 Tabel `tagihan`
-Mencatat kewajiban pembayaran sewa bulanan untuk setiap kamar.
+Mencatat kewajiban pembayaran sewa kamar per siklus bulanan mandiri.
 ```sql
 CREATE TABLE public.tagihan (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     kamar_id UUID NOT NULL REFERENCES public.kamar(id) ON DELETE CASCADE,
     penghuni_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
-    periode_bulan TEXT NOT NULL,       -- Contoh: 'September 2026'
-    tahun SMALLINT NOT NULL,           -- Contoh: 2026
-    bulan SMALLINT NOT NULL,           -- Nilai: 1-12
-    nominal INTEGER NOT NULL,          -- Nominal tagihan sewa
-    batas_bayar DATE NOT NULL,
+    penghuni_nama_snapshot TEXT NOT NULL,              -- Preservasi nama saat penghuni keluar
+    periode_label TEXT NOT NULL,                       -- Contoh: '15 Sep - 14 Okt 2026'
+    periode_mulai DATE NOT NULL,
+    periode_selesai DATE NOT NULL,
+    batas_bayar DATE NOT NULL,                         -- Tanggal jatuh tempo
+    nominal INTEGER NOT NULL,                          -- Nominal tagihan sewa
     status TEXT NOT NULL DEFAULT 'BELUM_BAYAR' 
-        CHECK (status IN ('BELUM_BAYAR', 'MENUNGGU_VERIFIKASI', 'LUNAS', 'DITOLAK')),
+        CHECK (status IN ('BELUM_BAYAR', 'MENUNGGU_VERIFIKASI', 'LUNAS', 'DITOLAK', 'MENUNGGAK')),
     metode_pembayaran TEXT CHECK (metode_pembayaran IN ('TRANSFER', 'CASH')),
-    alasan_penolakan TEXT,             -- Wajib diisi jika status = DITOLAK
-    catatan_pemilik TEXT,              -- Catatan opsional dari Pemilik Kost
+    alasan_penolakan TEXT,                             -- Wajib jika status = DITOLAK
+    catatan_pemilik TEXT,                              -- Catatan Pemilik Kost
     paid_at TIMESTAMPTZ,
     verified_at TIMESTAMPTZ,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -100,77 +108,74 @@ CREATE TABLE public.tagihan (
 ```
 
 ### 3.4 Tabel `bukti_pembayaran`
-Menyimpan referensi file bukti transfer bank/e-wallet yang diunggah oleh Penghuni.
+Menyimpan referensi file bukti transfer yang diunggah oleh Penghuni.
 ```sql
 CREATE TABLE public.bukti_pembayaran (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     tagihan_id UUID NOT NULL REFERENCES public.tagihan(id) ON DELETE CASCADE,
-    image_url TEXT NOT NULL,           -- URL publik file di bucket Supabase Storage
-    catatan_penghuni TEXT,             -- Catatan opsional saat upload bukti transfer
+    image_url TEXT NOT NULL,                           -- URL publik bucket Supabase Storage
+    catatan_penghuni TEXT,
     uploaded_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 ```
 
 ---
 
-## 4. Alur Autentikasi & Manajemen Penghuni
+## 4. Siklus Operasional & Fitur Utama
 
-### 4.1 Login Pemilik Kost
-* Mendaftar dan masuk secara **manual menggunakan Email & Password**.
-* Memiliki `role = 'PEMILIK'`.
-* Mengakses seluruh navigasi manajemen kost, verifikasi antrean, dan pengaturan kamar.
+### 4.1 Siklus Mandiri per Kamar & Otomasi Penerbitan H-7
+* Setiap kamar yang `TERISI` memiliki tanggal jatuh tempo bulanan (misal tanggal 15).
+* **Penerbitan H-7 (Hybrid On-Open):** Ketika aplikasi dibuka, sistem secara otomatis mengecek kamar terisi yang telah memasuki H-7 sebelum jatuh tempo namun belum dibuatkan tagihan periode berikutnya. Sistem langsung meng-generate record tagihan baru dengan status `BELUM_BAYAR`.
+* Penghuni dapat melihat tagihan baru dan melakukan pembayaran lebih awal (misal tepat setelah gajian).
 
-### 4.2 Login Penghuni Kost (Google OAuth)
-* Penghuni masuk menggunakan tombol **"Lanjutkan dengan Google"** (atau fallback Email/Password).
-* **Mekanisme Pencocokan Kamar:**
-  1. Pemilik Kost mendaftarkan email Google calon penghuni di kamar terkait via dashboard.
-  2. Saat penghuni pertama kali login via Google, Supabase Auth mengembalikan email pengguna yang terverifikasi.
-  3. Aplikasi mencocokkan email tersebut dengan data `users` / pendaftaran kamar.
-  4. Jika cocok, sesi langsung diikat ke kamar tersebut dan penghuni diarahkan ke dashboard tagihan kamar.
-  5. Jika email belum pernah didaftarkan oleh Pemilik Kost, aplikasi menampilkan pesan ramah: *"Email Anda belum terdaftar sebagai penghuni Kost Syantika. Silakan hubungi Pemilik Kost."*
+### 4.2 Notifikasi & Pengingat Jatuh Tempo (H-3)
+* **In-App Banner:** Pada H-3 sebelum jatuh tempo, dashboard Penghuni memunculkan *banner* kuning/amber peringatan jatuh tempo.
+* **Tombol 1-Klik WhatsApp:** Di dashboard Pemilik Kost, kamar yang berada pada rentang H-3 atau Menunggak dilengkapi tombol hijau WhatsApp yang langsung membuka chat ke Penghuni dengan pesan santun yang sudah disiapkan otomatis.
+* **Web Push Notification:** Notifikasi push background dikirimkan ke perangkat Penghuni jika izin notifikasi diaktifkan.
 
-### 4.3 Siklus Hidup "Keluar Kost" (Checkout)
-* Saat masa sewa penghuni berakhir dan keluar kost:
-  1. Pemilik Kost menekan tombol **"Keluarkan Penghuni"** pada kamar terkait.
-  2. Sistem melepaskan tautan akun penghuni dari kamar tersebut (`kamar_id = NULL`), dan mengubah `status_hunian` kamar menjadi `'KOSONG'`.
-  3. Riwayat tagihan dan arsip bukti pembayaran masa lalu tetap tersimpan untuk pembukuan Pemilik Kost.
-  4. Jika mantan penghuni mencoba login kembali, akses ke dashboard aktif tertolak karena akun sudah tidak memiliki kamar aktif.
-  5. Kamar yang kosong siap didaftarkan untuk anak kost berikutnya via tombol **"Tambah Penghuni"**.
+### 4.3 Keterlambatan Pembayaran (`MENUNGGAK`)
+* Jika tanggal jatuh tempo telah lewat dan tagihan belum berstatus `LUNAS` atau `MENUNGGU_VERIFIKASI`, status otomatis berubah menjadi `MENUNGGAK (Telat X Hari)` dengan badge merah menyala.
+* Tidak ada denda otomatis kaku; Pemilik Kost dapat mengedit nominal tagihan secara fleksibel jika ada denda yang disepakati.
 
----
-
-## 5. Optimalisasi Penyimpanan Foto Bukti Pembayaran
-
-* **Bucket Supabase Storage**: `bukti-pembayaran` (bersifat *authenticated read* atau *public read with unguessable path*).
-* **Kompresi Klien (Client-Side Compression)**:
-  * Sebelum berkas dikirim ke Supabase, aplikasi Next.js memproses gambar di browser menggunakan Canvas HTML5.
-  * Resolusi dibatasi maksimal lebar/tinggi 1280px dengan kualitas WebP 0.8.
-  * Ukuran rata-rata menyusut dari ~3 MB menjadi ~100-200 KB per bukti pembayaran, memastikan efisiensi bandwidth dan masa pakai kuota gratis yang panjang.
-* **Struktur File**: `bukti/[nomor_kamar]/[tahun]-[bulan]-[uuid].webp`.
+### 4.4 Autentikasi & Alur "Keluar Kost" (Checkout)
+* **Pemilik Kost:** Login manual dengan Email & Password biasa.
+* **Penghuni:** Login 1-klik dengan Google OAuth.
+  * Pemilik Kost mendaftarkan email Google anak kost pada kamar kosong (beserta nama, no. HP, dan tanggal masuk).
+  * Saat login dengan Google, sistem mencocokkan email dengan kamar terkait.
+  * Jika email salah / belum terdaftar, muncul pesan ramah dan di dashboard Pemilik Kost ada tombol cepat `Ubah Email Penghuni`.
+* **Keluarkan Penghuni:**
+  * Pemilik menekan tombol `Keluarkan Penghuni` pada kamar terkait.
+  * Dialog konfirmasi menawarkan penanganan tagihan aktif bulan berjalan (batalkan atau biarkan sebagai arsip tunggakan).
+  * Sistem melakukan *soft disconnect*: akun penghuni dilepas (`kamar_id = NULL`, status `'NONAKTIF'`), status kamar kembali `'KOSONG'`.
+  * Riwayat tagihan dan nama penghuni di bulan-bulan sebelumnya tetap utuh di pembukuan keuangan.
 
 ---
 
-## 6. Keamanan Data (Row Level Security / RLS)
+## 5. Optimalisasi Media & Keamanan (RLS)
 
-* **Prinsip Hak Akses**:
-  * Pengguna dengan peran `PEMILIK` memiliki hak `ALL` (baca, buat, ubah, hapus) di semua tabel.
-  * Pengguna dengan peran `PENGHUNI`:
-    * Hanya dapat membaca record `kamar` miliknya sendiri.
-    * Hanya dapat membaca record `tagihan` yang memiliki `kamar_id` miliknya.
-    * Hanya dapat mengunggah dan membuat record `bukti_pembayaran` untuk tagihannya sendiri yang berstatus `BELUM_BAYAR` atau `DITOLAK`.
-    * Dilarang membaca data tagihan atau bukti transfer kamar lain.
+* **Kompresi WebP Klien:** Foto bukti transfer di-render ke Canvas HTML5 di HP sebelum dikirim, menyusut dari ~3 MB menjadi ~150 KB. Kuota 1 GB gratis mampu menampung >6.000 bukti sewa (>15 tahun).
+* **Supabase Storage:** Bucket `bukti-pembayaran` dengan format direktori `kamar-[nomor]/[tahun]-[bulan]-[uuid].webp`.
+* **Row Level Security (RLS):**
+  * Pemilik memiliki akses penuh (`ALL`) ke semua data kamar, tagihan, dan bukti pembayaran.
+  * Penghuni hanya dapat membaca kamar & tagihannya sendiri, dan hanya dapat mengunggah bukti ke tagihannya sendiri.
 
 ---
 
-## 7. Rencana Integrasi Frontend (Next.js)
+## 6. Integrasi Frontend Next.js
 
-1. **Dependensi**: Memasang `@supabase/supabase-js` dan `@supabase/ssr`.
+1. **Paket**: `@supabase/supabase-js`, `@supabase/ssr`, `@tanstack/react-query`.
 2. **Klien Supabase**:
-   * `lib/supabase/client.ts`: Klien browser untuk autentikasi dan mutasi real-time.
-   * `lib/supabase/server.ts`: Klien server untuk Server Actions / SSR.
-3. **Penyelarasan Komponen**:
-   * Memperbarui halaman `/login` dengan tombol Google Sign-In dan form manual Pemilik Kost.
-   * Menambahkan modal "Tambah Penghuni" dan dialog "Keluarkan Penghuni" pada kartu kamar di dashboard Pemilik.
-   * Memodifikasi input upload bukti pembayaran pada dashboard Penghuni untuk menjalankan kompresi gambar sebelum upload ke storage Supabase.
-4. **Skrip Otomatisasi Database**:
-   * Menyediakan file `supabase/schema.sql` siap eksekusi di SQL Editor Supabase.
+   * `lib/supabase/client.ts` (Browser)
+   * `lib/supabase/server.ts` (Server Actions)
+3. **Penyempurnaan Antarmuka**:
+   * **Login Page (`app/login/page.tsx`)**: Tombol Google Sign-in untuk Penghuni & Form Login Pemilik.
+   * **Dashboard Pemilik (`PemilikDaftarKamar`)**:
+     * Urutan nomor kamar (101, 102, ...) dengan tab filter: *Semua*, *Butuh Verifikasi*, *H-3*, *Menunggak*, *Kosong*.
+     * Tombol `+ Tambah Penghuni` untuk kamar kosong.
+     * Tombol `Keluarkan Penghuni` & `Ubah Email` untuk kamar terisi.
+     * Tombol 1-klik WhatsApp untuk kamar H-3 dan Menunggak.
+   * **Dashboard Penghuni (`PenghuniDashboardView`)**:
+     * Banner pengingat H-3.
+     * Formulir unggah bukti transfer dengan kompresi otomatis client-side.
+4. **File Skema SQL**:
+   * File `supabase/schema.sql` siap eksekusi di Supabase SQL Editor sekali klik.
