@@ -354,7 +354,7 @@ export const usePaymentStore = create<PaymentState>()(
             tglJatuhTempo = isNaN(d.getDate()) ? 1 : d.getDate();
           }
 
-          const tenantId = `usr-${targetKamar.nomorKamar}`;
+          const penghuniId = `usr-${targetKamar.nomorKamar}-${Date.now().toString().slice(-4)}`;
           const updatedKamarList = state.kamarList.map((k) =>
             k.id === input.kamarId || k.nomorKamar === input.kamarId
               ? {
@@ -363,7 +363,7 @@ export const usePaymentStore = create<PaymentState>()(
                   tanggalMasuk: input.tanggalMasuk,
                   tanggalJatuhTempo: tglJatuhTempo!,
                   penghuni: {
-                    id: tenantId,
+                    id: penghuniId,
                     nama: input.nama.trim(),
                     email: input.email.trim().toLowerCase(),
                     telepon: input.telepon?.trim(),
@@ -372,7 +372,7 @@ export const usePaymentStore = create<PaymentState>()(
               : k
           );
 
-          // Cek apakah sudah ada tagihan aktif berjalan
+          // Cek apakah sudah ada tagihan pada periode aktif berjalan
           const activeIndex = state.tagihanList.findIndex(
             (t) =>
               (t.kamarId === targetKamar.id || t.nomorKamar === targetKamar.nomorKamar) &&
@@ -384,19 +384,23 @@ export const usePaymentStore = create<PaymentState>()(
           const batasBayar = `${tglJatuhTempo} ${monthShort} ${state.activePeriode.tahun}`;
 
           const updatedTagihanList = [...state.tagihanList];
-          if (activeIndex >= 0) {
+          const existingTagihan = activeIndex >= 0 ? state.tagihanList[activeIndex] : null;
+          // Jika kamar sebelumnya KOSONG, tagihan yang ada adalah arsip tunggakan penghuni lama yang tidak boleh ditimpa
+          const isArchivedOldTenantBill = existingTagihan && targetKamar.statusHunian === "KOSONG";
+
+          if (existingTagihan && !isArchivedOldTenantBill) {
             updatedTagihanList[activeIndex] = {
               ...updatedTagihanList[activeIndex],
-              penghuniId: tenantId,
+              penghuniId,
               penghuniNama: input.nama.trim(),
               batasBayar,
             };
           } else {
             const newTagihan: Tagihan = {
-              id: `tagihan-${targetKamar.nomorKamar}-${state.activePeriode.tahun}-${String(state.activePeriode.bulan).padStart(2, "0")}`,
+              id: `tagihan-${targetKamar.nomorKamar}-${state.activePeriode.tahun}-${String(state.activePeriode.bulan).padStart(2, "0")}${isArchivedOldTenantBill ? `-${penghuniId}` : ""}`,
               kamarId: targetKamar.id,
               nomorKamar: targetKamar.nomorKamar,
-              penghuniId: tenantId,
+              penghuniId,
               penghuniNama: input.nama.trim(),
               periodeBulan: state.activePeriode.periodeBulan,
               tahun: state.activePeriode.tahun,

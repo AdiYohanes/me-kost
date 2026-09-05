@@ -97,7 +97,7 @@ function UbahEmailForm({
           required
         />
         <p className="text-xs text-zinc-500 leading-relaxed">
-          Gunakan opsi ini jika anak kost salah memasukkan email saat pendaftaran atau mengganti akun Google aktif.
+          Gunakan opsi ini jika Penghuni salah memasukkan email saat pendaftaran atau mengganti akun Google aktif.
         </p>
       </div>
 

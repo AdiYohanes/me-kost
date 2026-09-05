@@ -164,7 +164,7 @@ function TambahPenghuniForm({
           required
         />
         <p className="text-xs text-zinc-500">
-          Digunakan anak kost untuk masuk ke sistem menggunakan tombol &apos;Lanjutkan dengan Google&apos;.
+          Digunakan Penghuni untuk masuk ke sistem menggunakan tombol &apos;Lanjutkan dengan Google&apos;.
         </p>
       </div>
 
@@ -278,7 +278,7 @@ export function TambahPenghuniDialog({
                 Tambah Penghuni Baru
               </DialogTitle>
               <DialogDescription className="text-xs text-zinc-500">
-                Daftarkan anak kost pada unit kamar {kamar.nomorKamar}
+                Daftarkan Penghuni baru pada unit kamar {kamar.nomorKamar}
               </DialogDescription>
             </div>
           </div>

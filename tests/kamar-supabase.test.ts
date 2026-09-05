@@ -262,6 +262,7 @@ describe("Supabase Kamar Service & Soft Disconnect", () => {
       });
 
       expect(result.success).toBe(true);
+      expect(result.penghuniId).toBe("new-user-id");
       expect(result.tenantId).toBe("new-user-id");
 
       // Verifikasi update status kamar menjadi TERISI dan tanggal_jatuh_tempo = 17
@@ -399,11 +400,12 @@ describe("Supabase Kamar Service & Soft Disconnect", () => {
         eq: vi.fn().mockResolvedValue({ error: null }),
       });
 
-      const mockTagihanDelete = vi.fn().mockReturnValue({
-        eq: vi.fn().mockReturnValue({
-          in: vi.fn().mockResolvedValue({ error: null }),
-        }),
-      });
+      const tagihanQueryBuilder = {
+        eq: vi.fn(),
+        in: vi.fn().mockResolvedValue({ error: null }),
+      };
+      tagihanQueryBuilder.eq.mockReturnValue(tagihanQueryBuilder);
+      const mockTagihanDelete = vi.fn().mockReturnValue(tagihanQueryBuilder);
 
       const mockSupabase = {
         from: vi.fn((table: string) => {

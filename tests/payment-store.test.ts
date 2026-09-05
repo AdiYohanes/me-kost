@@ -229,6 +229,53 @@ describe("usePaymentStore", () => {
 
       expect(kamar102?.penghuni?.email).toBe("siti.baru@gmail.com");
     });
+
+    it("mempertahankan arsip tagihan penghuni lama saat penghuni baru didaftarkan di kamar yang sama", () => {
+      // 1. Keluarkan penghuni kamar 103 dengan mempertahankan tagihan aktif sebagai arsip tunggakan
+      const namaPenghuniLama = usePaymentStore
+        .getState()
+        .kamarList.find((k) => k.nomorKamar === "103")?.penghuni?.nama;
+      expect(namaPenghuniLama).toBeTruthy();
+
+      usePaymentStore.getState().keluarkanPenghuni({
+        kamarId: "103",
+        batalkanTagihanAktif: false,
+      });
+
+      // Kamar 103 sekarang KOSONG
+      expect(
+        usePaymentStore.getState().kamarList.find((k) => k.nomorKamar === "103")?.statusHunian
+      ).toBe("KOSONG");
+
+      // Tagihan lama tetap ada dengan nama penghuni lama
+      const tagihanArsipLama = usePaymentStore
+        .getState()
+        .tagihanList.find((t) => t.nomorKamar === "103" && t.penghuniNama === namaPenghuniLama);
+      expect(tagihanArsipLama).toBeDefined();
+
+      // 2. Daftarkan penghuni baru pada kamar 103 di bulan yang sama
+      usePaymentStore.getState().tambahPenghuni({
+        kamarId: "103",
+        nama: "Rizky Ramadhan",
+        email: "rizky.ramadhan@gmail.com",
+        tanggalMasuk: "2026-09-20",
+      });
+
+      // Tagihan arsip milik penghuni lama tetap utuh dengan nama penghuni lama
+      const tagihanArsipSetelahnya = usePaymentStore
+        .getState()
+        .tagihanList.find((t) => t.nomorKamar === "103" && t.penghuniNama === namaPenghuniLama);
+      expect(tagihanArsipSetelahnya).toBeDefined();
+      expect(tagihanArsipSetelahnya?.penghuniNama).toBe(namaPenghuniLama);
+
+      // Tagihan baru dibuatkan khusus untuk penghuni baru
+      const tagihanPenghuniBaru = usePaymentStore
+        .getState()
+        .tagihanList.find((t) => t.nomorKamar === "103" && t.penghuniNama === "Rizky Ramadhan");
+      expect(tagihanPenghuniBaru).toBeDefined();
+      expect(tagihanPenghuniBaru?.penghuniNama).toBe("Rizky Ramadhan");
+      expect(tagihanPenghuniBaru?.status).toBe("BELUM_BAYAR");
+    });
   });
 });
 

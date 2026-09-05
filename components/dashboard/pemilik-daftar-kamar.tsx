@@ -198,7 +198,7 @@ export function PemilikDaftarKamar() {
     toast.success(
       `Email Google Kamar ${target?.nomorKamar || ""} Berhasil Diperbarui!`,
       {
-        description: `Akun anak kost kini terhubung dengan email: ${emailBaru}`,
+        description: `Akun Penghuni kini terhubung dengan email: ${emailBaru}`,
       }
     );
     setSelectedKamarForEmail(null);

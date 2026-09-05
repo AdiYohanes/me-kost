@@ -45,7 +45,7 @@ function KeluarkanPenghuniForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 pt-1">
-      {/* Box Profil Anak Kost & Kamar */}
+      {/* Box Profil Penghuni & Kamar */}
       <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 space-y-2 text-xs">
         <div className="flex items-center justify-between pb-2 border-b border-zinc-200">
           <div className="flex items-center gap-1.5 font-bold text-zinc-900">
@@ -92,7 +92,7 @@ function KeluarkanPenghuniForm({
               </span>
               <p className="text-zinc-500 leading-relaxed">
                 {hasActiveUnpaid
-                  ? "Kewajiban tagihan bulan ini akan dibatalkan/dihapus karena anak kost keluar sebelum menyelesaikan pembayaran."
+                  ? "Kewajiban tagihan bulan ini akan dibatalkan/dihapus karena Penghuni keluar sebelum menyelesaikan pembayaran."
                   : "Tagihan bulan ini dihapus dari daftar penagihan kamar."}
               </p>
             </div>
@@ -117,7 +117,7 @@ function KeluarkanPenghuniForm({
                 Pertahankan sebagai arsip catatan tunggakan
               </span>
               <p className="text-zinc-500 leading-relaxed">
-                Tagihan bulan berjalan tetap tercatat di pembukuan sebagai arsip tunggakan dengan identitas anak kost ini.
+                Tagihan bulan berjalan tetap tercatat di pembukuan sebagai arsip tunggakan dengan identitas Penghuni ini.
               </p>
             </div>
           </label>
@@ -131,7 +131,7 @@ function KeluarkanPenghuniForm({
           <span>Integritas Pembukuan Terjamin (Soft Disconnect)</span>
         </div>
         <p className="text-blue-800 leading-relaxed pl-5.5">
-          Akun anak kost akan dilepaskan dari kamar dan status kamar kembali menjadi <strong>KOSONG</strong>. Seluruh riwayat pembayaran dan bukti transfer bulan-bulan sebelumnya tetap aman tersimpan.
+          Akun Penghuni akan dilepaskan dari kamar dan status kamar kembali menjadi <strong>KOSONG</strong>. Seluruh riwayat pembayaran dan bukti transfer bulan-bulan sebelumnya tetap aman tersimpan.
         </p>
       </div>
 
@@ -178,7 +178,7 @@ export function KeluarkanPenghuniDialog({
                 Keluarkan Penghuni Kamar {kamar.nomorKamar}
               </DialogTitle>
               <DialogDescription className="text-xs text-zinc-500">
-                Konfirmasi pelepasan anak kost ({kamar.penghuni?.nama || "Penghuni"})
+                Konfirmasi pelepasan Penghuni ({kamar.penghuni?.nama || "Penghuni"})
               </DialogDescription>
             </div>
           </div>

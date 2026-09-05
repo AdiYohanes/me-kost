@@ -28,7 +28,8 @@ export interface TambahPenghuniInput {
 }
 
 export interface UbahEmailPenghuniInput {
-  userId?: string;
+  penghuniId?: string;
+  userId?: string; // alias backward compatibility
   kamarId?: string;
   emailBaru: string;
 }

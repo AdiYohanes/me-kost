@@ -34,7 +34,7 @@ export function mapDatabaseRowToKamar(
     } | null;
   }
 ): Kamar {
-  let activeTenant: {
+  let activePenghuni: {
     id: string;
     nama: string;
     email: string;
@@ -44,7 +44,7 @@ export function mapDatabaseRowToKamar(
   if (Array.isArray(row.users)) {
     const active = row.users.find((u) => u.status === "AKTIF");
     if (active) {
-      activeTenant = {
+      activePenghuni = {
         id: active.id,
         nama: active.nama,
         email: active.email,
@@ -52,7 +52,7 @@ export function mapDatabaseRowToKamar(
       };
     }
   } else if (row.users && row.users.status === "AKTIF") {
-    activeTenant = {
+    activePenghuni = {
       id: row.users.id,
       nama: row.users.nama,
       email: row.users.email,
@@ -65,16 +65,16 @@ export function mapDatabaseRowToKamar(
     nomorKamar: row.nomor_kamar,
     tipeKamar: row.tipe_kamar,
     tarifBulanan: row.tarif_bulanan,
-    statusHunian: (row.status_hunian as StatusHunian) || (activeTenant ? "TERISI" : "KOSONG"),
+    statusHunian: (row.status_hunian as StatusHunian) || (activePenghuni ? "TERISI" : "KOSONG"),
     tanggalMasuk: row.tanggal_masuk ?? undefined,
     tanggalJatuhTempo: row.tanggal_jatuh_tempo || 1,
-    penghuni: activeTenant,
+    penghuni: activePenghuni,
   };
 }
 
 /**
  * Mengambil seluruh unit fisik kamar terurut berurutan (101, 102, dst.)
- * beserta data anak kost aktif dari Supabase BaaS.
+ * beserta data Penghuni aktif dari Supabase BaaS.
  */
 export async function fetchDaftarKamar(supabase: SupabaseClient): Promise<Kamar[]> {
   const { data, error } = await supabase
@@ -99,28 +99,28 @@ export async function fetchDaftarKamar(supabase: SupabaseClient): Promise<Kamar[
 }
 
 /**
- * Mendaftarkan anak kost baru pada kamar kosong.
- * Menyimpan profil anak kost ke tabel `users`, mengupdate status kamar menjadi `TERISI`,
+ * Mendaftarkan Penghuni baru pada kamar kosong.
+ * Menyimpan profil Penghuni ke tabel `users`, mengupdate status kamar menjadi `TERISI`,
  * dan menyetel Tanggal Jatuh Tempo secara otomatis mengikuti tanggal masuk.
  */
 export async function tambahPenghuniKamar(
   supabase: SupabaseClient,
   input: TambahPenghuniInput
-): Promise<{ success: boolean; tenantId: string; error?: string }> {
+): Promise<{ success: boolean; penghuniId: string; tenantId: string; error?: string }> {
   const nama = input.nama.trim();
   const email = input.email.trim().toLowerCase();
   const telepon = input.telepon?.trim() || null;
 
   if (!nama) {
-    return { success: false, tenantId: "", error: "Nama lengkap wajib diisi." };
+    return { success: false, penghuniId: "", tenantId: "", error: "Nama lengkap wajib diisi." };
   }
 
   if (!email || !email.includes("@")) {
-    return { success: false, tenantId: "", error: "Format email Google tidak valid." };
+    return { success: false, penghuniId: "", tenantId: "", error: "Format email Google tidak valid." };
   }
 
   if (!input.tanggalMasuk) {
-    return { success: false, tenantId: "", error: "Tanggal masuk wajib diisi." };
+    return { success: false, penghuniId: "", tenantId: "", error: "Tanggal masuk wajib diisi." };
   }
 
   // Hitung Tanggal Jatuh Tempo otomatis dari tanggal masuk (day of month) jika tidak ditentukan manual
@@ -140,6 +140,7 @@ export async function tambahPenghuniKamar(
   if (kamarFetchError || !kamarData) {
     return {
       success: false,
+      penghuniId: "",
       tenantId: "",
       error: kamarFetchError?.message || "Unit kamar tidak ditemukan.",
     };
@@ -153,10 +154,10 @@ export async function tambahPenghuniKamar(
     .maybeSingle();
 
   if (findUserError) {
-    return { success: false, tenantId: "", error: findUserError.message };
+    return { success: false, penghuniId: "", tenantId: "", error: findUserError.message };
   }
 
-  let tenantId = existingUser?.id;
+  let penghuniId = existingUser?.id;
 
   if (existingUser) {
     const { error: updateUserError } = await supabase
@@ -171,7 +172,7 @@ export async function tambahPenghuniKamar(
       .eq("id", existingUser.id);
 
     if (updateUserError) {
-      return { success: false, tenantId: "", error: updateUserError.message };
+      return { success: false, penghuniId: "", tenantId: "", error: updateUserError.message };
     }
   } else {
     const { data: insertedUser, error: insertUserError } = await supabase
@@ -190,11 +191,12 @@ export async function tambahPenghuniKamar(
     if (insertUserError || !insertedUser) {
       return {
         success: false,
+        penghuniId: "",
         tenantId: "",
         error: insertUserError?.message || "Gagal membuat akun penghuni baru.",
       };
     }
-    tenantId = insertedUser.id;
+    penghuniId = insertedUser.id;
   }
 
   // 3. Update status kamar menjadi TERISI
@@ -208,7 +210,12 @@ export async function tambahPenghuniKamar(
     .eq("id", input.kamarId);
 
   if (updateKamarError) {
-    return { success: false, tenantId: tenantId || "", error: updateKamarError.message };
+    return {
+      success: false,
+      penghuniId: penghuniId || "",
+      tenantId: penghuniId || "",
+      error: updateKamarError.message,
+    };
   }
 
   // 4. Provisioning Tagihan perdana jika belum ada tagihan aktif berjalan
@@ -236,7 +243,7 @@ export async function tambahPenghuniKamar(
 
       await supabase.from("tagihan").insert({
         kamar_id: input.kamarId,
-        penghuni_id: tenantId,
+        penghuni_id: penghuniId,
         penghuni_nama_snapshot: nama,
         periode_label: periodeLabel,
         periode_mulai: startDateString,
@@ -250,11 +257,11 @@ export async function tambahPenghuniKamar(
     // Pengabaian kegagalan non-fatal saat provisioning tagihan
   }
 
-  return { success: true, tenantId: tenantId || "" };
+  return { success: true, penghuniId: penghuniId || "", tenantId: penghuniId || "" };
 }
 
 /**
- * Mengubah email Google terdaftar anak kost pada kamar aktif.
+ * Mengubah email Google terdaftar Penghuni pada kamar aktif.
  */
 export async function ubahEmailPenghuni(
   supabase: SupabaseClient,
@@ -268,8 +275,9 @@ export async function ubahEmailPenghuni(
 
   let query = supabase.from("users").update({ email: newEmail });
 
-  if (input.userId) {
-    query = query.eq("id", input.userId);
+  const targetPenghuniId = input.penghuniId || input.userId;
+  if (targetPenghuniId) {
+    query = query.eq("id", targetPenghuniId);
   } else if (input.kamarId) {
     query = query.eq("kamar_id", input.kamarId).eq("status", "AKTIF");
   } else {
@@ -286,8 +294,8 @@ export async function ubahEmailPenghuni(
 }
 
 /**
- * Melepaskan anak kost dari kamar (Soft Disconnect).
- * - Menghapus relasi kamar pada akun anak kost (`kamar_id = NULL`, status `NONAKTIF`).
+ * Melepaskan Penghuni dari kamar (Soft Disconnect).
+ * - Menghapus relasi kamar pada akun Penghuni (`kamar_id = NULL`, status `NONAKTIF`).
  * - Mengembalikan status kamar menjadi `KOSONG` dan mengosongkan `tanggal_masuk`.
  * - Membatalkan tagihan aktif bulan berjalan (jika dipilih) atau mempertahankan sebagai arsip.
  * - Seluruh riwayat pembayaran masa lalu tetap utuh dengan snapshot nama penghuni.
@@ -296,7 +304,7 @@ export async function keluarkanPenghuniKamar(
   supabase: SupabaseClient,
   input: KeluarkanPenghuniInput
 ): Promise<{ success: boolean; error?: string }> {
-  // 1. Soft disconnect pada baris anak kost di tabel users
+  // 1. Soft disconnect pada baris Penghuni di tabel users
   let userQuery = supabase
     .from("users")
     .update({ kamar_id: null, status: "NONAKTIF" });
@@ -327,11 +335,20 @@ export async function keluarkanPenghuniKamar(
 
   // 3. Batalkan tagihan aktif bulan berjalan jika dipilih oleh pemilik
   if (input.batalkanTagihanAktif) {
-    const { error: tagihanError } = await supabase
+    let tagihanQuery = supabase
       .from("tagihan")
       .delete()
-      .eq("kamar_id", input.kamarId)
-      .in("status", ["BELUM_BAYAR", "DITOLAK"]);
+      .eq("kamar_id", input.kamarId);
+
+    if (input.penghuniId) {
+      tagihanQuery = tagihanQuery.eq("penghuni_id", input.penghuniId);
+    }
+
+    const { error: tagihanError } = await tagihanQuery.in("status", [
+      "BELUM_BAYAR",
+      "MENUNGGU_VERIFIKASI",
+      "DITOLAK",
+    ]);
 
     if (tagihanError) {
       return { success: false, error: tagihanError.message };
