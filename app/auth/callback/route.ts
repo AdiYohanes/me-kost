@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { verifyAndLinkTenantGoogleUser, fetchUserProfile } from "@/lib/supabase/auth";
+import { verifyAndLinkPenghuniGoogleUser, fetchUserProfile } from "@/lib/supabase/auth";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -24,22 +24,16 @@ export async function GET(request: Request) {
         return NextResponse.redirect(`${origin}/login?error=auth_failed`);
       }
 
-      // Periksa apakah ini akun Pemilik Kost
+      // Periksa apakah ini akun Pemilik Kost (Pemilik wajib menggunakan Email & Kata Sandi)
       const profile = await fetchUserProfile(supabase, authUserId, userEmail);
 
       if (profile && profile.role === "PEMILIK") {
-        // Tautkan auth_id Pemilik jika belum
-        if (profile.auth_id !== authUserId) {
-          await supabase
-            .from("users")
-            .update({ auth_id: authUserId })
-            .eq("id", profile.id);
-        }
-        return NextResponse.redirect(`${origin}${next}`);
+        await supabase.auth.signOut();
+        return NextResponse.redirect(`${origin}/login?error=owner_oauth_unsupported`);
       }
 
       // Verifikasi alur Penghuni Kost dengan penaut kamar otomatis
-      const verification = await verifyAndLinkTenantGoogleUser(
+      const verification = await verifyAndLinkPenghuniGoogleUser(
         supabase,
         authUserId,
         userEmail

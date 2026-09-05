@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
   signInWithGoogle,
   signInWithEmailPassword,
-  verifyAndLinkTenantGoogleUser,
+  verifyAndLinkPenghuniGoogleUser,
   fetchUserProfile,
   signOutUser,
   mapProfileToSession,
@@ -80,7 +80,7 @@ describe("Supabase Authentication & Automated Room Linker", () => {
     });
   });
 
-  describe("2. Penaut Kamar Otomatis (verifyAndLinkTenantGoogleUser)", () => {
+  describe("2. Penaut Kamar Otomatis (verifyAndLinkPenghuniGoogleUser)", () => {
     it("berhasil memverifikasi penghuni terdaftar dan memperbarui auth_id", async () => {
       const mockProfile: SupabaseUserProfile = {
         id: "usr-uuid-1",
@@ -118,7 +118,7 @@ describe("Supabase Authentication & Automated Room Linker", () => {
       });
 
       // @ts-expect-error test mock
-      const result = await verifyAndLinkTenantGoogleUser(mockSupabaseClient, "auth-google-uuid-99", "rizky@gmail.com");
+      const result = await verifyAndLinkPenghuniGoogleUser(mockSupabaseClient, "auth-google-uuid-99", "rizky@gmail.com");
 
       expect(result.success).toBe(true);
       expect(result.profile?.nama).toBe("Rizky Ramadhan");
@@ -142,7 +142,7 @@ describe("Supabase Authentication & Automated Room Linker", () => {
       });
 
       // @ts-expect-error test mock
-      const result = await verifyAndLinkTenantGoogleUser(mockSupabaseClient, "auth-unknown-uuid", "calon@gmail.com");
+      const result = await verifyAndLinkPenghuniGoogleUser(mockSupabaseClient, "auth-unknown-uuid", "calon@gmail.com");
 
       expect(result.success).toBe(false);
       expect(result.reason).toBe("unregistered");
@@ -174,7 +174,7 @@ describe("Supabase Authentication & Automated Room Linker", () => {
       });
 
       // @ts-expect-error test mock
-      const result = await verifyAndLinkTenantGoogleUser(mockSupabaseClient, "auth-uuid", "mantan@gmail.com");
+      const result = await verifyAndLinkPenghuniGoogleUser(mockSupabaseClient, "auth-uuid", "mantan@gmail.com");
 
       expect(result.success).toBe(false);
       expect(result.reason).toBe("inactive");
@@ -205,7 +205,7 @@ describe("Supabase Authentication & Automated Room Linker", () => {
       });
 
       // @ts-expect-error test mock
-      const result = await verifyAndLinkTenantGoogleUser(mockSupabaseClient, "auth-uuid", "baru@gmail.com");
+      const result = await verifyAndLinkPenghuniGoogleUser(mockSupabaseClient, "auth-uuid", "baru@gmail.com");
 
       expect(result.success).toBe(false);
       expect(result.reason).toBe("no_room");

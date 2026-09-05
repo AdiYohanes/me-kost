@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useSyncExternalStore } from "react";
+import React, { useEffect, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/lib/store/use-auth-store";
 import { Building2 } from "lucide-react";
@@ -19,18 +19,46 @@ interface AuthGuardProps {
 
 export function AuthGuard({ children }: AuthGuardProps) {
   const router = useRouter();
-  const { isAuthenticated, user } = useAuthStore();
+  const { isAuthenticated, user, syncSupabaseSession } = useAuthStore();
   const isMounted = useIsMounted();
+  const [isSyncing, setIsSyncing] = useState(false);
 
   const isAuth = isMounted && isAuthenticated && !!user;
 
   useEffect(() => {
-    if (isMounted && (!isAuthenticated || !user)) {
-      router.replace("/login");
-    }
-  }, [isMounted, isAuthenticated, user, router]);
+    let cancelled = false;
 
-  if (!isAuth) {
+    async function verifySession() {
+      if (!isMounted) return;
+
+      if (!isAuthenticated || !user) {
+        setIsSyncing(true);
+        try {
+          const syncedUser = await syncSupabaseSession();
+          if (cancelled) return;
+          if (!syncedUser) {
+            router.replace("/login");
+          }
+        } catch {
+          if (!cancelled) {
+            router.replace("/login");
+          }
+        } finally {
+          if (!cancelled) {
+            setIsSyncing(false);
+          }
+        }
+      }
+    }
+
+    verifySession();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isMounted, isAuthenticated, user, syncSupabaseSession, router]);
+
+  if (!isAuth || isSyncing) {
     return (
       <div
         data-testid="auth-loading"

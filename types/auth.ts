@@ -1,5 +1,13 @@
 export type UserRole = "PEMILIK" | "PENGHUNI";
 
+export type AuthErrorReason =
+  | "unregistered"
+  | "inactive"
+  | "no_room"
+  | "auth_failed"
+  | "owner_oauth_unsupported"
+  | "no_code";
+
 export interface UserSession {
   id: string;
   username: string;

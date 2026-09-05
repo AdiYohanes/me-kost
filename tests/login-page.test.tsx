@@ -28,7 +28,7 @@ describe("LoginPage", () => {
   it("merender form input username, password, dan tombol masuk", () => {
     render(<LoginPage />);
 
-    expect(screen.getByLabelText(/username atau nomor kamar/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/email atau username/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/kata sandi/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /masuk ke dashboard/i })).toBeInTheDocument();
   });
@@ -48,7 +48,7 @@ describe("LoginPage", () => {
   it("menampilkan pesan error jika kredensial salah", async () => {
     render(<LoginPage />);
 
-    const usernameInput = screen.getByLabelText(/username atau nomor kamar/i);
+    const usernameInput = screen.getByLabelText(/email atau username/i);
     const passwordInput = screen.getByLabelText(/kata sandi/i);
     const submitBtn = screen.getByRole("button", { name: /masuk ke dashboard/i });
 
@@ -65,7 +65,7 @@ describe("LoginPage", () => {
   it("berhasil login manual dengan kredensial pemilik dan redirect ke /dashboard", async () => {
     render(<LoginPage />);
 
-    const usernameInput = screen.getByLabelText(/username atau nomor kamar/i);
+    const usernameInput = screen.getByLabelText(/email atau username/i);
     const passwordInput = screen.getByLabelText(/kata sandi/i);
     const submitBtn = screen.getByRole("button", { name: /masuk ke dashboard/i });
 

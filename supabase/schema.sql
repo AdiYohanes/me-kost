@@ -108,13 +108,28 @@ CREATE POLICY "kamar_all_pemilik"
 CREATE POLICY "users_read_self_or_pemilik"
     ON public.users FOR SELECT
     TO authenticated
-    USING (auth_id = auth.uid() OR id = auth.uid() OR public.is_pemilik());
+    USING (
+        auth_id = auth.uid() OR 
+        id = auth.uid() OR 
+        lower(email) = lower(auth.jwt() ->> 'email') OR 
+        public.is_pemilik()
+    );
 
 CREATE POLICY "users_update_self_or_pemilik"
     ON public.users FOR UPDATE
     TO authenticated
-    USING (auth_id = auth.uid() OR id = auth.uid() OR public.is_pemilik())
-    WITH CHECK (auth_id = auth.uid() OR id = auth.uid() OR public.is_pemilik());
+    USING (
+        auth_id = auth.uid() OR 
+        id = auth.uid() OR 
+        lower(email) = lower(auth.jwt() ->> 'email') OR 
+        public.is_pemilik()
+    )
+    WITH CHECK (
+        auth_id = auth.uid() OR 
+        id = auth.uid() OR 
+        lower(email) = lower(auth.jwt() ->> 'email') OR 
+        public.is_pemilik()
+    );
 
 CREATE POLICY "users_insert_pemilik"
     ON public.users FOR INSERT

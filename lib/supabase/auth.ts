@@ -127,10 +127,24 @@ export async function fetchUserProfile(
 }
 
 /**
+ * Helper untuk menautkan auth_id Supabase ke baris tabel public.users.
+ */
+export async function linkUserAuthId(
+  supabase: SupabaseClient,
+  userId: string,
+  authUserId: string
+) {
+  return supabase
+    .from("users")
+    .update({ auth_id: authUserId })
+    .eq("id", userId);
+}
+
+/**
  * Memvalidasi dan menautkan akun Google Penghuni ke data kamar terdaftar.
  * Dipanggil pada rute OAuth callback atau saat sinkronisasi sesi.
  */
-export async function verifyAndLinkTenantGoogleUser(
+export async function verifyAndLinkPenghuniGoogleUser(
   supabase: SupabaseClient,
   authUserId: string,
   email: string
@@ -179,11 +193,7 @@ export async function verifyAndLinkTenantGoogleUser(
 
   // Tautkan auth_id jika belum terhubung atau berbeda
   if (profile.auth_id !== authUserId) {
-    await supabase
-      .from("users")
-      .update({ auth_id: authUserId })
-      .eq("id", profile.id);
-
+    await linkUserAuthId(supabase, profile.id, authUserId);
     profile.auth_id = authUserId;
   }
 
@@ -192,6 +202,9 @@ export async function verifyAndLinkTenantGoogleUser(
     profile,
   };
 }
+
+// Alias untuk backwards compatibility jika ada modul lama
+export const verifyAndLinkTenantGoogleUser = verifyAndLinkPenghuniGoogleUser;
 
 /**
  * Logout dari sesi Supabase Auth.

@@ -51,7 +51,7 @@ describe("useAuthStore", () => {
   it("gagal login jika kata sandi salah", () => {
     const res = useAuthStore.getState().login("pemilik", "password_salah");
     expect(res.success).toBe(false);
-    expect(res.error).toBe("Kata sandi salah. Silakan coba lagi.");
+    expect(res.error).toBe("Kata sandi salah.");
 
     const state = useAuthStore.getState();
     expect(state.isAuthenticated).toBe(false);

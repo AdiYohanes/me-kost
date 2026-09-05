@@ -70,11 +70,15 @@ function LoginForm() {
   const emailQuery = searchParams.get("email") || "";
   const [dismissedUnregistered, setDismissedUnregistered] = useState(false);
 
-  const [errorMsg, setErrorMsg] = useState(() =>
-    errorQuery === "auth_failed"
-      ? "Gagal mengautentikasi akun Google. Silakan coba kembali."
-      : ""
-  );
+  const [errorMsg, setErrorMsg] = useState(() => {
+    if (errorQuery === "auth_failed") {
+      return "Gagal mengautentikasi akun Google. Silakan coba kembali.";
+    }
+    if (errorQuery === "owner_oauth_unsupported") {
+      return "Akun Pemilik Kost wajib masuk menggunakan formulir Email & Kata Sandi di bawah.";
+    }
+    return "";
+  });
 
   const unregisteredEmail =
     !dismissedUnregistered &&
@@ -150,7 +154,7 @@ function LoginForm() {
     }
   };
 
-  const demoRooms = ["101", "102", "103", "104", "105", "106", "107", "108"];
+  const demoKamar = ["101", "102", "103", "104", "105", "106", "107", "108"];
 
   const waHref = `https://wa.me/6281234567890?text=${encodeURIComponent(
     `Halo Ibu Hj. Syantika (Pemilik Kost), saya ingin mendaftarkan email Google saya (${unregisteredEmail}) untuk kamar kost di Kost Syantika.`
@@ -172,7 +176,7 @@ function LoginForm() {
           <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-zinc-950/80 text-xs font-medium tracking-wide backdrop-blur-xs border border-white/15">
               <Building2 className="w-3.5 h-3.5 text-emerald-400" />
-              Kost Syantika • 8 Unit Kamar
+              Kost Syantika • 8 Kamar
             </span>
             <span className="text-xs text-zinc-200 font-medium">
               Jl. Melati No. 15
@@ -295,14 +299,14 @@ function LoginForm() {
                 className="text-xs font-semibold text-zinc-800 flex items-center gap-1.5"
               >
                 <User className="w-3.5 h-3.5 text-zinc-500" />
-                <span>Username atau Nomor Kamar</span>
+                <span>Email atau Username Pemilik Kost</span>
               </label>
               <Input
                 id="username"
                 name="username"
                 type="text"
                 autoCapitalize="none"
-                placeholder="Contoh: pemilik atau 101"
+                placeholder="Contoh: pemilik@kostsyantika.com atau pemilik"
                 value={username}
                 onChange={(e) => {
                   setUsername(e.target.value);
@@ -436,16 +440,16 @@ function LoginForm() {
               <span>Akses Penghuni Kamar (101 - 108):</span>
             </p>
             <div className="grid grid-cols-4 gap-1.5">
-              {demoRooms.map((room) => (
+              {demoKamar.map((kamar) => (
                 <Button
-                  key={room}
+                  key={kamar}
                   type="button"
                   variant="outline"
                   size="sm"
                   className="text-xs font-bold tabular-nums h-9 rounded-md border-zinc-200 bg-zinc-50 hover:bg-zinc-900 hover:text-white hover:border-zinc-900 text-zinc-900 transition-colors cursor-pointer shadow-2xs"
-                  onClick={() => handleQuickLogin(room)}
+                  onClick={() => handleQuickLogin(kamar)}
                 >
-                  {room}
+                  {kamar}
                 </Button>
               ))}
             </div>
