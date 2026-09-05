@@ -64,7 +64,7 @@ export function PemilikVerifikasiAntrean() {
   return (
     <div className="space-y-3">
       <Card className="card-shadow border-amber-200/80 bg-linear-to-b from-amber-50/30 to-white overflow-hidden">
-        <CardHeader className="pb-2.5">
+        <CardHeader className="p-5 pb-3.5">
           <div className="flex items-center justify-between">
             <CardTitle className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
               <Clock className="w-4 h-4 text-amber-500" />
@@ -72,7 +72,7 @@ export function PemilikVerifikasiAntrean() {
             </CardTitle>
             <Badge
               variant={antreanVerifikasi.length > 0 ? "pending" : "outline"}
-              className="text-[10px] px-2"
+              className="text-[10px] px-2.5 py-0.5"
             >
               {antreanVerifikasi.length > 0
                 ? `${antreanVerifikasi.length} Menunggu`
@@ -81,23 +81,23 @@ export function PemilikVerifikasiAntrean() {
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-3">
+        <CardContent className="p-5 pt-0 space-y-3.5">
           {antreanVerifikasi.length === 0 ? (
             /* Empty State */
-            <div className="py-6 px-4 text-center rounded-2xl bg-white border border-dashed border-emerald-200 flex flex-col items-center">
+            <div className="py-8 px-5 text-center rounded-2xl bg-white border border-dashed border-emerald-200 flex flex-col items-center">
               <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mb-2">
                 <CheckCircle2 className="w-5 h-5" />
               </div>
               <p className="text-xs font-bold text-slate-800">
                 Semua Bukti Telah Diverifikasi
               </p>
-              <p className="text-[11px] text-slate-500 max-w-[240px] mt-0.5">
+              <p className="text-[11px] text-slate-500 max-w-[240px] mt-1">
                 Tidak ada bukti transfer baru yang menunggu persetujuan Anda saat ini.
               </p>
             </div>
           ) : (
             /* List Antrean */
-            <div className="space-y-2.5">
+            <div className="space-y-3">
               {antreanVerifikasi.map((tagihan) => {
                 const formattedUploadTime = tagihan.buktiPembayaran?.uploadedAt
                   ? new Date(tagihan.buktiPembayaran.uploadedAt).toLocaleString(
@@ -114,11 +114,11 @@ export function PemilikVerifikasiAntrean() {
                 return (
                   <div
                     key={tagihan.id}
-                    className="p-3 bg-white rounded-xl border border-slate-200/90 shadow-xs space-y-2.5 hover:border-amber-300 transition-colors"
+                    className="p-4 bg-white rounded-xl border border-slate-200/90 shadow-xs space-y-3 hover:border-amber-300 transition-colors"
                   >
                     {/* Header Item: Kamar, Nama, Nominal */}
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-2.5">
+                    <div className="flex items-start justify-between gap-2.5">
+                      <div className="flex items-center gap-3">
                         <div className="flex flex-col items-center justify-center w-11 h-11 rounded-xl bg-amber-500 text-white shadow-xs shrink-0">
                           <span className="text-[8px] uppercase tracking-wider font-semibold opacity-90 leading-tight">
                             Kamar
@@ -133,29 +133,29 @@ export function PemilikVerifikasiAntrean() {
                               Kamar {tagihan.nomorKamar} • {tagihan.penghuniNama}
                             </p>
                           </div>
-                          <p className="text-[10px] text-slate-500 flex items-center gap-1 mt-0.5">
+                          <p className="text-[10px] text-slate-500 flex items-center gap-1 mt-1">
                             <Calendar className="w-3 h-3 text-slate-400" />
                             <span>Unggah: {formattedUploadTime}</span>
                           </p>
                         </div>
                       </div>
 
-                      <div className="text-right">
+                      <div className="text-right shrink-0">
                         <span className="text-xs font-black text-slate-900 block">
                           {formatRupiah(tagihan.nominal)}
                         </span>
-                        <Badge variant="pending" className="text-[9px] py-0 px-1.5 h-4">
+                        <Badge variant="pending" className="text-[9px] py-0 px-1.5 h-4 mt-0.5">
                           Perlu Verifikasi
                         </Badge>
                       </div>
                     </div>
 
                     {/* Thumbnail & Tenant Note */}
-                    <div className="flex items-center gap-2 p-2 bg-slate-50 rounded-lg border border-slate-100">
+                    <div className="flex items-center gap-3 p-3 bg-slate-50/90 rounded-xl border border-slate-100">
                       {tagihan.buktiPembayaran && (
                         <div
                           onClick={() => setSelectedTagihanForLightbox(tagihan)}
-                          className="w-14 h-14 rounded-md border border-slate-200 overflow-hidden bg-slate-900/5 shrink-0 cursor-pointer relative group"
+                          className="w-14 h-14 rounded-lg border border-slate-200 overflow-hidden bg-slate-900/5 shrink-0 cursor-pointer relative group"
                           title="Klik untuk memperbesar bukti transfer"
                         >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -185,7 +185,7 @@ export function PemilikVerifikasiAntrean() {
                           variant="link"
                           size="sm"
                           onClick={() => setSelectedTagihanForLightbox(tagihan)}
-                          className="h-auto p-0 text-[10px] text-emerald-600 font-semibold gap-1 mt-1"
+                          className="h-auto p-0 text-[10px] text-emerald-600 font-semibold gap-1 mt-1.5 cursor-pointer"
                         >
                           <Eye className="w-3 h-3" />
                           <span>Lihat Bukti Ukuran Penuh</span>
@@ -194,13 +194,13 @@ export function PemilikVerifikasiAntrean() {
                     </div>
 
                     {/* Actions: Tolak vs Setujui */}
-                    <div className="flex items-center gap-2 pt-1 border-t border-slate-100">
+                    <div className="flex items-center gap-2.5 pt-2.5 border-t border-slate-100">
                       <Button
                         type="button"
                         variant="outline"
                         size="sm"
                         onClick={() => setSelectedTagihanForReject(tagihan)}
-                        className="flex-1 h-8 text-[11px] font-semibold text-rose-600 border-rose-200 hover:bg-rose-50 hover:border-rose-300 gap-1"
+                        className="flex-1 h-9 text-xs font-semibold text-rose-600 border-rose-200 hover:bg-rose-50 hover:border-rose-300 gap-1.5 cursor-pointer"
                       >
                         <XCircle className="w-3.5 h-3.5" />
                         <span>Tolak</span>
@@ -210,7 +210,7 @@ export function PemilikVerifikasiAntrean() {
                         type="button"
                         size="sm"
                         onClick={() => handleApprove(tagihan)}
-                        className="flex-1 h-8 text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white gap-1 shadow-xs"
+                        className="flex-1 h-9 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 shadow-xs cursor-pointer"
                       >
                         <CheckCircle2 className="w-3.5 h-3.5" />
                         <span>Setujui</span>
