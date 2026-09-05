@@ -12,6 +12,9 @@ import {
   ShieldCheck,
   DoorClosed,
   Sparkles,
+  Eye,
+  EyeOff,
+  ArrowRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,6 +36,7 @@ export default function LoginPage() {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -66,9 +70,14 @@ export default function LoginPage() {
     setIsLoading(false);
 
     if (result.success) {
-      toast.success(`Berhasil masuk sebagai ${userKey === "pemilik" ? "Pemilik Kost" : `Kamar ${userKey}`}!`, {
-        description: "Mengarahkan ke dashboard...",
-      });
+      toast.success(
+        `Berhasil masuk sebagai ${
+          userKey === "pemilik" ? "Pemilik Kost" : `Kamar ${userKey}`
+        }!`,
+        {
+          description: "Mengarahkan ke dashboard...",
+        }
+      );
       router.replace("/dashboard");
     } else {
       setErrorMsg(result.error || "Gagal masuk dengan akun demo.");
@@ -83,26 +92,26 @@ export default function LoginPage() {
         <div className="w-full max-w-md flex flex-col space-y-6">
           {/* Header Brand */}
           <div className="flex flex-col items-center text-center space-y-3 mb-1">
-            <div className="w-14 h-14 rounded-2xl bg-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-600/25 ring-4 ring-emerald-500/10">
+            <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-emerald-500 to-emerald-700 flex items-center justify-center text-white shadow-lg shadow-emerald-600/25 ring-4 ring-emerald-500/15">
               <Building2 className="w-8 h-8" />
             </div>
             <div>
               <h1 className="text-2xl font-black tracking-tight text-slate-900">
                 Kost Syantika
               </h1>
-              <p className="text-xs font-medium text-emerald-700 mt-0.5">
+              <p className="text-xs font-semibold text-emerald-700 mt-0.5 tracking-wide">
                 Manajemen Pembayaran & Sewa Kamar
               </p>
             </div>
           </div>
 
           {/* Form Login Card */}
-          <Card className="card-shadow border-slate-200/80">
-            <CardHeader className="p-5 pb-4 space-y-1.5">
+          <Card className="card-shadow border-slate-200/80 bg-white">
+            <CardHeader className="p-5 pb-4 space-y-1">
               <CardTitle className="text-lg font-bold text-slate-900">
                 Masuk ke Akun
               </CardTitle>
-              <CardDescription className="text-xs">
+              <CardDescription className="text-xs text-slate-500">
                 Gunakan username Pemilik atau Nomor Kamar Anda untuk masuk
               </CardDescription>
             </CardHeader>
@@ -110,19 +119,19 @@ export default function LoginPage() {
             <CardContent className="p-5 pt-0">
               <form onSubmit={handleSubmit} className="space-y-4">
                 {errorMsg && (
-                  <div className="flex items-start gap-2.5 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs animate-in fade-in">
+                  <div className="flex items-start gap-2.5 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-medium animate-in fade-in">
                     <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600" />
-                    <span>{errorMsg}</span>
+                    <span className="leading-relaxed">{errorMsg}</span>
                   </div>
                 )}
 
                 <div className="space-y-1.5">
                   <label
                     htmlFor="username"
-                    className="text-xs font-semibold text-slate-700 flex items-center gap-1.5"
+                    className="text-xs font-bold text-slate-700 flex items-center gap-1.5"
                   >
-                    <User className="w-3.5 h-3.5 text-slate-500" />
-                    Username atau Nomor Kamar
+                    <User className="w-3.5 h-3.5 text-slate-400" />
+                    <span>Username atau Nomor Kamar</span>
                   </label>
                   <Input
                     id="username"
@@ -135,7 +144,7 @@ export default function LoginPage() {
                       setUsername(e.target.value);
                       if (errorMsg) setErrorMsg("");
                     }}
-                    className="h-10 text-sm"
+                    className="h-11 rounded-xl text-sm border-slate-200 focus-visible:ring-emerald-500"
                     required
                   />
                 </div>
@@ -143,56 +152,81 @@ export default function LoginPage() {
                 <div className="space-y-1.5">
                   <label
                     htmlFor="password"
-                    className="text-xs font-semibold text-slate-700 flex items-center gap-1.5"
+                    className="text-xs font-bold text-slate-700 flex items-center gap-1.5"
                   >
-                    <KeyRound className="w-3.5 h-3.5 text-slate-500" />
-                    Kata Sandi
+                    <KeyRound className="w-3.5 h-3.5 text-slate-400" />
+                    <span>Kata Sandi</span>
                   </label>
-                  <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    placeholder="Masukkan kata sandi (demo: 123456)"
-                    value={password}
-                    onChange={(e) => {
-                      setPassword(e.target.value);
-                      if (errorMsg) setErrorMsg("");
-                    }}
-                    className="h-10 text-sm"
-                    required
-                  />
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Masukkan kata sandi (demo: 123456)"
+                      value={password}
+                      onChange={(e) => {
+                        setPassword(e.target.value);
+                        if (errorMsg) setErrorMsg("");
+                      }}
+                      className="h-11 pr-11 rounded-xl text-sm border-slate-200 focus-visible:ring-emerald-500"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-0 top-0 h-11 w-11 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                      aria-label={
+                        showPassword
+                          ? "Sembunyikan password"
+                          : "Tampilkan password"
+                      }
+                    >
+                      {showPassword ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
                 </div>
 
                 <Button
                   type="submit"
                   variant="emerald"
-                  className="w-full h-11 gap-2 font-semibold text-sm shadow-md shadow-emerald-600/20"
+                  className="w-full h-11 gap-2 font-bold text-sm rounded-xl shadow-md shadow-emerald-600/20 active:scale-[0.98] transition-all cursor-pointer"
                   disabled={isLoading}
                 >
                   <LogIn className="w-4 h-4" />
-                  {isLoading ? "Memproses..." : "Masuk ke Dashboard"}
+                  <span>
+                    {isLoading ? "Memproses..." : "Masuk ke Dashboard"}
+                  </span>
                 </Button>
               </form>
             </CardContent>
           </Card>
 
           {/* Demo Credentials Guide Card */}
-          <Card className="border-emerald-100 bg-linear-to-br from-emerald-500/5 via-white to-emerald-50/50 card-shadow">
-            <CardHeader className="p-5 pb-3">
+          <Card className="border-emerald-200/80 bg-linear-to-b from-emerald-50/40 via-white to-emerald-50/20 card-shadow overflow-hidden">
+            <CardHeader className="p-5 pb-3.5">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5">
-                  <Sparkles className="w-4 h-4 text-emerald-600" />
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                    <Sparkles className="w-3.5 h-3.5" />
+                  </div>
                   <CardTitle className="text-sm font-bold text-slate-900">
                     Panduan Kredensial Demo
                   </CardTitle>
                 </div>
-                <Badge variant="outline" className="text-[10px] border-emerald-300 text-emerald-700">
+                <Badge
+                  variant="outline"
+                  className="text-xs font-semibold border-emerald-300 text-emerald-800 bg-white"
+                >
                   Satu Klik Masuk
                 </Badge>
               </div>
-              <CardDescription className="text-xs text-slate-600 mt-1">
+              <CardDescription className="text-xs text-slate-600 mt-1.5 leading-relaxed">
                 Pilih peran di bawah untuk login instan atau gunakan kata sandi:{" "}
-                <code className="bg-emerald-100/70 text-emerald-800 px-1 py-0.5 rounded font-mono font-bold">
+                <code className="bg-emerald-100/80 text-emerald-900 px-1.5 py-0.5 rounded-md font-mono font-bold text-xs">
                   123456
                 </code>
               </CardDescription>
@@ -201,41 +235,45 @@ export default function LoginPage() {
             <CardContent className="p-5 pt-0 space-y-4">
               {/* Pemilik Demo Button */}
               <div className="space-y-1.5">
-                <div className="text-[11px] font-semibold text-slate-600 flex items-center gap-1">
+                <p className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                  Akses Pemilik Kost:
-                </div>
+                  <span>Akses Pemilik Kost:</span>
+                </p>
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full p-3.5 min-h-[52px] justify-between border-emerald-200 hover:bg-emerald-50 hover:border-emerald-300"
+                  className="w-full p-3.5 h-auto min-h-[54px] justify-between border-emerald-200 bg-white hover:bg-emerald-50/90 hover:border-emerald-300 rounded-xl group transition-all cursor-pointer active:scale-[0.98]"
                   onClick={() => handleQuickLogin("pemilik")}
                 >
-                  <div className="flex items-center gap-2.5 text-left">
-                    <div className="w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold shrink-0">
+                  <div className="flex items-center gap-3 text-left">
+                    <div className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold shrink-0 shadow-xs">
                       P
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-slate-800">
+                      <p className="text-xs font-bold text-slate-900 group-hover:text-emerald-950 transition-colors">
                         Ibu Hj. Syantika (Pemilik)
                       </p>
-                      <p className="text-[10px] text-slate-500">
-                        Username: <code className="font-semibold text-emerald-700">pemilik</code>
+                      <p className="text-xs text-slate-500 font-normal">
+                        Username:{" "}
+                        <code className="font-semibold text-emerald-700">
+                          pemilik
+                        </code>
                       </p>
                     </div>
                   </div>
-                  <Badge variant="lunas" className="text-[10px]">
-                    Masuk
-                  </Badge>
+                  <div className="flex items-center gap-1.5 text-emerald-700 group-hover:text-emerald-800 font-bold text-xs bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200/80">
+                    <span>Masuk</span>
+                    <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                  </div>
                 </Button>
               </div>
 
               {/* Penghuni Demo Chips */}
-              <div className="space-y-2 pt-2 border-t border-slate-100">
-                <div className="text-[11px] font-semibold text-slate-600 flex items-center gap-1">
+              <div className="space-y-2 pt-3 border-t border-slate-100">
+                <p className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
                   <DoorClosed className="w-3.5 h-3.5 text-emerald-600" />
-                  Akses Penghuni Kamar (101 - 108):
-                </div>
+                  <span>Akses Penghuni Kamar (101 - 108):</span>
+                </p>
                 <div className="grid grid-cols-4 gap-2">
                   {demoRooms.map((room) => (
                     <Button
@@ -243,7 +281,7 @@ export default function LoginPage() {
                       type="button"
                       variant="outline"
                       size="sm"
-                      className="text-xs font-semibold h-10 border-slate-200 hover:border-emerald-400 hover:bg-emerald-50 text-slate-700"
+                      className="text-xs font-bold h-10 rounded-xl border-emerald-200/70 bg-white hover:bg-emerald-600 hover:text-white hover:border-emerald-600 text-emerald-950 active:scale-[0.96] transition-all cursor-pointer shadow-2xs"
                       onClick={() => handleQuickLogin(room)}
                     >
                       {room}
@@ -254,9 +292,10 @@ export default function LoginPage() {
             </CardContent>
 
             <CardFooter className="p-5 pt-0 pb-4 text-center justify-center">
-              <span className="text-[10px] text-slate-400">
-                Klik salah satu nomor kamar untuk langsung menguji tampilan penghuni.
-              </span>
+              <p className="text-xs text-slate-500 font-medium">
+                Klik salah satu nomor kamar untuk langsung menguji tampilan
+                penghuni.
+              </p>
             </CardFooter>
           </Card>
 
