@@ -20,7 +20,8 @@ CREATE TABLE IF NOT EXISTS public.kamar (
 
 -- 3. TABEL: users (Profil Pengguna terhubung ke auth.users)
 CREATE TABLE IF NOT EXISTS public.users (
-    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    auth_id UUID UNIQUE REFERENCES auth.users(id) ON DELETE SET NULL,
     role TEXT NOT NULL CHECK (role IN ('PEMILIK', 'PENGHUNI')),
     nama TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
@@ -63,6 +64,7 @@ CREATE TABLE IF NOT EXISTS public.bukti_pembayaran (
 -- 6. INDEXES UNTUK PERFORMA QUERY CEPAT
 CREATE INDEX IF NOT EXISTS idx_kamar_nomor ON public.kamar(nomor_kamar);
 CREATE INDEX IF NOT EXISTS idx_users_email ON public.users(email);
+CREATE INDEX IF NOT EXISTS idx_users_auth_id ON public.users(auth_id);
 CREATE INDEX IF NOT EXISTS idx_users_kamar ON public.users(kamar_id);
 CREATE INDEX IF NOT EXISTS idx_tagihan_kamar ON public.tagihan(kamar_id);
 CREATE INDEX IF NOT EXISTS idx_tagihan_status ON public.tagihan(status);
@@ -81,7 +83,7 @@ RETURNS BOOLEAN AS $$
 BEGIN
     RETURN EXISTS (
         SELECT 1 FROM public.users
-        WHERE id = auth.uid() AND role = 'PEMILIK'
+        WHERE (auth_id = auth.uid() OR id = auth.uid()) AND role = 'PEMILIK'
     );
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -93,7 +95,7 @@ CREATE POLICY "kamar_read_self_or_pemilik"
     TO authenticated
     USING (
         public.is_pemilik() OR 
-        id = (SELECT kamar_id FROM public.users WHERE id = auth.uid())
+        id = (SELECT kamar_id FROM public.users WHERE auth_id = auth.uid() OR id = auth.uid())
     );
 
 CREATE POLICY "kamar_all_pemilik"
@@ -106,18 +108,18 @@ CREATE POLICY "kamar_all_pemilik"
 CREATE POLICY "users_read_self_or_pemilik"
     ON public.users FOR SELECT
     TO authenticated
-    USING (id = auth.uid() OR public.is_pemilik());
+    USING (auth_id = auth.uid() OR id = auth.uid() OR public.is_pemilik());
 
 CREATE POLICY "users_update_self_or_pemilik"
     ON public.users FOR UPDATE
     TO authenticated
-    USING (id = auth.uid() OR public.is_pemilik())
-    WITH CHECK (id = auth.uid() OR public.is_pemilik());
+    USING (auth_id = auth.uid() OR id = auth.uid() OR public.is_pemilik())
+    WITH CHECK (auth_id = auth.uid() OR id = auth.uid() OR public.is_pemilik());
 
 CREATE POLICY "users_insert_pemilik"
     ON public.users FOR INSERT
     TO authenticated
-    WITH CHECK (public.is_pemilik() OR id = auth.uid());
+    WITH CHECK (public.is_pemilik() OR auth_id = auth.uid() OR id = auth.uid());
 
 CREATE POLICY "users_delete_pemilik"
     ON public.users FOR DELETE
@@ -131,7 +133,7 @@ CREATE POLICY "tagihan_read_self_or_pemilik"
     TO authenticated
     USING (
         public.is_pemilik() OR 
-        kamar_id = (SELECT kamar_id FROM public.users WHERE id = auth.uid())
+        kamar_id = (SELECT kamar_id FROM public.users WHERE auth_id = auth.uid() OR id = auth.uid())
     );
 
 CREATE POLICY "tagihan_all_pemilik"
@@ -149,7 +151,7 @@ CREATE POLICY "bukti_read_self_or_pemilik"
         public.is_pemilik() OR
         tagihan_id IN (
             SELECT id FROM public.tagihan 
-            WHERE kamar_id = (SELECT kamar_id FROM public.users WHERE id = auth.uid())
+            WHERE kamar_id = (SELECT kamar_id FROM public.users WHERE auth_id = auth.uid() OR id = auth.uid())
         )
     );
 
@@ -160,7 +162,7 @@ CREATE POLICY "bukti_insert_penghuni_or_pemilik"
         public.is_pemilik() OR
         tagihan_id IN (
             SELECT id FROM public.tagihan 
-            WHERE kamar_id = (SELECT kamar_id FROM public.users WHERE id = auth.uid())
+            WHERE kamar_id = (SELECT kamar_id FROM public.users WHERE auth_id = auth.uid() OR id = auth.uid())
               AND status IN ('BELUM_BAYAR', 'DITOLAK', 'MENUNGGAK')
         )
     );
