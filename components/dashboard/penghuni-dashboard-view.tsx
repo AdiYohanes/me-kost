@@ -24,6 +24,7 @@ import {
 import { PenghuniTagihanCard } from "@/components/dashboard/penghuni-tagihan-card";
 import { PenghuniRiwayatPembayaran } from "@/components/dashboard/penghuni-riwayat-pembayaran";
 import { PengaturanProfilView } from "@/components/dashboard/pengaturan-profil-view";
+import { useSupabaseRealtime } from "@/lib/hooks/use-supabase-realtime";
 
 interface PenghuniDashboardViewProps {
   user: UserSession;
@@ -46,6 +47,14 @@ export function PenghuniDashboardView({
   );
 
   const nomorKamar = user.nomorKamar || user.kamarId || "101";
+
+  // Langganan pembaruan Supabase Realtime untuk status tagihan penghuni
+  useSupabaseRealtime({
+    role: "PENGHUNI",
+    nomorKamar,
+    kamarId: user.kamarId,
+  });
+
   const tagihanAktif = getTagihanAktifByKamar(nomorKamar);
   const evaluasi = tagihanAktif ? hitungStatusTagihan(tagihanAktif) : null;
   const isH3Aktif = Boolean(

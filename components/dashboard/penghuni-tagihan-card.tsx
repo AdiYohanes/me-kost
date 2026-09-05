@@ -36,8 +36,7 @@ import {
   formatUkuranBerkas,
   HasilKompresi,
 } from "@/lib/kompresi-gambar";
-import { uploadBuktiTransferSupabase } from "@/lib/supabase/tagihan";
-import { createClient } from "@/lib/supabase/client";
+import { useOptimisticTagihanMutations } from "@/lib/hooks/use-payment-query";
 
 interface PenghuniTagihanCardProps {
   user: UserSession;
@@ -46,6 +45,7 @@ interface PenghuniTagihanCardProps {
 export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
   const kamarIdentifier = user.nomorKamar || user.kamarId || "101";
   const { getTagihanAktifByKamar, uploadBuktiTransfer } = usePaymentStore();
+  const { uploadBuktiMutation } = useOptimisticTagihanMutations();
   const tagihan = getTagihanAktifByKamar(kamarIdentifier);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -150,27 +150,19 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
     }
 
     const dataUrlToUse = compressedResult?.dataUrl || previewUrl;
+    const fileToUpload = compressedResult?.file || compressedResult?.blob;
+
     uploadBuktiTransfer(tagihan.id, dataUrlToUse, catatan.trim() || undefined);
 
-    // Kirim juga ke Supabase BaaS jika tersedia
-    if (compressedResult?.file || compressedResult?.blob) {
-      try {
-        const supabase = createClient();
-        const fileToUpload = compressedResult.file || compressedResult.blob;
-        uploadBuktiTransferSupabase(supabase, {
-          tagihanId: tagihan.id,
-          nomorKamar: tagihan.nomorKamar || user.nomorKamar || "101",
-          tahun: tagihan.tahun || 2026,
-          bulan: tagihan.bulan || 9,
-          file: fileToUpload,
-          catatanPenghuni: catatan.trim() || undefined,
-        }).catch(() => {
-          // Silent catch in offline / mock mode
-        });
-      } catch {
-        // Fallback silently in mock mode
-      }
-    }
+    uploadBuktiMutation.mutate({
+      tagihanId: tagihan.id,
+      nomorKamar: tagihan.nomorKamar || user.nomorKamar || "101",
+      tahun: tagihan.tahun || 2026,
+      bulan: tagihan.bulan || 9,
+      previewUrl: dataUrlToUse,
+      file: fileToUpload,
+      catatanPenghuni: catatan.trim() || undefined,
+    });
 
     toast.success("Bukti transfer berhasil dikirim. Menunggu verifikasi Pemilik Kost.");
     setPreviewUrl(null);

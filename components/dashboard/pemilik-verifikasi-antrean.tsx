@@ -17,14 +17,11 @@ import { Tagihan } from "@/types/payment";
 import { BuktiLightboxDialog } from "./bukti-lightbox-dialog";
 import { TolakBuktiDialog } from "./tolak-bukti-dialog";
 import { formatRupiah } from "./pemilik-summary-cards";
-import { createClient } from "@/lib/supabase/client";
-import {
-  verifikasiLunasSupabase,
-  tolakBuktiPembayaranSupabase,
-} from "@/lib/supabase/tagihan";
+import { useOptimisticTagihanMutations } from "@/lib/hooks/use-payment-query";
 
 export function PemilikVerifikasiAntrean() {
   const { tagihanList, approveTagihan, rejectTagihan } = usePaymentStore();
+  const { verifikasiMutation, tolakMutation } = useOptimisticTagihanMutations();
 
   const [selectedTagihanForLightbox, setSelectedTagihanForLightbox] =
     useState<Tagihan | null>(null);
@@ -39,13 +36,11 @@ export function PemilikVerifikasiAntrean() {
   const handleApprove = (tagihan: Tagihan) => {
     approveTagihan(tagihan.id);
 
-    // Asinkronus simpan ke basis data Supabase jika tersedia
-    try {
-      const supabase = createClient();
-      verifikasiLunasSupabase(supabase, tagihan.id).catch(() => {});
-    } catch {
-      // Mock mode
-    }
+    verifikasiMutation.mutate({
+      tagihanId: tagihan.id,
+      nomorKamar: tagihan.nomorKamar,
+      penghuniNama: tagihan.penghuniNama,
+    });
 
     toast.success(`Pembayaran Kamar ${tagihan.nomorKamar} Berhasil Disetujui!`, {
       description: `Status tagihan ${tagihan.penghuniNama} telah diubah menjadi LUNAS.`,
@@ -60,13 +55,12 @@ export function PemilikVerifikasiAntrean() {
     const { id, nomorKamar, penghuniNama } = selectedTagihanForReject;
     rejectTagihan(id, alasan);
 
-    // Asinkronus simpan penolakan ke basis data Supabase jika tersedia
-    try {
-      const supabase = createClient();
-      tolakBuktiPembayaranSupabase(supabase, id, alasan).catch(() => {});
-    } catch {
-      // Mock mode
-    }
+    tolakMutation.mutate({
+      tagihanId: id,
+      alasan,
+      nomorKamar,
+      penghuniNama,
+    });
 
     toast.error(`Bukti Pembayaran Kamar ${nomorKamar} Ditolak`, {
       description: `Catatan penolakan telah dikirimkan ke ${penghuniNama}.`,

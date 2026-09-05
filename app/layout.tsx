@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import { QueryProvider } from "@/components/providers/query-provider";
 
 const jakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
@@ -58,7 +59,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Me Kost" />
       </head>
       <body className="min-h-full flex flex-col font-sans bg-zinc-50 text-zinc-950">
-        {children}
+        <QueryProvider>{children}</QueryProvider>
         <Toaster position="top-center" richColors closeButton />
       </body>
     </html>

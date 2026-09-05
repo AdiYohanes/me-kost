@@ -16,6 +16,7 @@ import { PemilikSummaryCards } from "./pemilik-summary-cards";
 import { PemilikVerifikasiAntrean } from "./pemilik-verifikasi-antrean";
 import { PemilikDaftarKamar } from "./pemilik-daftar-kamar";
 import { PengaturanProfilView } from "./pengaturan-profil-view";
+import { useSupabaseRealtime } from "@/lib/hooks/use-supabase-realtime";
 
 interface PemilikDashboardViewProps {
   user: UserSession;
@@ -29,6 +30,9 @@ export function PemilikDashboardView({
 }: PemilikDashboardViewProps) {
   const { activePeriode } = usePaymentStore();
   const currentPeriodeLabel = activePeriode?.periodeBulan || "September 2026";
+
+  // Langganan pembaruan Supabase Realtime via WebSocket
+  useSupabaseRealtime({ role: "PEMILIK" });
 
   if (activeTab === "pengaturan") {
     return <PengaturanProfilView user={user} />;

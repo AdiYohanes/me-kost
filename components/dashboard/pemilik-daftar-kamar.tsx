@@ -37,12 +37,7 @@ import { TambahPenghuniDialog } from "./tambah-penghuni-dialog";
 import { UbahEmailDialog } from "./ubah-email-dialog";
 import { KeluarkanPenghuniDialog } from "./keluarkan-penghuni-dialog";
 import { formatRupiah } from "./pemilik-summary-cards";
-import { createClient } from "@/lib/supabase/client";
-import {
-  tandaiLunasCashSupabase,
-  verifikasiLunasSupabase,
-  tolakBuktiPembayaranSupabase,
-} from "@/lib/supabase/tagihan";
+import { useOptimisticTagihanMutations } from "@/lib/hooks/use-payment-query";
 
 type FilterType =
   | "SEMUA"
@@ -68,6 +63,8 @@ export function PemilikDaftarKamar() {
     keluarkanPenghuni,
     sinkronisasiTagihanOtomatis,
   } = usePaymentStore();
+  const { tandaiCashMutation, verifikasiMutation, tolakMutation } =
+    useOptimisticTagihanMutations();
 
   useEffect(() => {
     sinkronisasiTagihanOtomatis();
@@ -176,12 +173,12 @@ export function PemilikDaftarKamar() {
     const target = tagihanList.find((t) => t.id === tagihanId);
     markCashTagihan(tagihanId, catatan);
 
-    try {
-      const supabase = createClient();
-      tandaiLunasCashSupabase(supabase, tagihanId, catatan).catch(() => {});
-    } catch {
-      // Mock mode
-    }
+    tandaiCashMutation.mutate({
+      tagihanId,
+      catatan,
+      nomorKamar: target?.nomorKamar,
+      penghuniNama: target?.penghuniNama,
+    });
 
     toast.success(
       `Pembayaran Tunai Kamar ${target?.nomorKamar || ""} Tercatat!`,
@@ -225,12 +222,11 @@ export function PemilikDaftarKamar() {
   const handleApprove = (tagihan: Tagihan) => {
     approveTagihan(tagihan.id);
 
-    try {
-      const supabase = createClient();
-      verifikasiLunasSupabase(supabase, tagihan.id).catch(() => {});
-    } catch {
-      // Mock mode
-    }
+    verifikasiMutation.mutate({
+      tagihanId: tagihan.id,
+      nomorKamar: tagihan.nomorKamar,
+      penghuniNama: tagihan.penghuniNama,
+    });
 
     toast.success(`Pembayaran Kamar ${tagihan.nomorKamar} Berhasil Disetujui!`, {
       description: `Status tagihan ${tagihan.penghuniNama} telah diubah menjadi LUNAS.`,
@@ -245,12 +241,12 @@ export function PemilikDaftarKamar() {
     const { id, nomorKamar, penghuniNama } = selectedTagihanForReject;
     rejectTagihan(id, alasan);
 
-    try {
-      const supabase = createClient();
-      tolakBuktiPembayaranSupabase(supabase, id, alasan).catch(() => {});
-    } catch {
-      // Mock mode
-    }
+    tolakMutation.mutate({
+      tagihanId: id,
+      alasan,
+      nomorKamar,
+      penghuniNama,
+    });
 
     toast.error(`Bukti Pembayaran Kamar ${nomorKamar} Ditolak`, {
       description: `Catatan penolakan telah dikirimkan ke ${penghuniNama}.`,
