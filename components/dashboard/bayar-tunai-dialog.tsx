@@ -53,20 +53,20 @@ export function BayarTunaiDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-      <DialogContent className="max-w-md p-6">
-        <DialogHeader className="text-left pb-2">
-          <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center mb-2">
+      <DialogContent className="max-w-md p-5 sm:p-6">
+        <DialogHeader className="text-left pb-3 space-y-1">
+          <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center mb-1">
             <Banknote className="w-5 h-5" />
           </div>
           <DialogTitle className="text-lg font-black text-slate-900">
             Panduan Pembayaran Tunai (Cash)
           </DialogTitle>
-          <DialogDescription className="text-xs text-slate-500">
+          <DialogDescription className="text-xs text-slate-500 mt-0.5">
             Tata cara pembayaran sewa langsung kepada Pemilik Kost Syantika.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 text-xs text-slate-700">
+        <div className="space-y-4 text-xs text-slate-700 pt-1">
           {/* Info Pemilik Card */}
           <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-2.5">
             <div className="flex items-center justify-between">
@@ -90,7 +90,7 @@ export function BayarTunaiDialog({
                 variant="outline"
                 size="sm"
                 onClick={handleCopyPhone}
-                className="h-8 text-[11px] font-semibold gap-1.5 flex-1 border-slate-300"
+                className="h-9 text-xs font-semibold gap-1.5 flex-1 border-slate-300 cursor-pointer"
               >
                 {copied ? (
                   <Check className="w-3.5 h-3.5 text-emerald-600" />
@@ -106,7 +106,7 @@ export function BayarTunaiDialog({
                 )}`}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center justify-center h-8 px-3 rounded-lg text-[11px] font-semibold bg-emerald-600 text-white hover:bg-emerald-700 gap-1.5 flex-1 transition-colors"
+                className="inline-flex items-center justify-center h-9 px-3 rounded-lg text-xs font-semibold bg-emerald-600 text-white hover:bg-emerald-700 gap-1.5 flex-1 transition-colors"
               >
                 <MessageCircle className="w-3.5 h-3.5" />
                 <span>WhatsApp</span>
@@ -116,27 +116,27 @@ export function BayarTunaiDialog({
 
           {/* Lokasi & Jam */}
           <div className="grid grid-cols-2 gap-2 text-[11px]">
-            <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
               <div className="flex items-center gap-1 text-slate-500 font-medium mb-1">
                 <MapPin className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                 <span>Lokasi</span>
               </div>
               <p className="font-semibold text-slate-800">Ruang Pengelola Kost</p>
-              <p className="text-[10px] text-slate-500">Lantai 1, samping Ruang Tamu</p>
+              <p className="text-[10px] text-slate-500 mt-0.5">Lantai 1, samping Ruang Tamu</p>
             </div>
 
-            <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
               <div className="flex items-center gap-1 text-slate-500 font-medium mb-1">
                 <Clock className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                 <span>Jam Layanan</span>
               </div>
               <p className="font-semibold text-slate-800">08:00 - 20:00 WIB</p>
-              <p className="text-[10px] text-slate-500">Setiap hari</p>
+              <p className="text-[10px] text-slate-500 mt-0.5">Setiap hari</p>
             </div>
           </div>
 
           {/* Langkah Pembayaran */}
-          <div className="p-3 rounded-xl bg-emerald-50/60 border border-emerald-100/80 space-y-2">
+          <div className="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-100/80 space-y-2">
             <p className="font-bold text-emerald-950 text-xs">Langkah Pembayaran Tunai:</p>
             <ol className="space-y-1.5 list-decimal list-inside text-emerald-900 text-[11px] leading-relaxed">
               <li>Siapkan uang tunai pas sesuai nominal sewa kamar Anda.</li>

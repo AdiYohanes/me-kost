@@ -77,7 +77,7 @@ export function BottomNav({ role, activeTab, onTabChange }: BottomNavProps) {
   return (
     <nav
       aria-label="Navigasi Utama Bawah"
-      className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/90 shadow-[0_-4px_24px_rgba(0,0,0,0.06)] safe-bottom"
+      className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/80 shadow-[0_-4px_20px_rgba(0,0,0,0.04)] safe-bottom"
     >
       <div className="max-w-md mx-auto px-4 h-16 flex items-center justify-around">
         {tabs.map((tab) => {
@@ -89,14 +89,14 @@ export function BottomNav({ role, activeTab, onTabChange }: BottomNavProps) {
               key={tab.id}
               type="button"
               onClick={() => onTabChange(tab.id)}
-              className={`relative flex flex-col items-center justify-center flex-1 h-full py-1.5 transition-all select-none cursor-pointer touch-manipulation group ${
+              className={`relative flex flex-col items-center justify-center flex-1 h-full py-1 transition-all select-none cursor-pointer touch-manipulation group ${
                 isActive
                   ? "text-emerald-700 font-bold"
                   : "text-slate-600 hover:text-slate-800 font-medium"
               }`}
             >
               <div
-                className={`relative flex items-center justify-center w-10 h-7 rounded-full transition-all ${
+                className={`relative flex items-center justify-center w-12 h-7.5 rounded-full transition-all ${
                   isActive
                     ? "bg-emerald-100/80 text-emerald-700 scale-105"
                     : "text-slate-600 group-hover:bg-slate-100/80"
@@ -109,7 +109,7 @@ export function BottomNav({ role, activeTab, onTabChange }: BottomNavProps) {
                   </span>
                 )}
               </div>
-              <span className="text-[10px] tracking-tight mt-0.5">
+              <span className="text-[10px] tracking-tight mt-1">
                 {tab.label}
               </span>
             </button>

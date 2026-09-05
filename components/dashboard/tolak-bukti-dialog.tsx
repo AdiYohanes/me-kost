@@ -108,19 +108,19 @@ function TolakBuktiForm({
         </p>
       </div>
 
-      <DialogFooter className="pt-2 flex items-center gap-2">
+      <DialogFooter className="pt-4 flex items-center gap-2.5">
         <Button
           type="button"
           variant="outline"
           onClick={onClose}
-          className="flex-1 h-9 text-xs font-semibold border-slate-200 text-slate-700"
+          className="flex-1 h-10 text-xs font-semibold border-slate-200 text-slate-700 cursor-pointer"
         >
           Batal
         </Button>
         <Button
           type="submit"
           disabled={!isReasonValid}
-          className="flex-1 h-9 text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white disabled:opacity-40 disabled:cursor-not-allowed shadow-xs"
+          className="flex-1 h-10 text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white disabled:opacity-40 disabled:cursor-not-allowed shadow-xs cursor-pointer"
         >
           Konfirmasi Tolak
         </Button>
@@ -142,9 +142,9 @@ export function TolakBuktiDialog({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-md p-5 sm:p-6">
-        <DialogHeader className="text-left pb-2">
-          <div className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+        <DialogHeader className="text-left pb-3 space-y-1">
+          <div className="flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0 shadow-xs">
               <AlertTriangle className="w-5 h-5" />
             </div>
             <div>

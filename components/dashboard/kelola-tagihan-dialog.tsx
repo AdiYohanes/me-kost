@@ -162,18 +162,18 @@ function BuatPeriodeForm({
         </div>
       </div>
 
-      <DialogFooter className="pt-2 flex items-center gap-2">
+      <DialogFooter className="pt-4 flex items-center gap-2.5">
         <Button
           type="button"
           variant="outline"
           onClick={onClose}
-          className="flex-1 h-9 text-xs font-semibold border-slate-200 text-slate-700"
+          className="flex-1 h-10 text-xs font-semibold border-slate-200 text-slate-700 cursor-pointer"
         >
           Batal
         </Button>
         <Button
           type="submit"
-          className="flex-1 h-9 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
+          className="flex-1 h-10 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs cursor-pointer"
         >
           Terbitkan Tagihan Baru
         </Button>
@@ -190,7 +190,7 @@ export function BuatPeriodeTagihanDialog({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-md p-5 sm:p-6">
-        <DialogHeader className="text-left pb-2">
+        <DialogHeader className="text-left pb-3 space-y-1">
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 shadow-xs">
               <CalendarPlus className="w-5 h-5" />
@@ -247,7 +247,7 @@ function UbahTarifForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 pt-1">
-      <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between text-xs">
+      <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between text-xs shadow-2xs">
         <div className="flex items-center gap-1.5 font-bold text-slate-800">
           <DoorClosed className="w-4 h-4 text-emerald-600" />
           <span>Unit {tagihan.nomorKamar}</span>
@@ -278,26 +278,26 @@ function UbahTarifForm({
           value={nominalStr}
           onChange={(e) => setNominalStr(e.target.value)}
           placeholder="Contoh: 1600000"
-          className="w-full text-xs p-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all font-semibold text-slate-800 bg-white"
+          className="w-full text-xs h-10 p-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all font-semibold text-slate-800 bg-white"
         />
         <p className="text-[10px] text-slate-400 leading-tight">
           Nominal ini akan memperbarui tagihan periode berjalan dan periode tagihan berikutnya.
         </p>
       </div>
 
-      <DialogFooter className="pt-2 flex items-center gap-2">
+      <DialogFooter className="pt-4 flex items-center gap-2.5">
         <Button
           type="button"
           variant="outline"
           onClick={onClose}
-          className="flex-1 h-9 text-xs font-semibold border-slate-200 text-slate-700"
+          className="flex-1 h-10 text-xs font-semibold border-slate-200 text-slate-700 cursor-pointer"
         >
           Batal
         </Button>
         <Button
           type="submit"
           disabled={!isValid}
-          className="flex-1 h-9 text-xs font-bold bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-40 disabled:cursor-not-allowed shadow-xs"
+          className="flex-1 h-10 text-xs font-bold bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-40 disabled:cursor-not-allowed shadow-xs cursor-pointer"
         >
           Simpan Perubahan
         </Button>
@@ -319,7 +319,7 @@ export function UbahTarifKamarDialog({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-md p-5 sm:p-6">
-        <DialogHeader className="text-left pb-2">
+        <DialogHeader className="text-left pb-3 space-y-1">
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 shadow-xs">
               <Coins className="w-5 h-5" />
