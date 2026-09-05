@@ -1,5 +1,5 @@
 import React from "react";
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import { PenghuniDashboardView } from "@/components/dashboard/penghuni-dashboard-view";
 import { usePaymentStore } from "@/lib/store/use-payment-store";
@@ -183,12 +183,82 @@ describe("PenghuniDashboardView - Tiket #03 Kriteria Lengkap", () => {
 
     const tagihan107 = usePaymentStore.getState().getTagihanAktifByKamar("107");
     act(() => {
-      usePaymentStore.getState().rejectTagihan(tagihan107!.id, "Struk tidak valid dan terpotong.");
+      usePaymentStore.getState().rejectTagihan(tagihan107!.id, "Bukti pembayaran tidak valid dan terpotong.");
     });
 
     await waitFor(() => {
       expect(screen.getByText("Ditolak")).toBeInTheDocument();
-      expect(screen.getByText(/Struk tidak valid dan terpotong\./i)).toBeInTheDocument();
+      expect(screen.getByText(/Bukti pembayaran tidak valid dan terpotong\./i)).toBeInTheDocument();
+    });
+  });
+
+  it("9. Menampilkan banner pengingat amber mencolok pada H-3 sebelum tanggal jatuh tempo dengan informasi nominal dan tanggal batas bayar", () => {
+    const in2Days = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
+    const bulanPendek = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+    const batasBayarH3 = `${in2Days.getDate()} ${bulanPendek[in2Days.getMonth()]} ${in2Days.getFullYear()}`;
+
+    usePaymentStore.setState((state) => ({
+      tagihanList: state.tagihanList.map((t) =>
+        t.nomorKamar === "101"
+          ? { ...t, batasBayar: batasBayarH3, status: "BELUM_BAYAR" as const }
+          : t
+      ),
+    }));
+
+    render(<PenghuniDashboardView user={mockPenghuni101} />);
+
+    const banner = screen.getByTestId("banner-pengingat-h3");
+    expect(banner).toBeInTheDocument();
+    expect(banner).toHaveTextContent(/Pengingat Jatuh Tempo \(H-3\)/i);
+    expect(banner).toHaveTextContent(/Rp 1\.500\.000/i);
+    expect(banner).toHaveTextContent(batasBayarH3);
+  });
+
+  it("10. Banner pengingat H-3 tidak ditampilkan jika tagihan sudah Lunas", () => {
+    const in2Days = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
+    const bulanPendek = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+    const batasBayarH3 = `${in2Days.getDate()} ${bulanPendek[in2Days.getMonth()]} ${in2Days.getFullYear()}`;
+
+    usePaymentStore.setState((state) => ({
+      tagihanList: state.tagihanList.map((t) =>
+        t.nomorKamar === "101"
+          ? { ...t, batasBayar: batasBayarH3, status: "LUNAS" as const }
+          : t
+      ),
+    }));
+
+    render(<PenghuniDashboardView user={mockPenghuni101} />);
+
+    expect(screen.queryByTestId("banner-pengingat-h3")).not.toBeInTheDocument();
+  });
+
+  it("11. Meminta izin notifikasi peramban saat tombol aktifkan diklik", async () => {
+    const in2Days = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
+    const bulanPendek = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+    const batasBayarH3 = `${in2Days.getDate()} ${bulanPendek[in2Days.getMonth()]} ${in2Days.getFullYear()}`;
+
+    usePaymentStore.setState((state) => ({
+      tagihanList: state.tagihanList.map((t) =>
+        t.nomorKamar === "101"
+          ? { ...t, batasBayar: batasBayarH3, status: "BELUM_BAYAR" as const }
+          : t
+      ),
+    }));
+
+    const mockRequestPermission = vi.fn().mockResolvedValue("granted");
+    // @ts-expect-error Mocking Notification
+    globalThis.Notification = {
+      requestPermission: mockRequestPermission,
+      permission: "default",
+    };
+
+    render(<PenghuniDashboardView user={mockPenghuni101} />);
+
+    const aktifkanBtn = screen.getByRole("button", { name: /Aktifkan Notifikasi/i });
+    fireEvent.click(aktifkanBtn);
+
+    await waitFor(() => {
+      expect(mockRequestPermission).toHaveBeenCalled();
     });
   });
 });

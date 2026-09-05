@@ -182,4 +182,67 @@ describe("PemilikDaftarKamar", () => {
     const tagihanOktober = tagihanList.filter((t) => t.bulan === 10);
     expect(tagihanOktober.length).toBe(8);
   });
+
+  it("menampilkan tombol hijau 1-klik WhatsApp pada kamar H-3 dengan tautan wa.me dan pesan ramah terformat", () => {
+    const in2Days = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
+    const bulanPendek = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+    const batasBayarH3 = `${in2Days.getDate()} ${bulanPendek[in2Days.getMonth()]} ${in2Days.getFullYear()}`;
+
+    usePaymentStore.setState((state) => ({
+      tagihanList: state.tagihanList.map((t) =>
+        t.nomorKamar === "104"
+          ? { ...t, batasBayar: batasBayarH3, status: "BELUM_BAYAR" as const }
+          : t
+      ),
+    }));
+
+    render(<PemilikDaftarKamar />);
+
+    const waLink = screen.getByRole("link", {
+      name: /Hubungi Kamar 104 via WhatsApp/i,
+    });
+    expect(waLink).toBeInTheDocument();
+    expect(waLink).toHaveAttribute("target", "_blank");
+
+    const href = waLink.getAttribute("href") || "";
+    expect(href).toMatch(/^https:\/\/wa\.me\/628129876104\?text=/);
+    const decoded = decodeURIComponent(href);
+    expect(decoded).toContain("Dimas Anggara");
+    expect(decoded).toContain("104");
+    expect(decoded).toContain("Rp 1.300.000");
+    expect(decoded).toContain(batasBayarH3);
+    expect(decoded).toContain("jatuh tempo");
+  });
+
+  it("menampilkan tombol hijau 1-klik WhatsApp pada kamar Menunggak dengan tautan wa.me dan teks teguran ramah", () => {
+    usePaymentStore.setState((state) => ({
+      tagihanList: state.tagihanList.map((t) =>
+        t.nomorKamar === "101" ? { ...t, batasBayar: "1 Sep 2026" } : t
+      ),
+    }));
+
+    render(<PemilikDaftarKamar />);
+
+    const waLink = screen.getByRole("link", {
+      name: /Hubungi Kamar 101 via WhatsApp/i,
+    });
+    expect(waLink).toBeInTheDocument();
+
+    const href = waLink.getAttribute("href") || "";
+    expect(href).toMatch(/^https:\/\/wa\.me\/628129876101\?text=/);
+    const decoded = decodeURIComponent(href);
+    expect(decoded).toContain("Rizky Ramadhan");
+    expect(decoded).toContain("101");
+    expect(decoded).toContain("melewati tanggal jatuh tempo");
+  });
+
+  it("tidak menampilkan tombol WhatsApp pada kamar yang sudah Lunas", () => {
+    render(<PemilikDaftarKamar />);
+
+    expect(
+      screen.queryByRole("link", {
+        name: /Hubungi Kamar 103 via WhatsApp/i,
+      })
+    ).not.toBeInTheDocument();
+  });
 });

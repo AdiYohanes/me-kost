@@ -14,6 +14,7 @@ import {
   UserMinus,
   Mail,
   AlertTriangle,
+  MessageCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -23,6 +24,8 @@ import { usePaymentStore } from "@/lib/store/use-payment-store";
 import { Tagihan, StatusPembayaran } from "@/types/payment";
 import { Kamar, TambahPenghuniInput } from "@/types/kamar";
 import { hitungStatusTagihan } from "@/lib/siklus-tagihan";
+import { buatTautanWhatsApp } from "@/lib/whatsapp";
+import { MOCK_USERS } from "@/lib/mock-data";
 import { BuktiLightboxDialog } from "./bukti-lightbox-dialog";
 import { TolakBuktiDialog } from "./tolak-bukti-dialog";
 import { TandaiCashDialog } from "./tandai-cash-dialog";
@@ -143,10 +146,9 @@ export function PemilikDaftarKamar() {
     }
     if (activeFilter === "H3") {
       return (
+        tagihan.status === "BELUM_BAYAR" &&
         evaluasi.isH3 &&
-        !evaluasi.isMenunggak &&
-        tagihan.status !== "LUNAS" &&
-        tagihan.status !== "MENUNGGU_VERIFIKASI"
+        !evaluasi.isMenunggak
       );
     }
     if (activeFilter === "MENUNGGAK") {
@@ -527,6 +529,33 @@ export function PemilikDaftarKamar() {
                 tagihan?.batasBayar ||
                 `${kamar.tanggalJatuhTempo} ${currentPeriodeLabel}`;
 
+              const evaluasi = tagihan ? hitungStatusTagihan(tagihan) : null;
+              const isMenunggak = Boolean(
+                evaluasi?.isMenunggak || tagihan?.status === "MENUNGGAK"
+              );
+              const isH3 = Boolean(
+                tagihan?.status === "BELUM_BAYAR" &&
+                  evaluasi?.isH3 &&
+                  !isMenunggak
+              );
+
+              const teleponPenghuni =
+                kamar.penghuni?.telepon ||
+                MOCK_USERS.find((u) => u.nomorKamar === kamar.nomorKamar)?.phone ||
+                "";
+
+              const waUrl =
+                (isH3 || isMenunggak) && teleponPenghuni
+                  ? buatTautanWhatsApp({
+                      telepon: teleponPenghuni,
+                      penghuniNama,
+                      nomorKamar: kamar.nomorKamar,
+                      nominal: nominalSewa,
+                      batasBayar: batasBayarText,
+                      tipe: isMenunggak ? "MENUNGGAK" : "H3",
+                    })
+                  : null;
+
               return (
                 <div
                   key={kamar.id}
@@ -614,6 +643,18 @@ export function PemilikDaftarKamar() {
                     </span>
 
                     <div className="flex items-center gap-2">
+                      {waUrl && (
+                        <a
+                          href={waUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`Hubungi Kamar ${kamar.nomorKamar} via WhatsApp`}
+                          className="inline-flex items-center justify-center whitespace-nowrap transition-all h-7.5 px-2.5 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white gap-1.5 rounded-md cursor-pointer shadow-xs"
+                        >
+                          <MessageCircle className="w-3.5 h-3.5" />
+                          <span>{isMenunggak ? "Tegur WA" : "Pengingat WA"}</span>
+                        </a>
+                      )}
                       {tagihan?.status === "MENUNGGU_VERIFIKASI" && (
                         <Button
                           type="button"

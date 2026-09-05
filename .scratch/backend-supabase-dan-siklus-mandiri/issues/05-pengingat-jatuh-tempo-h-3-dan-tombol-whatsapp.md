@@ -6,8 +6,8 @@
 
 **Status:** ready-for-agent
 
-- [ ] Dashboard Penghuni menampilkan banner pengingat amber mencolok pada H-3 sebelum tanggal jatuh tempo dengan informasi nominal dan tanggal batas bayar.
-- [ ] Kartu kamar di dashboard Pemilik Kost yang berada dalam rentang H-3 atau berstatus Menunggak memunculkan tombol hijau 1-klik WhatsApp.
-- [ ] Klik pada tombol WhatsApp membuka tautan deep-link `https://wa.me/...` dengan teks pesan sopan terformat otomatis mencantumkan nama penghuni, nomor kamar, nominal tagihan, dan batas bayar.
-- [ ] Pengiriman notifikasi Web Push lokal/service worker terdaftar jika izin peramban diaktifkan oleh Penghuni.
-- [ ] Pengujian integrasi memverifikasi kemunculan banner H-3 dan format teks tautan WhatsApp.
+- [x] Dashboard Penghuni menampilkan banner pengingat amber mencolok pada H-3 sebelum tanggal jatuh tempo dengan informasi nominal dan tanggal batas bayar.
+- [x] Kartu kamar di dashboard Pemilik Kost yang berada dalam rentang H-3 atau berstatus Menunggak memunculkan tombol hijau 1-klik WhatsApp.
+- [x] Klik pada tombol WhatsApp membuka tautan deep-link `https://wa.me/...` dengan teks pesan sopan terformat otomatis mencantumkan nama penghuni, nomor kamar, nominal tagihan, dan batas bayar.
+- [x] Pengiriman notifikasi Web Push lokal/service worker terdaftar jika izin peramban diaktifkan oleh Penghuni.
+- [x] Pengujian integrasi memverifikasi kemunculan banner H-3 dan format teks tautan WhatsApp.
