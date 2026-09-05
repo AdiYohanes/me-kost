@@ -28,12 +28,12 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
   const isPemilik = user.role === "PEMILIK";
 
   return (
-    <header className="flex items-center justify-between pb-3 border-b border-slate-200/80">
-      <div className="flex items-center space-x-2.5">
-        <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-md shadow-emerald-600/20">
+    <header className="flex items-center justify-between pb-4 mb-2 border-b border-slate-200/70">
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-md shadow-emerald-600/20 shrink-0">
           <Building2 className="w-5 h-5" />
         </div>
-        <div>
+        <div className="space-y-0.5">
           <div className="flex items-center gap-1.5">
             <h1 className="text-base font-black tracking-tight text-slate-900 leading-none">
               Kost Syantika
@@ -60,7 +60,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
         variant="outline"
         size="sm"
         onClick={handleLogout}
-        className="text-xs text-rose-600 border-rose-200 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-300 gap-1.5 h-8 px-2.5"
+        className="text-xs text-rose-600 border-rose-200 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-300 gap-1.5 h-9 px-3 font-medium cursor-pointer"
       >
         <LogOut className="w-3.5 h-3.5" />
         <span>Keluar</span>

@@ -79,18 +79,18 @@ export default function LoginPage() {
 
   return (
     <GuestGuard>
-      <main className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4 safe-top safe-bottom">
-        <div className="w-full max-w-md flex flex-col space-y-5">
+      <main className="min-h-screen bg-slate-50 flex flex-col items-center justify-center px-4.5 py-8 sm:py-12 safe-top safe-bottom">
+        <div className="w-full max-w-md flex flex-col space-y-6">
           {/* Header Brand */}
-          <div className="flex flex-col items-center text-center space-y-2">
-            <div className="w-14 h-14 rounded-2xl bg-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-600/25">
+          <div className="flex flex-col items-center text-center space-y-3 mb-1">
+            <div className="w-14 h-14 rounded-2xl bg-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-600/25 ring-4 ring-emerald-500/10">
               <Building2 className="w-8 h-8" />
             </div>
             <div>
               <h1 className="text-2xl font-black tracking-tight text-slate-900">
                 Kost Syantika
               </h1>
-              <p className="text-xs font-medium text-emerald-700">
+              <p className="text-xs font-medium text-emerald-700 mt-0.5">
                 Manajemen Pembayaran & Sewa Kamar
               </p>
             </div>
@@ -98,7 +98,7 @@ export default function LoginPage() {
 
           {/* Form Login Card */}
           <Card className="card-shadow border-slate-200/80">
-            <CardHeader className="pb-3">
+            <CardHeader className="p-5 pb-4 space-y-1.5">
               <CardTitle className="text-lg font-bold text-slate-900">
                 Masuk ke Akun
               </CardTitle>
@@ -107,7 +107,7 @@ export default function LoginPage() {
               </CardDescription>
             </CardHeader>
 
-            <CardContent>
+            <CardContent className="p-5 pt-0">
               <form onSubmit={handleSubmit} className="space-y-4">
                 {errorMsg && (
                   <div className="flex items-start gap-2.5 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs animate-in fade-in">
@@ -135,6 +135,7 @@ export default function LoginPage() {
                       setUsername(e.target.value);
                       if (errorMsg) setErrorMsg("");
                     }}
+                    className="h-10 text-sm"
                     required
                   />
                 </div>
@@ -157,6 +158,7 @@ export default function LoginPage() {
                       setPassword(e.target.value);
                       if (errorMsg) setErrorMsg("");
                     }}
+                    className="h-10 text-sm"
                     required
                   />
                 </div>
@@ -164,7 +166,7 @@ export default function LoginPage() {
                 <Button
                   type="submit"
                   variant="emerald"
-                  className="w-full gap-2 font-semibold shadow-md shadow-emerald-600/20"
+                  className="w-full h-11 gap-2 font-semibold text-sm shadow-md shadow-emerald-600/20"
                   disabled={isLoading}
                 >
                   <LogIn className="w-4 h-4" />
@@ -176,7 +178,7 @@ export default function LoginPage() {
 
           {/* Demo Credentials Guide Card */}
           <Card className="border-emerald-100 bg-linear-to-br from-emerald-500/5 via-white to-emerald-50/50 card-shadow">
-            <CardHeader className="pb-2.5">
+            <CardHeader className="p-5 pb-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
                   <Sparkles className="w-4 h-4 text-emerald-600" />
@@ -188,7 +190,7 @@ export default function LoginPage() {
                   Satu Klik Masuk
                 </Badge>
               </div>
-              <CardDescription className="text-xs text-slate-600">
+              <CardDescription className="text-xs text-slate-600 mt-1">
                 Pilih peran di bawah untuk login instan atau gunakan kata sandi:{" "}
                 <code className="bg-emerald-100/70 text-emerald-800 px-1 py-0.5 rounded font-mono font-bold">
                   123456
@@ -196,9 +198,9 @@ export default function LoginPage() {
               </CardDescription>
             </CardHeader>
 
-            <CardContent className="space-y-3 pt-1">
+            <CardContent className="p-5 pt-0 space-y-4">
               {/* Pemilik Demo Button */}
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <div className="text-[11px] font-semibold text-slate-600 flex items-center gap-1">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                   Akses Pemilik Kost:
@@ -206,11 +208,11 @@ export default function LoginPage() {
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full justify-between border-emerald-200 hover:bg-emerald-50 hover:border-emerald-300"
+                  className="w-full p-3.5 min-h-[52px] justify-between border-emerald-200 hover:bg-emerald-50 hover:border-emerald-300"
                   onClick={() => handleQuickLogin("pemilik")}
                 >
-                  <div className="flex items-center gap-2 text-left">
-                    <div className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">
+                  <div className="flex items-center gap-2.5 text-left">
+                    <div className="w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold shrink-0">
                       P
                     </div>
                     <div>
@@ -229,19 +231,19 @@ export default function LoginPage() {
               </div>
 
               {/* Penghuni Demo Chips */}
-              <div className="space-y-1.5 pt-1 border-t border-slate-100">
+              <div className="space-y-2 pt-2 border-t border-slate-100">
                 <div className="text-[11px] font-semibold text-slate-600 flex items-center gap-1">
                   <DoorClosed className="w-3.5 h-3.5 text-emerald-600" />
                   Akses Penghuni Kamar (101 - 108):
                 </div>
-                <div className="grid grid-cols-4 gap-1.5">
+                <div className="grid grid-cols-4 gap-2">
                   {demoRooms.map((room) => (
                     <Button
                       key={room}
                       type="button"
                       variant="outline"
                       size="sm"
-                      className="text-xs font-semibold py-1.5 h-auto border-slate-200 hover:border-emerald-400 hover:bg-emerald-50 text-slate-700"
+                      className="text-xs font-semibold h-10 border-slate-200 hover:border-emerald-400 hover:bg-emerald-50 text-slate-700"
                       onClick={() => handleQuickLogin(room)}
                     >
                       {room}
@@ -251,7 +253,7 @@ export default function LoginPage() {
               </div>
             </CardContent>
 
-            <CardFooter className="pt-0 pb-3 text-center justify-center">
+            <CardFooter className="p-5 pt-0 pb-4 text-center justify-center">
               <span className="text-[10px] text-slate-400">
                 Klik salah satu nomor kamar untuk langsung menguji tampilan penghuni.
               </span>
@@ -259,7 +261,7 @@ export default function LoginPage() {
           </Card>
 
           {/* Footer */}
-          <footer className="text-center py-2 text-xs text-slate-400">
+          <footer className="text-center py-4 text-xs text-slate-400">
             <p>Kost Syantika PWA • Demo Fase 1</p>
           </footer>
         </div>
