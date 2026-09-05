@@ -2,6 +2,7 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import { Tagihan, StatusPembayaran, MetodePembayaran, BuktiPembayaran } from "@/types/payment";
 import { mapDatabaseRowToKamar } from "@/lib/supabase/kamar";
 import { evaluasiPenerbitanH7, BULAN_SHORT, formatDuaDigit } from "@/lib/siklus-tagihan";
+import { buatStoragePathBukti } from "@/lib/kompresi-gambar";
 
 /**
  * Format tanggal YYYY-MM-DD ke string tampilan bahasa Indonesia ("10 Sep 2026")
@@ -253,4 +254,162 @@ export async function periksaDanTerbitkanTagihanH7Supabase(
 
   const createdList = (insertedData || []).map((r) => mapDatabaseRowToTagihan(r));
   return { success: true, terbitCount: createdList.length, tagihanList: createdList };
+}
+
+/**
+ * Mengunggah berkas foto bukti transfer ke Supabase Storage bucket `bukti-pembayaran`
+ * dan mencatat bukti ke tabel `bukti_pembayaran`.
+ */
+export async function uploadBuktiTransferSupabase(
+  supabase: SupabaseClient,
+  params: {
+    tagihanId: string;
+    nomorKamar: string;
+    tahun: number;
+    bulan: number;
+    file: File | Blob;
+    catatanPenghuni?: string;
+  }
+): Promise<{ success: boolean; imageUrl?: string; buktiId?: string; error?: string }> {
+  try {
+    const storagePath = buatStoragePathBukti(
+      params.nomorKamar,
+      params.tahun,
+      params.bulan
+    );
+
+    // 1. Unggah berkas ke bucket Supabase Storage
+    const { error: uploadError } = await supabase.storage
+      .from("bukti-pembayaran")
+      .upload(storagePath, params.file, {
+        contentType: params.file.type || "image/webp",
+        upsert: true,
+      });
+
+    if (uploadError) {
+      return { success: false, error: `Gagal mengunggah foto bukti: ${uploadError.message}` };
+    }
+
+    // 2. Dapatkan public URL
+    const { data: urlData } = supabase.storage
+      .from("bukti-pembayaran")
+      .getPublicUrl(storagePath);
+
+    const imageUrl = urlData.publicUrl;
+
+    // 3. Simpan record ke tabel `bukti_pembayaran`
+    const { data: buktiRow, error: insertError } = await supabase
+      .from("bukti_pembayaran")
+      .insert({
+        tagihan_id: params.tagihanId,
+        image_url: imageUrl,
+        catatan_penghuni: params.catatanPenghuni?.trim() || null,
+      })
+      .select()
+      .single();
+
+    if (insertError) {
+      return { success: false, error: `Gagal mencatat bukti pembayaran: ${insertError.message}` };
+    }
+
+    // 4. Perbarui status tagihan menjadi MENUNGGU_VERIFIKASI
+    const { error: tagihanError } = await supabase
+      .from("tagihan")
+      .update({
+        status: "MENUNGGU_VERIFIKASI",
+        metode_pembayaran: "TRANSFER",
+        alasan_penolakan: null,
+      })
+      .eq("id", params.tagihanId);
+
+    if (tagihanError) {
+      return { success: false, error: `Gagal memperbarui status tagihan: ${tagihanError.message}` };
+    }
+
+    return {
+      success: true,
+      imageUrl,
+      buktiId: buktiRow?.id,
+    };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Terjadi kesalahan saat mengunggah bukti.";
+    return { success: false, error: message };
+  }
+}
+
+/**
+ * Memverifikasi bukti pembayaran transfer menjadi LUNAS.
+ */
+export async function verifikasiLunasSupabase(
+  supabase: SupabaseClient,
+  tagihanId: string
+): Promise<{ success: boolean; error?: string }> {
+  const now = new Date().toISOString();
+  const { error } = await supabase
+    .from("tagihan")
+    .update({
+      status: "LUNAS",
+      metode_pembayaran: "TRANSFER",
+      verified_at: now,
+      paid_at: now,
+    })
+    .eq("id", tagihanId);
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+  return { success: true };
+}
+
+/**
+ * Menolak bukti pembayaran dengan alasan penolakan wajib.
+ */
+export async function tolakBuktiPembayaranSupabase(
+  supabase: SupabaseClient,
+  tagihanId: string,
+  alasanPenolakan: string
+): Promise<{ success: boolean; error?: string }> {
+  if (!alasanPenolakan || !alasanPenolakan.trim()) {
+    return { success: false, error: "Alasan penolakan wajib diisi." };
+  }
+
+  const { error } = await supabase
+    .from("tagihan")
+    .update({
+      status: "DITOLAK",
+      alasan_penolakan: alasanPenolakan.trim(),
+    })
+    .eq("id", tagihanId);
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+  return { success: true };
+}
+
+/**
+ * Menandai tagihan lunas secara tunai langsung (CASH) dengan catatan opsional.
+ */
+export async function tandaiLunasCashSupabase(
+  supabase: SupabaseClient,
+  tagihanId: string,
+  catatanPemilik?: string
+): Promise<{ success: boolean; error?: string }> {
+  const now = new Date().toISOString();
+  const { error } = await supabase
+    .from("tagihan")
+    .update({
+      status: "LUNAS",
+      metode_pembayaran: "CASH",
+      catatan_pemilik: catatanPemilik?.trim() || null,
+      paid_at: now,
+      verified_at: now,
+      alasan_penolakan: null,
+    })
+    .eq("id", tagihanId);
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+  return { success: true };
 }

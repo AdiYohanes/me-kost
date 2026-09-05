@@ -82,4 +82,52 @@ describe("BuktiLightboxDialog", () => {
     fireEvent.click(rejectBtn);
     expect(rejected).toBe(true);
   });
+
+  it("dapat memperbesar, memperkecil, mereset zoom, dan toggle zoom saat foto diklik", () => {
+    render(
+      <BuktiLightboxDialog
+        isOpen={true}
+        onClose={() => {}}
+        tagihan={mockTagihanWithBukti}
+      />
+    );
+
+    const indicator = screen.getByTestId("zoom-scale-indicator");
+    expect(indicator).toHaveTextContent("100%");
+
+    const zoomInBtn = screen.getByRole("button", { name: /Perbesar foto/i });
+    const zoomOutBtn = screen.getByRole("button", { name: /Perkecil foto/i });
+    const resetBtn = screen.getByRole("button", { name: /Reset zoom/i });
+
+    // Tombol zoom out & reset awalnya disabled pada 100%
+    expect(zoomOutBtn).toBeDisabled();
+    expect(resetBtn).toBeDisabled();
+
+    // Klik zoom in -> 150%
+    fireEvent.click(zoomInBtn);
+    expect(indicator).toHaveTextContent("150%");
+    expect(zoomOutBtn).not.toBeDisabled();
+    expect(resetBtn).not.toBeDisabled();
+
+    // Klik zoom in lagi -> 200%
+    fireEvent.click(zoomInBtn);
+    expect(indicator).toHaveTextContent("200%");
+
+    // Klik zoom out -> 150%
+    fireEvent.click(zoomOutBtn);
+    expect(indicator).toHaveTextContent("150%");
+
+    // Klik reset -> 100%
+    fireEvent.click(resetBtn);
+    expect(indicator).toHaveTextContent("100%");
+    expect(resetBtn).toBeDisabled();
+
+    // Klik gambar untuk toggle pembesaran (1x -> 2x -> 1x)
+    const img = screen.getByAltText(/Foto Bukti Transfer/i);
+    fireEvent.click(img);
+    expect(indicator).toHaveTextContent("200%");
+
+    fireEvent.click(img);
+    expect(indicator).toHaveTextContent("100%");
+  });
 });

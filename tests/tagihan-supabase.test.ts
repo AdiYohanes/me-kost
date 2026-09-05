@@ -6,6 +6,10 @@ import {
   updateNominalTagihanSupabase,
   evaluasiTagihanMenunggakSupabase,
   periksaDanTerbitkanTagihanH7Supabase,
+  uploadBuktiTransferSupabase,
+  verifikasiLunasSupabase,
+  tolakBuktiPembayaranSupabase,
+  tandaiLunasCashSupabase,
 } from "@/lib/supabase/tagihan";
 
 describe("Supabase Tagihan Service (lib/supabase/tagihan.ts)", () => {
@@ -190,6 +194,160 @@ describe("Supabase Tagihan Service (lib/supabase/tagihan.ts)", () => {
       expect(result.success).toBe(true);
       expect(result.terbitCount).toBe(1);
       expect(insertMock).toHaveBeenCalled();
+    });
+  });
+
+  describe("uploadBuktiTransferSupabase", () => {
+    it("mengunggah berkas ke storage bucket bukti-pembayaran dan mencatat ke tabel bukti_pembayaran", async () => {
+      const mockUpload = vi.fn().mockResolvedValue({ data: { path: "mock-path" }, error: null });
+      const mockGetPublicUrl = vi.fn().mockReturnValue({
+        data: { publicUrl: "https://supabase.co/storage/v1/object/public/bukti-pembayaran/kamar-101/bukti.webp" },
+      });
+
+      const mockBuktiInsert = vi.fn().mockReturnValue({
+        select: vi.fn().mockReturnValue({
+          single: vi.fn().mockResolvedValue({
+            data: { id: "bukti-uuid-1", tagihan_id: "tag-1" },
+            error: null,
+          }),
+        }),
+      });
+
+      const mockTagihanUpdate = vi.fn().mockReturnValue({
+        eq: vi.fn().mockResolvedValue({ error: null }),
+      });
+
+      const mockSupabase = {
+        storage: {
+          from: vi.fn().mockReturnValue({
+            upload: mockUpload,
+            getPublicUrl: mockGetPublicUrl,
+          }),
+        },
+        from: vi.fn((table: string) => {
+          if (table === "bukti_pembayaran") {
+            return { insert: mockBuktiInsert };
+          }
+          if (table === "tagihan") {
+            return { update: mockTagihanUpdate };
+          }
+          return {};
+        }),
+      } as unknown as SupabaseClient;
+
+      const dummyBlob = new Blob(["webp content"], { type: "image/webp" });
+      const res = await uploadBuktiTransferSupabase(mockSupabase, {
+        tagihanId: "tag-1",
+        nomorKamar: "101",
+        tahun: 2026,
+        bulan: 9,
+        file: dummyBlob,
+        catatanPenghuni: "Transfer via BCA a.n. Siti",
+      });
+
+      expect(res.success).toBe(true);
+      expect(res.imageUrl).toContain("bukti-pembayaran/kamar-101/bukti.webp");
+      expect(res.buktiId).toBe("bukti-uuid-1");
+      expect(mockUpload).toHaveBeenCalled();
+      expect(mockBuktiInsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          tagihan_id: "tag-1",
+          catatan_penghuni: "Transfer via BCA a.n. Siti",
+        })
+      );
+      expect(mockTagihanUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          status: "MENUNGGU_VERIFIKASI",
+          metode_pembayaran: "TRANSFER",
+        })
+      );
+    });
+  });
+
+  describe("verifikasiLunasSupabase", () => {
+    it("memperbarui status tagihan menjadi LUNAS dengan metode TRANSFER dan mencatat timestamp verifikasi", async () => {
+      const mockUpdate = vi.fn().mockReturnValue({
+        eq: vi.fn().mockResolvedValue({ error: null }),
+      });
+
+      const mockSupabase = {
+        from: vi.fn().mockReturnValue({ update: mockUpdate }),
+      } as unknown as SupabaseClient;
+
+      const res = await verifikasiLunasSupabase(mockSupabase, "tag-1");
+
+      expect(res.success).toBe(true);
+      expect(mockUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          status: "LUNAS",
+          metode_pembayaran: "TRANSFER",
+          verified_at: expect.any(String),
+          paid_at: expect.any(String),
+        })
+      );
+    });
+  });
+
+  describe("tolakBuktiPembayaranSupabase", () => {
+    it("menolak eksekusi jika alasan penolakan kosong", async () => {
+      const mockSupabase = {} as unknown as SupabaseClient;
+      const res = await tolakBuktiPembayaranSupabase(mockSupabase, "tag-1", "");
+
+      expect(res.success).toBe(false);
+      expect(res.error).toContain("Alasan penolakan wajib");
+    });
+
+    it("memperbarui status tagihan menjadi DITOLAK beserta alasan penolakan", async () => {
+      const mockUpdate = vi.fn().mockReturnValue({
+        eq: vi.fn().mockResolvedValue({ error: null }),
+      });
+
+      const mockSupabase = {
+        from: vi.fn().mockReturnValue({ update: mockUpdate }),
+      } as unknown as SupabaseClient;
+
+      const res = await tolakBuktiPembayaranSupabase(
+        mockSupabase,
+        "tag-1",
+        "Foto bukti transfer buram dan nominal tidak terbaca"
+      );
+
+      expect(res.success).toBe(true);
+      expect(mockUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          status: "DITOLAK",
+          alasan_penolakan: "Foto bukti transfer buram dan nominal tidak terbaca",
+        })
+      );
+    });
+  });
+
+  describe("tandaiLunasCashSupabase", () => {
+    it("memperbarui status tagihan menjadi LUNAS metode CASH dengan catatan pemilik opsional", async () => {
+      const mockUpdate = vi.fn().mockReturnValue({
+        eq: vi.fn().mockResolvedValue({ error: null }),
+      });
+
+      const mockSupabase = {
+        from: vi.fn().mockReturnValue({ update: mockUpdate }),
+      } as unknown as SupabaseClient;
+
+      const res = await tandaiLunasCashSupabase(
+        mockSupabase,
+        "tag-1",
+        "Uang pas diterima di kantor"
+      );
+
+      expect(res.success).toBe(true);
+      expect(mockUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          status: "LUNAS",
+          metode_pembayaran: "CASH",
+          catatan_pemilik: "Uang pas diterima di kantor",
+          paid_at: expect.any(String),
+          verified_at: expect.any(String),
+        })
+      );
     });
   });
 });

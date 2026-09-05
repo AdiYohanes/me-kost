@@ -25,18 +25,19 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
 import { usePaymentStore } from "@/lib/store/use-payment-store";
 import { BayarTunaiDialog } from "@/components/dashboard/bayar-tunai-dialog";
+import { BuktiLightboxDialog } from "@/components/dashboard/bukti-lightbox-dialog";
 import { UserSession } from "@/types/auth";
 import { StatusPembayaran } from "@/types/payment";
 import { hitungStatusTagihan } from "@/lib/siklus-tagihan";
+import {
+  kompresGambarBukti,
+  formatUkuranBerkas,
+  HasilKompresi,
+} from "@/lib/kompresi-gambar";
+import { uploadBuktiTransferSupabase } from "@/lib/supabase/tagihan";
+import { createClient } from "@/lib/supabase/client";
 
 interface PenghuniTagihanCardProps {
   user: UserSession;
@@ -49,6 +50,8 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [compressedResult, setCompressedResult] = useState<HasilKompresi | null>(null);
+  const [isCompressing, setIsCompressing] = useState<boolean>(false);
   const [catatan, setCatatan] = useState<string>("");
   const [showFormUpload, setShowFormUpload] = useState<boolean>(false);
   const [showLightbox, setShowLightbox] = useState<boolean>(false);
@@ -102,7 +105,7 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
 
   const badgeConfig = getBadgeConfig();
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -111,14 +114,29 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === "string") {
-        setPreviewUrl(reader.result);
-        setShowFormUpload(true);
-      }
-    };
-    reader.readAsDataURL(file);
+    setIsCompressing(true);
+    try {
+      const hasil = await kompresGambarBukti(file, {
+        maxDimension: 1280,
+        quality: 0.8,
+        targetFormat: "image/webp",
+      });
+      setCompressedResult(hasil);
+      setPreviewUrl(hasil.dataUrl);
+      setShowFormUpload(true);
+    } catch {
+      // Fallback jika kompresi canvas tidak didukung di peramban tertentu
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === "string") {
+          setPreviewUrl(reader.result);
+          setShowFormUpload(true);
+        }
+      };
+      reader.readAsDataURL(file);
+    } finally {
+      setIsCompressing(false);
+    }
   };
 
   const handleTriggerUpload = () => {
@@ -131,15 +149,39 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
       return;
     }
 
-    uploadBuktiTransfer(tagihan.id, previewUrl, catatan.trim() || undefined);
+    const dataUrlToUse = compressedResult?.dataUrl || previewUrl;
+    uploadBuktiTransfer(tagihan.id, dataUrlToUse, catatan.trim() || undefined);
+
+    // Kirim juga ke Supabase BaaS jika tersedia
+    if (compressedResult?.file || compressedResult?.blob) {
+      try {
+        const supabase = createClient();
+        const fileToUpload = compressedResult.file || compressedResult.blob;
+        uploadBuktiTransferSupabase(supabase, {
+          tagihanId: tagihan.id,
+          nomorKamar: tagihan.nomorKamar || user.nomorKamar || "101",
+          tahun: tagihan.tahun || 2026,
+          bulan: tagihan.bulan || 9,
+          file: fileToUpload,
+          catatanPenghuni: catatan.trim() || undefined,
+        }).catch(() => {
+          // Silent catch in offline / mock mode
+        });
+      } catch {
+        // Fallback silently in mock mode
+      }
+    }
+
     toast.success("Bukti transfer berhasil dikirim. Menunggu verifikasi Pemilik Kost.");
     setPreviewUrl(null);
+    setCompressedResult(null);
     setCatatan("");
     setShowFormUpload(false);
   };
 
   const handleCancelUpload = () => {
     setPreviewUrl(null);
+    setCompressedResult(null);
     setCatatan("");
     setShowFormUpload(false);
     if (fileInputRef.current) {
@@ -245,6 +287,26 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
                   className="w-full h-full object-contain"
                 />
               </div>
+
+              {/* Info Kompresi WebP */}
+              {compressedResult && (
+                <div
+                  data-testid="compression-info"
+                  className="flex items-center justify-between p-2.5 rounded-md bg-emerald-50/80 border border-emerald-200 text-xs text-emerald-900"
+                >
+                  <span className="font-semibold flex items-center gap-1.5">
+                    <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <span>Kompresi WebP Otomatis</span>
+                  </span>
+                  <span className="font-medium text-emerald-800 tabular-nums">
+                    {formatUkuranBerkas(compressedResult.originalSizeBytes)} →{" "}
+                    {formatUkuranBerkas(compressedResult.compressedSizeBytes)}
+                    {compressedResult.kompresiRasioPersen > 0
+                      ? ` (Hemat ${compressedResult.kompresiRasioPersen}%)`
+                      : ""}
+                  </span>
+                </div>
+              )}
 
               <div className="space-y-1">
                 <label className="text-xs font-medium text-zinc-600">
@@ -367,12 +429,24 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
               <Button
                 type="button"
                 onClick={handleTriggerUpload}
-                className="w-full h-9.5 gap-2 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-md shadow-xs cursor-pointer"
+                disabled={isCompressing}
+                className="w-full h-9.5 gap-2 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-md shadow-xs cursor-pointer disabled:opacity-60"
               >
-                <UploadCloud className="w-4 h-4" />
-                {status === "DITOLAK"
-                  ? "Unggah Ulang Bukti Transfer"
-                  : "Unggah Bukti Transfer"}
+                {isCompressing ? (
+                  <>
+                    <Clock className="w-4 h-4 animate-spin" />
+                    <span>Mengompresi Foto...</span>
+                  </>
+                ) : (
+                  <>
+                    <UploadCloud className="w-4 h-4" />
+                    <span>
+                      {status === "DITOLAK"
+                        ? "Unggah Ulang Bukti Transfer"
+                        : "Unggah Bukti Transfer"}
+                    </span>
+                  </>
+                )}
               </Button>
 
               <BayarTunaiDialog
@@ -401,36 +475,12 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
         </CardFooter>
       </Card>
 
-      {/* Modal Lightbox Bukti Transfer */}
-      <Dialog open={showLightbox} onOpenChange={setShowLightbox}>
-        <DialogContent className="max-w-md p-5 sm:p-6">
-          <DialogHeader className="pb-2">
-            <DialogTitle className="text-base font-bold text-slate-900">
-              Bukti Pembayaran Transfer
-            </DialogTitle>
-            <DialogDescription className="text-xs text-slate-500">
-              Kamar {user.nomorKamar} • Periode {tagihan?.periodeBulan || "September 2026"}
-            </DialogDescription>
-          </DialogHeader>
-
-          {tagihan?.buktiPembayaran?.imageUrl && (
-            <div className="rounded-xl overflow-hidden border border-slate-200 bg-slate-100 aspect-3/4 max-h-[70vh] flex items-center justify-center">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={tagihan.buktiPembayaran.imageUrl}
-                alt="Bukti Transfer Penuh"
-                className="w-full h-full object-contain"
-              />
-            </div>
-          )}
-
-          {tagihan?.buktiPembayaran?.catatanPenghuni && (
-            <p className="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-              <strong>Catatan:</strong> {tagihan.buktiPembayaran.catatanPenghuni}
-            </p>
-          )}
-        </DialogContent>
-      </Dialog>
+      {/* Modal Lightbox Bukti Transfer Zoomable */}
+      <BuktiLightboxDialog
+        isOpen={showLightbox}
+        onClose={() => setShowLightbox(false)}
+        tagihan={tagihan || null}
+      />
     </>
   );
 }

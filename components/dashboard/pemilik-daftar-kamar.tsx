@@ -37,6 +37,12 @@ import { TambahPenghuniDialog } from "./tambah-penghuni-dialog";
 import { UbahEmailDialog } from "./ubah-email-dialog";
 import { KeluarkanPenghuniDialog } from "./keluarkan-penghuni-dialog";
 import { formatRupiah } from "./pemilik-summary-cards";
+import { createClient } from "@/lib/supabase/client";
+import {
+  tandaiLunasCashSupabase,
+  verifikasiLunasSupabase,
+  tolakBuktiPembayaranSupabase,
+} from "@/lib/supabase/tagihan";
 
 type FilterType =
   | "SEMUA"
@@ -169,6 +175,14 @@ export function PemilikDaftarKamar() {
   const handleConfirmCash = (tagihanId: string, catatan?: string) => {
     const target = tagihanList.find((t) => t.id === tagihanId);
     markCashTagihan(tagihanId, catatan);
+
+    try {
+      const supabase = createClient();
+      tandaiLunasCashSupabase(supabase, tagihanId, catatan).catch(() => {});
+    } catch {
+      // Mock mode
+    }
+
     toast.success(
       `Pembayaran Tunai Kamar ${target?.nomorKamar || ""} Tercatat!`,
       {
@@ -210,6 +224,14 @@ export function PemilikDaftarKamar() {
 
   const handleApprove = (tagihan: Tagihan) => {
     approveTagihan(tagihan.id);
+
+    try {
+      const supabase = createClient();
+      verifikasiLunasSupabase(supabase, tagihan.id).catch(() => {});
+    } catch {
+      // Mock mode
+    }
+
     toast.success(`Pembayaran Kamar ${tagihan.nomorKamar} Berhasil Disetujui!`, {
       description: `Status tagihan ${tagihan.penghuniNama} telah diubah menjadi LUNAS.`,
     });
@@ -222,6 +244,14 @@ export function PemilikDaftarKamar() {
     if (!selectedTagihanForReject) return;
     const { id, nomorKamar, penghuniNama } = selectedTagihanForReject;
     rejectTagihan(id, alasan);
+
+    try {
+      const supabase = createClient();
+      tolakBuktiPembayaranSupabase(supabase, id, alasan).catch(() => {});
+    } catch {
+      // Mock mode
+    }
+
     toast.error(`Bukti Pembayaran Kamar ${nomorKamar} Ditolak`, {
       description: `Catatan penolakan telah dikirimkan ke ${penghuniNama}.`,
     });
