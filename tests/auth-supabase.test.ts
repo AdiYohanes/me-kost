@@ -28,7 +28,7 @@ const mockSupabaseClient = {
     exchangeCodeForSession: mockExchangeCodeForSession,
   },
   from: mockFrom,
-};
+} as unknown as ReturnType<typeof import("@/lib/supabase/client").createClient>;
 
 vi.mock("@/lib/supabase/client", () => ({
   createClient: () => mockSupabaseClient,
@@ -121,7 +121,6 @@ describe("Supabase Authentication & Automated Room Linker", () => {
         return {};
       });
 
-      // @ts-expect-error test mock
       const result = await verifyAndLinkPenghuniGoogleUser(
         mockSupabaseClient,
         "auth-google-uuid-99",
@@ -153,7 +152,6 @@ describe("Supabase Authentication & Automated Room Linker", () => {
         return {};
       });
 
-      // @ts-expect-error test mock
       const result = await verifyAndLinkPenghuniGoogleUser(
         mockSupabaseClient,
         "auth-unknown-uuid",
@@ -191,7 +189,6 @@ describe("Supabase Authentication & Automated Room Linker", () => {
         return {};
       });
 
-      // @ts-expect-error test mock
       const result = await verifyAndLinkPenghuniGoogleUser(
         mockSupabaseClient,
         "auth-uuid",
@@ -228,7 +225,6 @@ describe("Supabase Authentication & Automated Room Linker", () => {
         return {};
       });
 
-      // @ts-expect-error test mock
       const result = await verifyAndLinkPenghuniGoogleUser(
         mockSupabaseClient,
         "auth-uuid",
@@ -274,7 +270,6 @@ describe("Supabase Authentication & Automated Room Linker", () => {
         return {};
       });
 
-      // @ts-expect-error test mock
       const res = await signInWithEmailPassword(
         "pemilik@kostsyantika.com",
         "password123",
@@ -292,7 +287,6 @@ describe("Supabase Authentication & Automated Room Linker", () => {
         error: { message: "Invalid login credentials" },
       });
 
-      // @ts-expect-error test mock
       const res = await signInWithEmailPassword(
         "pemilik@kostsyantika.com",
         "salah",
@@ -335,7 +329,6 @@ describe("Supabase Authentication & Automated Room Linker", () => {
         return {};
       });
 
-      // @ts-expect-error test mock
       const res = await signInWithEmailPassword(
         "penghuni@gmail.com",
         "secret",
@@ -581,13 +574,11 @@ describe("Supabase Authentication & Automated Room Linker", () => {
         return {};
       });
 
-      // @ts-expect-error test mock
       const profile = await fetchUserProfile(mockSupabaseClient, "auth-id-123");
       expect(profile).not.toBeNull();
       expect(profile?.nama).toBe("Pemilik");
 
       // Test signOutUser
-      // @ts-expect-error test mock
       await signOutUser(mockSupabaseClient);
       expect(mockSignOut).toHaveBeenCalled();
     });

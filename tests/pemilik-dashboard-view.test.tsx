@@ -25,7 +25,7 @@ describe("PemilikDashboardView Integration", () => {
     // Header & Banner
     expect(screen.getByText(/Panel Pengelola Properti/i)).toBeInTheDocument();
     expect(
-      screen.getByText(/Selamat Datang, Ibu Hj\. Syantika/i),
+      screen.getByText(/Selamat Datang, Adi Yohanes/i),
     ).toBeInTheDocument();
 
     // Ringkasan Keuangan

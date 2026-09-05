@@ -69,16 +69,16 @@ export function PemilikDashboardView({
         </CardHeader>
 
         <CardContent className="p-4 sm:p-5 pt-3">
-          <div className="p-3 bg-zinc-50 rounded-lg border border-zinc-200 flex items-center justify-between text-xs text-zinc-700">
-            <div className="flex items-center gap-2">
+          <div className="p-3 bg-zinc-50 rounded-lg border border-zinc-200 flex items-center justify-between gap-2 text-xs text-zinc-700">
+            <div className="flex items-center gap-2 min-w-0">
               <div className="w-7 h-7 rounded-md bg-zinc-900 text-white flex items-center justify-center shrink-0">
                 <Building2 className="w-3.5 h-3.5" />
               </div>
-              <span className="font-semibold text-zinc-900">
+              <span className="font-semibold text-zinc-900 truncate">
                 8 Unit Kamar Aktif (101 - 108)
               </span>
             </div>
-            <span className="text-xs font-semibold text-zinc-700 bg-white px-2.5 py-0.5 rounded-md border border-zinc-200 tabular-nums">
+            <span className="text-xs font-semibold text-zinc-700 bg-white px-2.5 py-0.5 rounded-md border border-zinc-200 tabular-nums shrink-0 whitespace-nowrap">
               {currentPeriodeLabel}
             </span>
           </div>

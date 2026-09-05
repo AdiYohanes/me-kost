@@ -39,7 +39,7 @@ describe("PengaturanProfilView", () => {
     render(<PengaturanProfilView user={mockPemilik} />);
 
     expect(
-      screen.getAllByText(/Ibu Hj\. Syantika/i).length,
+      screen.getAllByText(/Adi Yohanes/i).length,
     ).toBeGreaterThanOrEqual(1);
     expect(screen.getByText(/Pemilik Kost/i)).toBeInTheDocument();
     expect(

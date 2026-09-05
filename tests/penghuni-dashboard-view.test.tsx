@@ -109,7 +109,7 @@ describe("PenghuniDashboardView - Tiket #03 Kriteria Lengkap", () => {
     fireEvent.click(tunaiBtn);
 
     expect(screen.getByText(/Panduan Pembayaran Tunai/i)).toBeInTheDocument();
-    expect(screen.getAllByText(/Ibu Hj\. Syantika/i).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/Adi Yohanes/i).length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText(/0812-3456-7890/i)).toBeInTheDocument();
   });
 

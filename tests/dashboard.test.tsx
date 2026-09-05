@@ -35,7 +35,7 @@ describe("DashboardPage & Unified Guard", () => {
     render(<DashboardPage />);
 
     await waitFor(() => {
-      expect(screen.getAllByText(/Ibu Hj\. Syantika/i).length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText(/Adi Yohanes/i).length).toBeGreaterThanOrEqual(1);
       expect(screen.getByText(/Pemilik Kost/i)).toBeInTheDocument();
       expect(screen.getByText(/Panel Pengelola Properti/i)).toBeInTheDocument();
     });

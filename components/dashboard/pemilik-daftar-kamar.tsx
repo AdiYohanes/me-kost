@@ -369,31 +369,32 @@ export function PemilikDaftarKamar() {
     <div className="space-y-3">
       <Card className="card-shadow border-zinc-200 bg-white overflow-hidden">
         <CardHeader className="p-4 sm:p-5 pb-3.5 border-b border-zinc-100">
-          <div className="flex items-center justify-between gap-2">
-            <div>
-              <CardTitle className="text-sm font-bold text-zinc-900 flex items-center gap-1.5">
-                <Users className="w-4 h-4 text-zinc-700" />
-                <span>Daftar Unit Kamar</span>
-              </CardTitle>
-              <p className="text-xs text-zinc-500 mt-0.5">
-                Periode {currentPeriodeLabel}
-              </p>
-            </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => setIsBuatPeriodeOpen(true)}
-                className="h-8 px-2.5 text-xs font-medium text-zinc-800 border-zinc-200 hover:bg-zinc-50 gap-1.5 rounded-md cursor-pointer"
-              >
-                <CalendarPlus className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Periode Baru</span>
-              </Button>
-              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-md bg-zinc-100 text-zinc-700 border border-zinc-200 tabular-nums">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-2">
+            <div className="flex items-center justify-between sm:justify-start sm:gap-3">
+              <div>
+                <CardTitle className="text-sm font-bold text-zinc-900 flex items-center gap-1.5">
+                  <Users className="w-4 h-4 text-zinc-700 shrink-0" />
+                  <span className="whitespace-nowrap">Daftar Unit Kamar</span>
+                </CardTitle>
+                <p className="text-xs text-zinc-500 mt-0.5 whitespace-nowrap">
+                  Periode {currentPeriodeLabel}
+                </p>
+              </div>
+              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-md bg-zinc-100 text-zinc-700 border border-zinc-200 tabular-nums shrink-0">
                 {filteredList.length} Kamar
               </span>
             </div>
+
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setIsBuatPeriodeOpen(true)}
+              className="w-full sm:w-auto h-8 px-2.5 text-xs font-medium text-zinc-800 border-zinc-200 hover:bg-zinc-50 gap-1.5 rounded-md cursor-pointer justify-center shrink-0"
+            >
+              <CalendarPlus className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <span>Periode Baru</span>
+            </Button>
           </div>
 
           {/* Filter Status Pills (Issue 04) */}
