@@ -33,16 +33,11 @@ describe("LoginPage", () => {
     expect(screen.getByRole("button", { name: /masuk ke dashboard/i })).toBeInTheDocument();
   });
 
-  it("merender kartu panduan kredensial demo untuk Pemilik dan Penghuni", () => {
+  it("tidak lagi menampilkan kartu panduan kredensial demo", () => {
     render(<LoginPage />);
 
-    expect(screen.getByText(/panduan kredensial demo/i)).toBeInTheDocument();
-    expect(screen.getByText(/Akses Pemilik Kost:/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Ibu Hj\. Syantika/i })).toBeInTheDocument();
-    // Verify room 101 through 108 demo chips are available
-    for (const room of ["101", "102", "103", "104", "105", "106", "107", "108"]) {
-      expect(screen.getByRole("button", { name: new RegExp(room, "i") })).toBeInTheDocument();
-    }
+    expect(screen.queryByText(/panduan kredensial demo/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Akses Pemilik Kost:/i)).not.toBeInTheDocument();
   });
 
   it("menampilkan pesan error jika kredensial salah", async () => {
@@ -76,20 +71,6 @@ describe("LoginPage", () => {
     await waitFor(() => {
       expect(useAuthStore.getState().isAuthenticated).toBe(true);
       expect(useAuthStore.getState().user?.role).toBe("PEMILIK");
-      expect(mockReplace).toHaveBeenCalledWith("/dashboard");
-    });
-  });
-
-  it("berhasil quick login saat klik chip Kamar 101 pada kartu demo", async () => {
-    render(<LoginPage />);
-
-    const chip101 = screen.getByRole("button", { name: /101/i });
-    fireEvent.click(chip101);
-
-    await waitFor(() => {
-      expect(useAuthStore.getState().isAuthenticated).toBe(true);
-      expect(useAuthStore.getState().user?.role).toBe("PENGHUNI");
-      expect(useAuthStore.getState().user?.nomorKamar).toBe("101");
       expect(mockReplace).toHaveBeenCalledWith("/dashboard");
     });
   });

@@ -9,12 +9,8 @@ import {
   AlertCircle,
   KeyRound,
   User,
-  ShieldCheck,
-  DoorClosed,
-  Sparkles,
   Eye,
   EyeOff,
-  ArrowRight,
   MessageCircle,
   X,
 } from "lucide-react";
@@ -25,9 +21,7 @@ import {
   CardHeader,
   CardDescription,
   CardContent,
-  CardFooter,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { GuestGuard } from "@/components/auth/guest-guard";
 import { useAuthStore } from "@/lib/store/use-auth-store";
 
@@ -57,7 +51,7 @@ function GoogleIcon({ className = "w-4 h-4" }: { className?: string }) {
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { quickLogin, loginWithPassword, loginWithGoogle } = useAuthStore();
+  const { loginWithPassword, loginWithGoogle } = useAuthStore();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -131,30 +125,6 @@ function LoginForm() {
       setErrorMsg(result.error || "Gagal masuk.");
     }
   };
-
-  const handleQuickLogin = (userKey: string) => {
-    setErrorMsg("");
-    setDismissedUnregistered(true);
-    setIsLoading(true);
-    const result = quickLogin(userKey);
-    setIsLoading(false);
-
-    if (result.success) {
-      toast.success(
-        `Berhasil masuk sebagai ${
-          userKey === "pemilik" ? "Pemilik Kost" : `Kamar ${userKey}`
-        }!`,
-        {
-          description: "Mengarahkan ke dashboard...",
-        }
-      );
-      router.replace("/dashboard");
-    } else {
-      setErrorMsg(result.error || "Gagal memuat akun demo.");
-    }
-  };
-
-  const demoKamar = ["101", "102", "103", "104", "105", "106", "107", "108"];
 
   const waHref = `https://wa.me/6281234567890?text=${encodeURIComponent(
     `Halo Ibu Hj. Syantika (Pemilik Kost), saya ingin mendaftarkan email Google saya (${unregisteredEmail}) untuk kamar kost di Kost Syantika.`
@@ -330,7 +300,7 @@ function LoginForm() {
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Masukkan kata sandi (demo: 123456)"
+                  placeholder="Masukkan kata sandi"
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);
@@ -370,98 +340,6 @@ function LoginForm() {
             </Button>
           </form>
         </CardContent>
-      </Card>
-
-      {/* Demo Credentials Guide Card */}
-      <Card className="card-shadow border-zinc-200 bg-white overflow-hidden rounded-xl">
-        <CardHeader className="p-4 sm:p-5 pb-3 border-b border-zinc-100">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-              <p className="text-sm font-bold text-zinc-900">
-                Panduan Kredensial Demo
-              </p>
-            </div>
-            <Badge
-              variant="outline"
-              className="text-xs font-medium text-zinc-600 border-zinc-200 bg-zinc-50"
-            >
-              Masuk Instan
-            </Badge>
-          </div>
-          <CardDescription className="text-xs text-zinc-500 mt-1">
-            Pilih peran di bawah untuk login instan atau gunakan kata sandi:{" "}
-            <code className="bg-zinc-100 text-zinc-900 border border-zinc-200 px-1.5 py-0.5 rounded font-bold text-xs">
-              123456
-            </code>
-          </CardDescription>
-        </CardHeader>
-
-        <CardContent className="p-4 sm:p-5 pt-3.5 space-y-3.5">
-          {/* Pemilik Demo Button */}
-          <div className="space-y-1.5">
-            <p className="text-xs font-bold text-zinc-800 flex items-center gap-1.5">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Akses Pemilik Kost:</span>
-            </p>
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full p-3 h-auto min-h-[50px] justify-between border-zinc-200 bg-zinc-50 hover:bg-zinc-100 hover:border-zinc-300 rounded-lg group transition-colors cursor-pointer"
-              onClick={() => handleQuickLogin("pemilik")}
-            >
-              <div className="flex items-center gap-2.5 text-left">
-                <div className="w-7 h-7 rounded bg-zinc-900 text-white flex items-center justify-center text-xs font-bold shrink-0">
-                  P
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-zinc-950">
-                    Ibu Hj. Syantika (Pemilik)
-                  </p>
-                  <p className="text-xs text-zinc-500">
-                    Username:{" "}
-                    <code className="font-semibold text-zinc-800">
-                      pemilik
-                    </code>
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-1 text-emerald-800 font-semibold text-xs bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
-                <span>Masuk</span>
-                <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
-              </div>
-            </Button>
-          </div>
-
-          {/* Penghuni Demo Chips */}
-          <div className="space-y-1.5 pt-3 border-t border-zinc-100">
-            <p className="text-xs font-bold text-zinc-800 flex items-center gap-1.5">
-              <DoorClosed className="w-3.5 h-3.5 text-zinc-600" />
-              <span>Akses Penghuni Kamar (101 - 108):</span>
-            </p>
-            <div className="grid grid-cols-4 gap-1.5">
-              {demoKamar.map((kamar) => (
-                <Button
-                  key={kamar}
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="text-xs font-bold tabular-nums h-9 rounded-md border-zinc-200 bg-zinc-50 hover:bg-zinc-900 hover:text-white hover:border-zinc-900 text-zinc-900 transition-colors cursor-pointer shadow-2xs"
-                  onClick={() => handleQuickLogin(kamar)}
-                >
-                  {kamar}
-                </Button>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-
-        <CardFooter className="p-3 text-center justify-center border-t border-zinc-100 bg-zinc-50/50">
-          <p className="text-xs text-zinc-500">
-            Klik salah satu nomor kamar untuk langsung menguji tampilan
-            penghuni.
-          </p>
-        </CardFooter>
       </Card>
 
       {/* Footer */}
