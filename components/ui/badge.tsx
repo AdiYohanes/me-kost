@@ -21,6 +21,8 @@ const badgeVariants = cva(
           "bg-rose-100 text-rose-800 border border-rose-200/90 font-medium",
         belumbayar:
           "bg-slate-100 text-slate-700 border border-slate-200 font-medium",
+        menunggak:
+          "bg-red-100 text-red-700 border border-red-300 font-semibold",
       },
     },
     defaultVariants: {

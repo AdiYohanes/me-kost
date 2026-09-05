@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import { Tagihan, PaymentState, BuktiPembayaran } from "@/types/payment";
 import { Kamar, TambahPenghuniInput, KeluarkanPenghuniInput } from "@/types/kamar";
 import { MOCK_USERS } from "@/lib/mock-data";
+import { evaluasiPenerbitanH7, hitungStatusTagihan } from "@/lib/siklus-tagihan";
 
 export function generateInitialKamar(): Kamar[] {
   const penghuniAccounts = MOCK_USERS.filter((u) => u.role === "PENGHUNI");
@@ -197,11 +198,23 @@ export const usePaymentStore = create<PaymentState>()(
 
       getTagihanAktifByKamar: (kamarId: string) => {
         const { tagihanList, activePeriode } = get();
-        return tagihanList.find(
-          (t) =>
-            (t.kamarId === kamarId || t.nomorKamar === kamarId) &&
-            t.bulan === activePeriode.bulan &&
-            t.tahun === activePeriode.tahun
+        const kamarBills = tagihanList.filter(
+          (t) => t.kamarId === kamarId || t.nomorKamar === kamarId
+        );
+        if (kamarBills.length === 0) return undefined;
+
+        // 1. Prioritaskan tagihan belum lunas terbaru (termasuk tagihan baru H-7 atau menunggak)
+        const unfinalized = kamarBills
+          .filter((t) => t.status !== "LUNAS")
+          .sort((a, b) => (b.tahun !== a.tahun ? b.tahun - a.tahun : b.bulan - a.bulan));
+
+        if (unfinalized.length > 0) {
+          return unfinalized[0];
+        }
+
+        // 2. Jika semua lunas, ambil tagihan periode aktif berjalan
+        return kamarBills.find(
+          (t) => t.bulan === activePeriode.bulan && t.tahun === activePeriode.tahun
         );
       },
 
@@ -297,11 +310,37 @@ export const usePaymentStore = create<PaymentState>()(
       },
 
       updateNominalTagihan: (tagihanId: string, nominalBaru: number) => {
-        set((state) => ({
-          tagihanList: state.tagihanList.map((t) =>
-            t.id === tagihanId ? { ...t, nominal: nominalBaru } : t
-          ),
-        }));
+        set((state) => {
+          const existingIndex = state.tagihanList.findIndex((t) => t.id === tagihanId);
+          let targetNomorKamar = "";
+
+          let updatedTagihanList = state.tagihanList;
+          if (existingIndex >= 0) {
+            targetNomorKamar = state.tagihanList[existingIndex].nomorKamar;
+            updatedTagihanList = state.tagihanList.map((t) =>
+              t.id === tagihanId ? { ...t, nominal: nominalBaru } : t
+            );
+          } else {
+            const match = tagihanId.match(/^tagihan-([^-]+)/);
+            if (match) {
+              targetNomorKamar = match[1];
+            }
+          }
+
+          // Perbarui juga tarif dasar kamar di kamarList
+          const updatedKamarList = targetNomorKamar
+            ? state.kamarList.map((k) =>
+                k.nomorKamar === targetNomorKamar || k.id === targetNomorKamar
+                  ? { ...k, tarifBulanan: nominalBaru }
+                  : k
+              )
+            : state.kamarList;
+
+          return {
+            tagihanList: updatedTagihanList,
+            kamarList: updatedKamarList,
+          };
+        });
       },
 
       buatTagihanPeriodeBaru: (
@@ -472,6 +511,61 @@ export const usePaymentStore = create<PaymentState>()(
             kamarList: updatedKamarList,
             tagihanList: updatedTagihanList,
           };
+        });
+      },
+
+      sinkronisasiTagihanOtomatis: (referenceDate?: Date) => {
+        const ref = referenceDate || new Date();
+        set((state) => {
+          // 1. Evaluasi dan perbarui status tagihan aktif yang melewati batas bayar menjadi MENUNGGAK
+          const updatedTagihanList = state.tagihanList.map((tagihan) => {
+            const evaluasi = hitungStatusTagihan(tagihan, ref);
+            if (
+              evaluasi.isMenunggak &&
+              (tagihan.status === "BELUM_BAYAR" || tagihan.status === "DITOLAK")
+            ) {
+              return { ...tagihan, status: "MENUNGGAK" as const };
+            }
+            return tagihan;
+          });
+
+          // 2. Evaluasi apakah ada kamar terisi yang mencapai H-7 sebelum jatuh tempo berikutnya
+          const newTagihanToAdd: Tagihan[] = [];
+          state.kamarList.forEach((kamar) => {
+            if (kamar.statusHunian === "TERISI" && kamar.penghuni) {
+              const h7Check = evaluasiPenerbitanH7(kamar, updatedTagihanList, ref);
+              if (h7Check.perluTerbit && h7Check.newTagihanData) {
+                const candBulan = h7Check.newTagihanData.bulan!;
+                const candTahun = h7Check.newTagihanData.tahun!;
+                const newTagihan: Tagihan = {
+                  id:
+                    h7Check.newTagihanData.id ||
+                    `tagihan-${kamar.nomorKamar}-${candTahun}-${String(candBulan).padStart(2, "0")}`,
+                  kamarId: kamar.id,
+                  nomorKamar: kamar.nomorKamar,
+                  penghuniId: kamar.penghuni.id,
+                  penghuniNama: kamar.penghuni.nama,
+                  periodeBulan: h7Check.newTagihanData.periodeBulan || "",
+                  periodeLabel: h7Check.newTagihanData.periodeLabel,
+                  periodeMulai: h7Check.newTagihanData.periodeMulai,
+                  periodeSelesai: h7Check.newTagihanData.periodeSelesai,
+                  tanggalJatuhTempo: h7Check.newTagihanData.tanggalJatuhTempo,
+                  tahun: candTahun,
+                  bulan: candBulan,
+                  nominal: h7Check.newTagihanData.nominal || kamar.tarifBulanan,
+                  batasBayar: h7Check.newTagihanData.batasBayar || "",
+                  status: "BELUM_BAYAR",
+                };
+                newTagihanToAdd.push(newTagihan);
+              }
+            }
+          });
+
+          if (newTagihanToAdd.length > 0) {
+            return { tagihanList: [...updatedTagihanList, ...newTagihanToAdd] };
+          }
+
+          return { tagihanList: updatedTagihanList };
         });
       },
 

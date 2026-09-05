@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Users,
   Banknote,
@@ -13,6 +13,7 @@ import {
   UserPlus,
   UserMinus,
   Mail,
+  AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -21,6 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { usePaymentStore } from "@/lib/store/use-payment-store";
 import { Tagihan, StatusPembayaran } from "@/types/payment";
 import { Kamar, TambahPenghuniInput } from "@/types/kamar";
+import { hitungStatusTagihan } from "@/lib/siklus-tagihan";
 import { BuktiLightboxDialog } from "./bukti-lightbox-dialog";
 import { TolakBuktiDialog } from "./tolak-bukti-dialog";
 import { TandaiCashDialog } from "./tandai-cash-dialog";
@@ -33,7 +35,14 @@ import { UbahEmailDialog } from "./ubah-email-dialog";
 import { KeluarkanPenghuniDialog } from "./keluarkan-penghuni-dialog";
 import { formatRupiah } from "./pemilik-summary-cards";
 
-type FilterType = "SEMUA" | StatusPembayaran | "KOSONG";
+type FilterType =
+  | "SEMUA"
+  | "BUTUH_VERIFIKASI"
+  | "H3"
+  | "MENUNGGAK"
+  | "KOSONG"
+  | "LUNAS"
+  | StatusPembayaran;
 
 export function PemilikDaftarKamar() {
   const {
@@ -48,7 +57,12 @@ export function PemilikDaftarKamar() {
     tambahPenghuni,
     ubahEmailPenghuni,
     keluarkanPenghuni,
+    sinkronisasiTagihanOtomatis,
   } = usePaymentStore();
+
+  useEffect(() => {
+    sinkronisasiTagihanOtomatis();
+  }, [sinkronisasiTagihanOtomatis]);
 
   const [activeFilter, setActiveFilter] = useState<FilterType>("SEMUA");
   const [selectedTagihanForLightbox, setSelectedTagihanForLightbox] =
@@ -86,10 +100,10 @@ export function PemilikDaftarKamar() {
 
   // Hitung jumlah tiap kategori untuk badge tab filter
   let countLunas = 0;
-  let countBelumBayar = 0;
   let countPending = 0;
-  let countDitolak = 0;
   let countKosong = 0;
+  let countMenunggak = 0;
+  let countH3 = 0;
 
   sortedKamarList.forEach((kamar) => {
     if (kamar.statusHunian === "KOSONG") {
@@ -97,10 +111,16 @@ export function PemilikDaftarKamar() {
     } else {
       const tagihan = tagihanAktifMap.get(kamar.nomorKamar);
       if (tagihan) {
-        if (tagihan.status === "LUNAS") countLunas++;
-        else if (tagihan.status === "BELUM_BAYAR") countBelumBayar++;
-        else if (tagihan.status === "MENUNGGU_VERIFIKASI") countPending++;
-        else if (tagihan.status === "DITOLAK") countDitolak++;
+        const evaluasi = hitungStatusTagihan(tagihan);
+        if (evaluasi.isMenunggak || tagihan.status === "MENUNGGAK") {
+          countMenunggak++;
+        } else if (tagihan.status === "LUNAS") {
+          countLunas++;
+        } else if (tagihan.status === "MENUNGGU_VERIFIKASI") {
+          countPending++;
+        } else if (tagihan.status === "BELUM_BAYAR" && evaluasi.isH3) {
+          countH3++;
+        }
       }
     }
   });
@@ -111,7 +131,37 @@ export function PemilikDaftarKamar() {
     if (kamar.statusHunian === "KOSONG") return false;
 
     const tagihan = tagihanAktifMap.get(kamar.nomorKamar);
-    return tagihan?.status === activeFilter;
+    if (!tagihan) return false;
+
+    const evaluasi = hitungStatusTagihan(tagihan);
+
+    if (
+      activeFilter === "BUTUH_VERIFIKASI" ||
+      activeFilter === "MENUNGGU_VERIFIKASI"
+    ) {
+      return tagihan.status === "MENUNGGU_VERIFIKASI";
+    }
+    if (activeFilter === "H3") {
+      return (
+        evaluasi.isH3 &&
+        !evaluasi.isMenunggak &&
+        tagihan.status !== "LUNAS" &&
+        tagihan.status !== "MENUNGGU_VERIFIKASI"
+      );
+    }
+    if (activeFilter === "MENUNGGAK") {
+      return evaluasi.isMenunggak || tagihan.status === "MENUNGGAK";
+    }
+    if (activeFilter === "LUNAS") {
+      return tagihan.status === "LUNAS";
+    }
+    if (activeFilter === "BELUM_BAYAR") {
+      return tagihan.status === "BELUM_BAYAR" && !evaluasi.isMenunggak;
+    }
+    if (activeFilter === "DITOLAK") {
+      return tagihan.status === "DITOLAK";
+    }
+    return tagihan.status === activeFilter;
   });
 
   const handleConfirmCash = (tagihanId: string, catatan?: string) => {
@@ -228,6 +278,21 @@ export function PemilikDaftarKamar() {
         </Badge>
       );
     }
+
+    const evaluasi = hitungStatusTagihan(tagihan);
+
+    if (evaluasi.isMenunggak || tagihan.status === "MENUNGGAK") {
+      return (
+        <Badge
+          variant="menunggak"
+          className="text-xs font-semibold gap-1 bg-red-100 text-red-700 border border-red-300"
+        >
+          <AlertTriangle className="w-3 h-3 text-red-600 shrink-0" />
+          <span>{evaluasi.isMenunggak ? evaluasi.labelStatus : "MENUNGGAK"}</span>
+        </Badge>
+      );
+    }
+
     switch (tagihan.status) {
       case "LUNAS":
         return (
@@ -253,6 +318,17 @@ export function PemilikDaftarKamar() {
         );
       case "BELUM_BAYAR":
       default:
+        if (evaluasi.isH3) {
+          return (
+            <Badge
+              variant="pending"
+              className="text-xs font-semibold gap-1 bg-amber-100 text-amber-800 border border-amber-300"
+            >
+              <Clock className="w-3 h-3 text-amber-600 shrink-0" />
+              <span>H-3 Jatuh Tempo</span>
+            </Badge>
+          );
+        }
         return (
           <Badge variant="belumbayar" className="text-xs font-medium">
             Belum Bayar
@@ -292,11 +368,12 @@ export function PemilikDaftarKamar() {
             </div>
           </div>
 
-          {/* Filter Status Pills */}
+          {/* Filter Status Pills (Issue 04) */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-3 no-scrollbar">
             <button
               type="button"
               onClick={() => setActiveFilter("SEMUA")}
+              aria-label={`Semua (${sortedKamarList.length})`}
               className={`px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors cursor-pointer border ${
                 activeFilter === "SEMUA"
                   ? "bg-zinc-900 text-white border-zinc-900 font-semibold"
@@ -308,7 +385,48 @@ export function PemilikDaftarKamar() {
 
             <button
               type="button"
+              onClick={() => setActiveFilter("BUTUH_VERIFIKASI")}
+              aria-label={`Butuh Verifikasi (${countPending})`}
+              className={`px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors cursor-pointer border ${
+                activeFilter === "BUTUH_VERIFIKASI" ||
+                activeFilter === "MENUNGGU_VERIFIKASI"
+                  ? "bg-amber-600 text-white border-amber-600 font-semibold"
+                  : "bg-zinc-50 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 border-zinc-200"
+              }`}
+            >
+              Butuh Verifikasi ({countPending})
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveFilter("H3")}
+              aria-label={`Mendekati Jatuh Tempo (H-3) (${countH3})`}
+              className={`px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors cursor-pointer border ${
+                activeFilter === "H3"
+                  ? "bg-amber-600 text-white border-amber-600 font-semibold"
+                  : "bg-zinc-50 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 border-zinc-200"
+              }`}
+            >
+              Mendekati Jatuh Tempo (H-3) ({countH3})
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveFilter("MENUNGGAK")}
+              aria-label={`Menunggak (${countMenunggak})`}
+              className={`px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors cursor-pointer border ${
+                activeFilter === "MENUNGGAK"
+                  ? "bg-rose-600 text-white border-rose-600 font-semibold"
+                  : "bg-zinc-50 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 border-zinc-200"
+              }`}
+            >
+              Menunggak ({countMenunggak})
+            </button>
+
+            <button
+              type="button"
               onClick={() => setActiveFilter("LUNAS")}
+              aria-label={`Lunas (${countLunas})`}
               className={`px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors cursor-pointer border ${
                 activeFilter === "LUNAS"
                   ? "bg-emerald-600 text-white border-emerald-600 font-semibold"
@@ -320,55 +438,16 @@ export function PemilikDaftarKamar() {
 
             <button
               type="button"
-              onClick={() => setActiveFilter("BELUM_BAYAR")}
+              onClick={() => setActiveFilter("KOSONG")}
+              aria-label={`Kamar Kosong (${countKosong})`}
               className={`px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors cursor-pointer border ${
-                activeFilter === "BELUM_BAYAR"
-                  ? "bg-zinc-700 text-white border-zinc-700 font-semibold"
+                activeFilter === "KOSONG"
+                  ? "bg-slate-700 text-white border-slate-700 font-semibold"
                   : "bg-zinc-50 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 border-zinc-200"
               }`}
             >
-              Belum Bayar ({countBelumBayar})
+              Kamar Kosong ({countKosong})
             </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveFilter("MENUNGGU_VERIFIKASI")}
-              className={`px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors cursor-pointer border ${
-                activeFilter === "MENUNGGU_VERIFIKASI"
-                  ? "bg-amber-600 text-white border-amber-600 font-semibold"
-                  : "bg-zinc-50 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 border-zinc-200"
-              }`}
-            >
-              Menunggu Verifikasi ({countPending})
-            </button>
-
-            {countDitolak > 0 && (
-              <button
-                type="button"
-                onClick={() => setActiveFilter("DITOLAK")}
-                className={`px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors cursor-pointer border ${
-                  activeFilter === "DITOLAK"
-                    ? "bg-rose-600 text-white border-rose-600 font-semibold"
-                    : "bg-zinc-50 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 border-zinc-200"
-                }`}
-              >
-                Ditolak ({countDitolak})
-              </button>
-            )}
-
-            {countKosong > 0 && (
-              <button
-                type="button"
-                onClick={() => setActiveFilter("KOSONG")}
-                className={`px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors cursor-pointer border ${
-                  activeFilter === "KOSONG"
-                    ? "bg-slate-700 text-white border-slate-700 font-semibold"
-                    : "bg-zinc-50 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 border-zinc-200"
-                }`}
-              >
-                Kosong ({countKosong})
-              </button>
-            )}
           </div>
         </CardHeader>
 

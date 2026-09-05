@@ -36,6 +36,7 @@ import { usePaymentStore } from "@/lib/store/use-payment-store";
 import { BayarTunaiDialog } from "@/components/dashboard/bayar-tunai-dialog";
 import { UserSession } from "@/types/auth";
 import { StatusPembayaran } from "@/types/payment";
+import { hitungStatusTagihan } from "@/lib/siklus-tagihan";
 
 interface PenghuniTagihanCardProps {
   user: UserSession;
@@ -60,10 +61,30 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
     maximumFractionDigits: 0,
   }).format(nominal);
 
-  const status: StatusPembayaran = tagihan?.status || "BELUM_BAYAR";
+  const evaluasi = tagihan
+    ? hitungStatusTagihan(tagihan)
+    : {
+        statusVisual: "BELUM_BAYAR" as const,
+        labelStatus: "Belum Bayar",
+        isMenunggak: false,
+        telatHari: 0,
+        isH3: false,
+        sisaHari: 0,
+      };
 
-  const getBadgeConfig = (st: StatusPembayaran) => {
-    switch (st) {
+  const status: StatusPembayaran =
+    evaluasi.isMenunggak || tagihan?.status === "MENUNGGAK"
+      ? "MENUNGGAK"
+      : tagihan?.status || "BELUM_BAYAR";
+
+  const getBadgeConfig = () => {
+    if (evaluasi.isMenunggak || tagihan?.status === "MENUNGGAK") {
+      return {
+        variant: "menunggak" as const,
+        label: evaluasi.isMenunggak ? evaluasi.labelStatus : "MENUNGGAK",
+      };
+    }
+    switch (tagihan?.status) {
       case "LUNAS":
         return { variant: "lunas" as const, label: "Lunas" };
       case "MENUNGGU_VERIFIKASI":
@@ -72,11 +93,14 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
         return { variant: "ditolak" as const, label: "Ditolak" };
       case "BELUM_BAYAR":
       default:
+        if (evaluasi.isH3) {
+          return { variant: "pending" as const, label: "H-3 Jatuh Tempo" };
+        }
         return { variant: "belumbayar" as const, label: "Belum Bayar" };
     }
   };
 
-  const badgeConfig = getBadgeConfig(status);
+  const badgeConfig = getBadgeConfig();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -176,6 +200,19 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
               </div>
               <p className="text-rose-800 bg-white/90 p-2.5 rounded border border-rose-200 text-xs leading-relaxed font-normal">
                 &ldquo;{tagihan?.alasanPenolakan || "Bukti transfer tidak sesuai. Silakan unggah ulang."}&rdquo;
+              </p>
+            </div>
+          )}
+
+          {/* Alert jika Menunggak */}
+          {status === "MENUNGGAK" && (
+            <div className="p-3.5 rounded-lg bg-red-50 border border-red-200 text-xs space-y-1.5 animate-in fade-in duration-200">
+              <div className="flex items-center gap-1.5 text-red-800 font-bold">
+                <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+                <span>Tagihan Menunggak ({evaluasi.telatHari} Hari)</span>
+              </div>
+              <p className="text-red-700 text-xs leading-relaxed font-normal">
+                Batas waktu pembayaran sewa kamar telah terlewati. Mohon segera selesaikan pembayaran dan unggah bukti transfer.
               </p>
             </div>
           )}
@@ -321,8 +358,11 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
             </div>
           )}
 
-          {/* Action buttons jika Belum Bayar atau Ditolak (dan form belum aktif) */}
-          {(status === "BELUM_BAYAR" || status === "DITOLAK") && !showFormUpload && (
+          {/* Action buttons jika Belum Bayar, Ditolak, atau Menunggak (dan form belum aktif) */}
+          {(status === "BELUM_BAYAR" ||
+            status === "DITOLAK" ||
+            status === "MENUNGGAK") &&
+            !showFormUpload && (
             <div className="space-y-2 pt-0.5">
               <Button
                 type="button"

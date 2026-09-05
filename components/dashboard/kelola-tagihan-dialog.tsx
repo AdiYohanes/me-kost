@@ -281,7 +281,7 @@ function UbahTarifForm({
           className="w-full text-xs h-10 p-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all font-semibold text-slate-800 bg-white"
         />
         <p className="text-xs text-slate-500 leading-relaxed">
-          Nominal ini akan memperbarui tagihan periode berjalan dan periode tagihan berikutnya.
+          Sesuaikan nominal tagihan kamar ini (misal untuk penambahan biaya fasilitas, listrik, atau pemotongan diskon).
         </p>
       </div>
 

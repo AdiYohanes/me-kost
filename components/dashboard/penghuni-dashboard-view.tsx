@@ -26,8 +26,12 @@ export function PenghuniDashboardView({
   user,
   activeTab = "tagihan",
 }: PenghuniDashboardViewProps) {
-  const { activePeriode } = usePaymentStore();
+  const { activePeriode, sinkronisasiTagihanOtomatis } = usePaymentStore();
   const currentPeriodeLabel = activePeriode?.periodeBulan || "September 2026";
+
+  React.useEffect(() => {
+    sinkronisasiTagihanOtomatis();
+  }, [sinkronisasiTagihanOtomatis]);
 
   if (activeTab === "pengaturan") {
     return <PengaturanProfilView user={user} />;

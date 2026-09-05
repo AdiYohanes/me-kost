@@ -277,6 +277,52 @@ describe("usePaymentStore", () => {
       expect(tagihanPenghuniBaru?.status).toBe("BELUM_BAYAR");
     });
   });
+
+  describe("Siklus Tagihan Mandiri, Terbit H-7, & Deteksi Menunggak (Issue 04)", () => {
+    it("menerbitkan tagihan periode berikutnya secara otomatis saat mencapai H-7", () => {
+      // Kamar 103 lunas di September 2026. Tanggal jatuh tempo: 10.
+      // Untuk Oktober 2026, tanggal jatuh tempo adalah 10 Oktober. H-7 adalah 3 Oktober.
+      // Jalankan sinkronisasi pada tanggal 4 Oktober 2026 (H-6)
+      const refDate = new Date(2026, 9, 4);
+      usePaymentStore.getState().sinkronisasiTagihanOtomatis(refDate);
+
+      const tagihanOktober103 = usePaymentStore
+        .getState()
+        .tagihanList.find((t) => t.nomorKamar === "103" && t.bulan === 10 && t.tahun === 2026);
+
+      expect(tagihanOktober103).toBeDefined();
+      expect(tagihanOktober103?.status).toBe("BELUM_BAYAR");
+      expect(tagihanOktober103?.penghuniNama).toBe("Budi Santoso");
+      expect(tagihanOktober103?.nominal).toBe(1500000);
+      expect(tagihanOktober103?.batasBayar).toContain("10 Okt 2026");
+    });
+
+    it("mengubah status tagihan belum bayar menjadi MENUNGGAK jika telah melewati batas bayar", () => {
+      // Kamar 101 memiliki tagihan September 2026 dengan batas bayar 10 Sep 2026 (BELUM_BAYAR)
+      const tagihan101 = usePaymentStore.getState().getTagihanAktifByKamar("101");
+      expect(tagihan101?.status).toBe("BELUM_BAYAR");
+
+      // Simulasikan tanggal 14 September 2026 (terlambat 4 hari)
+      const refDate = new Date(2026, 8, 14);
+      usePaymentStore.getState().sinkronisasiTagihanOtomatis(refDate);
+
+      const updated101 = usePaymentStore.getState().getTagihanAktifByKamar("101");
+      expect(updated101?.status).toBe("MENUNGGAK");
+    });
+
+    it("tidak mengubah status tagihan LUNAS atau MENUNGGU_VERIFIKASI menjadi MENUNGGAK", () => {
+      // Kamar 102 (MENUNGGU_VERIFIKASI) dan Kamar 103 (LUNAS)
+      const refDate = new Date(2026, 8, 14); // Melewati batas bayar 10 Sep
+      usePaymentStore.getState().sinkronisasiTagihanOtomatis(refDate);
+
+      const tagihan102 = usePaymentStore.getState().getTagihanAktifByKamar("102");
+      const tagihan103 = usePaymentStore.getState().getTagihanAktifByKamar("103");
+
+      expect(tagihan102?.status).toBe("MENUNGGU_VERIFIKASI");
+      expect(tagihan103?.status).toBe("LUNAS");
+    });
+  });
 });
+
 
 

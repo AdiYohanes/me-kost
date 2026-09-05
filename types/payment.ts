@@ -2,7 +2,8 @@ export type StatusPembayaran =
   | "BELUM_BAYAR"
   | "MENUNGGU_VERIFIKASI"
   | "LUNAS"
-  | "DITOLAK";
+  | "DITOLAK"
+  | "MENUNGGAK";
 
 export type MetodePembayaran = "TRANSFER" | "CASH";
 
@@ -29,6 +30,10 @@ export interface Tagihan {
   bulan: number;
   nominal: number;
   batasBayar: string;
+  periodeMulai?: string;
+  periodeSelesai?: string;
+  periodeLabel?: string;
+  tanggalJatuhTempo?: string;
   status: StatusPembayaran;
   metodePembayaran?: MetodePembayaran;
   buktiPembayaran?: BuktiPembayaran;
@@ -69,6 +74,7 @@ export interface PaymentState {
   tambahPenghuni: (input: TambahPenghuniInput) => void;
   ubahEmailPenghuni: (kamarId: string, emailBaru: string) => void;
   keluarkanPenghuni: (input: KeluarkanPenghuniInput) => void;
+  sinkronisasiTagihanOtomatis: (referenceDate?: Date) => void;
   resetPayments: () => void;
 }
 

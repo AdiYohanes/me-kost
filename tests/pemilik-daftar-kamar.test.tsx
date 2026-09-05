@@ -21,7 +21,7 @@ describe("PemilikDaftarKamar", () => {
     }
   });
 
-  it("memfilter daftar kamar berdasarkan status: Lunas, Belum Bayar, dan Menunggu Verifikasi", () => {
+  it("memfilter daftar kamar berdasarkan tab filter: Butuh Verifikasi, Lunas, Menunggak, Mendekati Jatuh Tempo (H-3), dan Kamar Kosong", () => {
     render(<PemilikDaftarKamar />);
 
     // Filter "Lunas"
@@ -35,20 +35,65 @@ describe("PemilikDaftarKamar", () => {
     // Kamar 101 (Belum Bayar) tidak boleh tampil
     expect(screen.queryByText(/Rizky Ramadhan/i)).not.toBeInTheDocument();
 
-    // Filter "Belum Bayar"
-    const belumBayarFilterBtn = screen.getByRole("button", { name: /^Belum Bayar/i });
-    fireEvent.click(belumBayarFilterBtn);
-    // Kamar 101 & 105 Belum Bayar
-    expect(screen.getByText(/Rizky Ramadhan/i)).toBeInTheDocument();
-    expect(screen.getByText(/Anisa Rahma/i)).toBeInTheDocument();
-    expect(screen.queryByText(/Budi Santoso/i)).not.toBeInTheDocument();
-
-    // Filter "Menunggu Verifikasi"
-    const pendingFilterBtn = screen.getByRole("button", { name: /^Menunggu Verifikasi/i });
+    // Filter "Butuh Verifikasi"
+    const pendingFilterBtn = screen.getByRole("button", { name: /^Butuh Verifikasi/i });
     fireEvent.click(pendingFilterBtn);
     // Kamar 102 & 107 Menunggu Verifikasi
     expect(screen.getAllByText(/Siti Nurhaliza/i).length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText(/Dewi Lestari/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Budi Santoso/i)).not.toBeInTheDocument();
+  });
+
+  it("menampilkan badge visual MENUNGGAK (Telat X Hari) dengan aksen merah dan memfilter tab Menunggak", () => {
+    // Siapkan tagihan kamar 101 telah melewati jatuh tempo (batasBayar 1 Sep 2026, telat 4 hari dari 5 Sep 2026)
+    usePaymentStore.setState((state) => ({
+      tagihanList: state.tagihanList.map((t) =>
+        t.nomorKamar === "101" ? { ...t, batasBayar: "1 Sep 2026" } : t
+      ),
+    }));
+
+    render(<PemilikDaftarKamar />);
+
+    // Kamar 101 menampilkan badge MENUNGGAK
+    expect(screen.getByText(/MENUNGGAK \(Telat \d+ Hari\)/i)).toBeInTheDocument();
+
+    // Klik tab filter Menunggak
+    const menunggakBtn = screen.getByRole("button", { name: /^Menunggak/i });
+    fireEvent.click(menunggakBtn);
+
+    // Kamar 101 muncul
+    expect(screen.getByText(/Rizky Ramadhan/i)).toBeInTheDocument();
+    // Kamar 103 (Lunas) tidak muncul
+    expect(screen.queryByText(/Budi Santoso/i)).not.toBeInTheDocument();
+  });
+
+  it("menampilkan badge H-3 Jatuh Tempo dan memfilter tab Mendekati Jatuh Tempo (H-3)", () => {
+    // Siapkan tagihan kamar 104 berada di rentang H-3 (2 hari lagi)
+    const in2Days = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000);
+    const bulanPendek = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+    const batasBayarH3 = `${in2Days.getDate()} ${bulanPendek[in2Days.getMonth()]} ${in2Days.getFullYear()}`;
+
+    usePaymentStore.setState((state) => ({
+      tagihanList: state.tagihanList.map((t) =>
+        t.nomorKamar === "104"
+          ? { ...t, batasBayar: batasBayarH3, status: "BELUM_BAYAR" as const }
+          : t
+      ),
+    }));
+
+    render(<PemilikDaftarKamar />);
+
+    // Kamar 104 menampilkan badge H-X Jatuh Tempo
+    expect(screen.getByText(/H-\d+ Jatuh Tempo/i)).toBeInTheDocument();
+
+    // Klik tab filter Mendekati Jatuh Tempo (H-3)
+    const h3Btn = screen.getByRole("button", { name: /Mendekati Jatuh Tempo \(H-3\)/i });
+    fireEvent.click(h3Btn);
+
+    // Kamar 104 (Dimas Anggara) muncul
+    expect(screen.getByText(/Dimas Anggara/i)).toBeInTheDocument();
+    // Kamar 103 (Lunas) tidak muncul
+    expect(screen.queryByText(/Budi Santoso/i)).not.toBeInTheDocument();
   });
 
   it("dapat membuka modal konfirmasi 'Tandai Lunas (Cash)' dan menandai pembayaran tunai dengan catatan opsional", () => {

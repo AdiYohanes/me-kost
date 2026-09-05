@@ -226,7 +226,7 @@ describe("PemilikManajemenKamar Integration (Issue 03)", () => {
     render(<PemilikDaftarKamar />);
 
     // Tab filter Kosong (2) muncul
-    const kosongFilterBtn = screen.getByRole("button", { name: /^Kosong \(2\)$/i });
+    const kosongFilterBtn = screen.getByRole("button", { name: /^(Kamar )?Kosong \(2\)$/i });
     expect(kosongFilterBtn).toBeInTheDocument();
 
     // Klik tab filter Kosong
