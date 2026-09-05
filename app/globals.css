@@ -42,11 +42,11 @@
 
 /* Mobile viewport utilities */
 .safe-bottom {
-  padding-bottom: env(safe-area-inset-bottom, 1rem);
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.5rem);
 }
 
 .safe-top {
-  padding-top: env(safe-area-inset-top, 1rem);
+  padding-top: calc(env(safe-area-inset-top, 0px) + 1.5rem);
 }
 
 /* Duolingo & Mamikos inspired soft card shadow */

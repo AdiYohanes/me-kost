@@ -28,7 +28,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
   const isPemilik = user.role === "PEMILIK";
 
   return (
-    <header className="flex items-center justify-between pb-4 mb-2 border-b border-slate-200/70">
+    <header className="flex items-center justify-between pt-1 sm:pt-1.5 pb-4 mb-2 border-b border-slate-200/70">
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-md shadow-emerald-600/20 shrink-0">
           <Building2 className="w-5 h-5" />

@@ -19,7 +19,7 @@ function DashboardContent() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 flex flex-col items-center justify-start px-4 pt-4 pb-28 sm:px-6 safe-top safe-bottom">
+    <main className="min-h-screen bg-slate-50 flex flex-col items-center justify-start px-4 pb-32 sm:px-6 safe-top">
       <div className="w-full max-w-md flex flex-col space-y-6">
         {/* Top App Bar & Profile Header */}
         <DashboardHeader user={user} />
