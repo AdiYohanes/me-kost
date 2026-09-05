@@ -129,7 +129,7 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
   return (
     <>
       <Card className="card-shadow overflow-hidden">
-        <CardHeader className="pb-3">
+        <CardHeader className="p-5 pb-3.5">
           <div className="flex items-center justify-between">
             <CardTitle className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
               <CreditCard className="w-4 h-4 text-emerald-600" />
@@ -137,22 +137,22 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
             </CardTitle>
             <Badge variant={badgeConfig.variant}>{badgeConfig.label}</Badge>
           </div>
-          <CardDescription className="text-xs">
+          <CardDescription className="text-xs mt-1">
             Periode: <strong>{tagihan?.periodeBulan || "September 2026"}</strong> • Batas Bayar:{" "}
             <strong>{tagihan?.batasBayar || "10 Sep 2026"}</strong>
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="space-y-3.5">
+        <CardContent className="p-5 pt-0 space-y-4">
           {/* Nominal Box */}
-          <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
             <div>
               <p className="text-[11px] text-slate-500 font-medium">Nominal Sewa Bulanan</p>
-              <p className="text-xl font-black text-slate-900">{formattedNominal}</p>
+              <p className="text-xl sm:text-2xl font-black text-slate-900 mt-0.5">{formattedNominal}</p>
             </div>
             <div className="text-right">
               <p className="text-[10px] text-slate-400">Jatuh Tempo</p>
-              <p className="text-xs font-semibold text-rose-600">
+              <p className="text-xs font-semibold text-rose-600 mt-0.5">
                 {tagihan?.batasBayar || "10 Sep 2026"}
               </p>
             </div>
@@ -170,12 +170,12 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
 
           {/* Alert jika Ditolak */}
           {status === "DITOLAK" && (
-            <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs space-y-1.5 animate-in fade-in duration-200">
+            <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-xs space-y-2 animate-in fade-in duration-200">
               <div className="flex items-center gap-1.5 text-rose-800 font-bold">
                 <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
                 <span>Alasan Penolakan dari Pemilik Kost:</span>
               </div>
-              <p className="text-rose-700 bg-white/70 p-2 rounded-lg border border-rose-100 leading-relaxed font-medium">
+              <p className="text-rose-700 bg-white/70 p-2.5 rounded-lg border border-rose-100 leading-relaxed font-medium">
                 &ldquo;{tagihan?.alasanPenolakan || "Bukti transfer tidak sesuai. Silakan unggah ulang."}&rdquo;
               </p>
             </div>
@@ -183,7 +183,7 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
 
           {/* Mode Upload Preview */}
           {showFormUpload && previewUrl && (
-            <div className="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/40 space-y-3 animate-in fade-in zoom-in-95 duration-200">
+            <div className="p-4 rounded-xl border border-emerald-200 bg-emerald-50/40 space-y-3.5 animate-in fade-in zoom-in-95 duration-200">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                   <ImageIcon className="w-4 h-4 text-emerald-600" />
@@ -194,9 +194,9 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
                   variant="ghost"
                   size="sm"
                   onClick={handleTriggerUpload}
-                  className="h-7 text-[11px] text-emerald-700 hover:text-emerald-800 hover:bg-emerald-100/60 gap-1 px-2"
+                  className="h-8 text-xs text-emerald-700 hover:text-emerald-800 hover:bg-emerald-100/60 gap-1.5 px-2.5 cursor-pointer"
                 >
-                  <RotateCcw className="w-3 h-3" />
+                  <RotateCcw className="w-3.5 h-3.5" />
                   Ganti Foto
                 </Button>
               </div>
@@ -211,7 +211,7 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[11px] font-medium text-slate-600">
+                <label className="text-xs font-medium text-slate-600">
                   Catatan Tambahan (Opsional)
                 </label>
                 <Input
@@ -219,17 +219,17 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
                   placeholder="Contoh: Transfer lewat BCA a.n. Nama Anda"
                   value={catatan}
                   onChange={(e) => setCatatan(e.target.value)}
-                  className="text-xs h-9 bg-white"
+                  className="text-xs h-9.5 bg-white"
                 />
               </div>
 
-              <div className="flex items-center gap-2 pt-1">
+              <div className="flex items-center gap-2.5 pt-1">
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
                   onClick={handleCancelUpload}
-                  className="text-xs h-9 flex-1 border-slate-300"
+                  className="text-xs h-10 flex-1 border-slate-300 cursor-pointer"
                 >
                   Batal
                 </Button>
@@ -238,7 +238,7 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
                   variant="emerald"
                   size="sm"
                   onClick={handleSubmitProof}
-                  className="text-xs h-9 flex-1 gap-1.5 font-semibold"
+                  className="text-xs h-10 flex-1 gap-1.5 font-semibold cursor-pointer"
                 >
                   <Check className="w-4 h-4" />
                   Kirim Bukti Pembayaran
@@ -249,19 +249,19 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
 
           {/* Status: Menunggu Verifikasi */}
           {status === "MENUNGGU_VERIFIKASI" && !showFormUpload && (
-            <div className="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200 space-y-2.5 animate-in fade-in duration-200">
+            <div className="p-4 rounded-xl bg-amber-50/70 border border-amber-200 space-y-3 animate-in fade-in duration-200">
               <div className="flex items-center gap-2 text-amber-900 font-bold text-xs">
                 <Clock className="w-4 h-4 text-amber-600 shrink-0" />
                 <span>Sedang Ditinjau Pemilik Kost</span>
               </div>
-              <p className="text-[11px] text-amber-800/90 leading-relaxed">
+              <p className="text-xs text-amber-800/90 leading-relaxed">
                 Bukti transfer Anda telah diterima dan sedang menunggu verifikasi oleh Ibu Hj. Syantika.
               </p>
 
               {tagihan?.buktiPembayaran?.imageUrl && (
-                <div className="flex items-center justify-between p-2 rounded-lg bg-white border border-amber-100 text-xs">
-                  <div className="flex items-center gap-2">
-                    <div className="w-10 h-10 rounded-md overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
+                <div className="flex items-center justify-between p-2.5 rounded-lg bg-white border border-amber-100 text-xs">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-11 h-11 rounded-md overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={tagihan.buktiPembayaran.imageUrl}
@@ -271,7 +271,7 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
                     </div>
                     <div>
                       <p className="font-semibold text-slate-800 text-[11px]">Bukti Transfer Terkirim</p>
-                      <p className="text-[10px] text-slate-400">
+                      <p className="text-[10px] text-slate-400 mt-0.5">
                         {tagihan.buktiPembayaran.catatanPenghuni || "Tidak ada catatan"}
                       </p>
                     </div>
@@ -281,9 +281,9 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
                     variant="outline"
                     size="sm"
                     onClick={() => setShowLightbox(true)}
-                    className="h-7 text-[11px] gap-1 px-2 border-slate-200 text-slate-700"
+                    className="h-8 text-xs gap-1.5 px-2.5 border-slate-200 text-slate-700 cursor-pointer"
                   >
-                    <Eye className="w-3 h-3" />
+                    <Eye className="w-3.5 h-3.5" />
                     Lihat
                   </Button>
                 </div>
@@ -294,7 +294,7 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
                 variant="outline"
                 size="sm"
                 onClick={handleTriggerUpload}
-                className="w-full h-8 text-[11px] font-semibold border-amber-300 text-amber-900 hover:bg-amber-100/60 gap-1.5"
+                className="w-full h-9 text-xs font-semibold border-amber-300 text-amber-900 hover:bg-amber-100/60 gap-1.5 cursor-pointer"
               >
                 <RotateCcw className="w-3.5 h-3.5 text-amber-700" />
                 Unggah Ulang Bukti Transfer
@@ -304,18 +304,18 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
 
           {/* Status: Lunas */}
           {status === "LUNAS" && (
-            <div className="p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-200 space-y-2 animate-in fade-in duration-200">
+            <div className="p-4 rounded-xl bg-emerald-50/70 border border-emerald-200 space-y-2.5 animate-in fade-in duration-200">
               <div className="flex items-center gap-2 text-emerald-900 font-bold text-xs">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span>Tagihan Periode Ini Telah Lunas</span>
               </div>
-              <p className="text-[11px] text-emerald-800/90 leading-relaxed">
+              <p className="text-xs text-emerald-800/90 leading-relaxed">
                 Terima kasih atas pembayaran tepat waktu! Pembayaran telah diverifikasi oleh Pemilik Kost.
               </p>
-              <div className="flex items-center justify-between pt-1 text-[11px] text-emerald-950 font-medium">
+              <div className="flex items-center justify-between pt-1.5 text-xs text-emerald-950 font-medium border-t border-emerald-100">
                 <span>Metode: {tagihan?.metodePembayaran === "CASH" ? "Tunai (Cash)" : "Transfer Bank"}</span>
                 {tagihan?.paidAt && (
-                  <span className="text-emerald-700 text-[10px]">
+                  <span className="text-emerald-700 text-[11px]">
                     Lunas: {new Date(tagihan.paidAt).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
                   </span>
                 )}
@@ -325,12 +325,12 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
 
           {/* Action buttons jika Belum Bayar atau Ditolak (dan form belum aktif) */}
           {(status === "BELUM_BAYAR" || status === "DITOLAK") && !showFormUpload && (
-            <div className="space-y-2 pt-1">
+            <div className="space-y-2.5 pt-1">
               <Button
                 type="button"
                 variant="emerald"
                 onClick={handleTriggerUpload}
-                className="w-full gap-2 text-xs font-semibold"
+                className="w-full h-10 gap-2 text-xs font-semibold cursor-pointer"
               >
                 <UploadCloud className="w-4 h-4" />
                 {status === "DITOLAK"
@@ -345,7 +345,7 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full gap-2 text-xs font-semibold border-slate-200"
+                    className="w-full h-10 gap-2 text-xs font-semibold border-slate-200 cursor-pointer"
                   >
                     <Banknote className="w-4 h-4 text-slate-600" />
                     Informasi Bayar Tunai (Cash)
@@ -356,8 +356,8 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
           )}
         </CardContent>
 
-        <CardFooter className="pt-0">
-          <div className="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between text-[11px] text-slate-600">
+        <CardFooter className="p-5 pt-0">
+          <div className="w-full p-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between text-xs text-slate-600">
             <span>Metode Tersedia:</span>
             <span className="font-semibold text-slate-800">Transfer Bank & Tunai</span>
           </div>
@@ -366,7 +366,7 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
 
       {/* Modal Lightbox Bukti Transfer */}
       <Dialog open={showLightbox} onOpenChange={setShowLightbox}>
-        <DialogContent className="max-w-md p-4">
+        <DialogContent className="max-w-md p-5 sm:p-6">
           <DialogHeader className="pb-2">
             <DialogTitle className="text-base font-bold text-slate-900">
               Bukti Pembayaran Transfer

@@ -67,11 +67,11 @@ export function PengaturanProfilView({ user }: PengaturanProfilViewProps) {
   };
 
   return (
-    <div className="space-y-4 animate-in fade-in duration-300">
+    <div className="space-y-6 animate-in fade-in duration-300">
       {/* Profil Header Card */}
       <Card className="border-emerald-100 bg-linear-to-br from-emerald-500/10 via-white to-emerald-50/50 card-shadow overflow-hidden">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
+        <CardHeader className="p-5 pb-3.5">
+          <div className="flex items-center justify-between mb-1">
             <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 flex items-center gap-1">
               <User className="w-3.5 h-3.5" />
               Profil Akun
@@ -94,14 +94,14 @@ export function PengaturanProfilView({ user }: PengaturanProfilViewProps) {
           <CardTitle className="text-lg font-black text-slate-900 mt-1">
             {user.name}
           </CardTitle>
-          <CardDescription className="text-xs text-slate-500">
+          <CardDescription className="text-xs text-slate-500 mt-1">
             Username: @{user.username} • Kost Syantika
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="pt-0 space-y-2 text-xs">
+        <CardContent className="p-5 pt-0 space-y-3 text-xs">
           {isPemilik ? (
-            <div className="p-3 rounded-xl bg-white/90 border border-emerald-100/80 space-y-1.5">
+            <div className="p-3.5 rounded-xl bg-white/90 border border-emerald-100/80 space-y-2 shadow-2xs">
               <div className="flex items-center justify-between text-slate-700">
                 <span className="text-slate-500">Total Properti:</span>
                 <span className="font-bold text-slate-900">8 Unit Kamar</span>
@@ -120,7 +120,7 @@ export function PengaturanProfilView({ user }: PengaturanProfilViewProps) {
               </div>
             </div>
           ) : (
-            <div className="p-3 rounded-xl bg-white/90 border border-emerald-100/80 space-y-1.5">
+            <div className="p-3.5 rounded-xl bg-white/90 border border-emerald-100/80 space-y-2 shadow-2xs">
               <div className="flex items-center justify-between text-slate-700">
                 <span className="text-slate-500">Unit Kamar:</span>
                 <span className="font-bold text-slate-900">
@@ -146,22 +146,22 @@ export function PengaturanProfilView({ user }: PengaturanProfilViewProps) {
 
       {/* Info Rekening Kost Card */}
       <Card className="card-shadow">
-        <CardHeader className="pb-2.5">
+        <CardHeader className="p-5 pb-3.5">
           <CardTitle className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
             <CreditCard className="w-4 h-4 text-emerald-600" />
             <span>Rekening Resmi Kost Syantika</span>
           </CardTitle>
         </CardHeader>
-        <CardContent className="pt-0 space-y-2 text-xs">
-          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
+        <CardContent className="p-5 pt-0 space-y-2 text-xs">
+          <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between shadow-2xs">
             <div>
               <p className="text-[11px] text-slate-500 font-medium">Bank BCA</p>
-              <p className="font-mono font-bold text-sm text-slate-900 tracking-wider">
+              <p className="font-mono font-bold text-sm text-slate-900 tracking-wider mt-0.5">
                 8830-192-881
               </p>
-              <p className="text-[11px] text-slate-600">a.n. Ibu Hj. Syantika</p>
+              <p className="text-[11px] text-slate-600 mt-0.5">a.n. Ibu Hj. Syantika</p>
             </div>
-            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-md">
+            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100/80 px-2.5 py-1 rounded-md">
               Terkonfirmasi
             </span>
           </div>
@@ -170,8 +170,8 @@ export function PengaturanProfilView({ user }: PengaturanProfilViewProps) {
 
       {/* Utilitas & Simulasi Demo */}
       <Card className="card-shadow border-amber-200/80 bg-amber-50/20">
-        <CardHeader className="pb-2">
-          <div className="flex items-center justify-between">
+        <CardHeader className="p-5 pb-3">
+          <div className="flex items-center justify-between mb-1">
             <CardTitle className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
               <Sparkles className="w-4 h-4 text-amber-600" />
               <span>Utilitas & Simulasi Demo</span>
@@ -180,12 +180,12 @@ export function PengaturanProfilView({ user }: PengaturanProfilViewProps) {
               Demo Tool
             </span>
           </div>
-          <CardDescription className="text-xs text-slate-600 leading-relaxed">
+          <CardDescription className="text-xs text-slate-600 leading-relaxed mt-1">
             Kembalikan seluruh data transaksi, unggahan bukti, verifikasi, dan status tagihan ke kondisi awal data benih (seed).
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="pt-0 space-y-3">
+        <CardContent className="p-5 pt-0 space-y-3">
           <Button
             type="button"
             variant="outline"
@@ -200,7 +200,7 @@ export function PengaturanProfilView({ user }: PengaturanProfilViewProps) {
             type="button"
             variant="outline"
             onClick={handleLogout}
-            className="w-full h-9 text-xs font-semibold text-rose-600 border-rose-200 hover:bg-rose-50 hover:text-rose-700 gap-1.5 cursor-pointer"
+            className="w-full h-10 text-xs font-semibold text-rose-600 border-rose-200 hover:bg-rose-50 hover:text-rose-700 gap-1.5 cursor-pointer"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>Keluar dari Akun (Logout)</span>
@@ -211,7 +211,7 @@ export function PengaturanProfilView({ user }: PengaturanProfilViewProps) {
       {/* Modal Dialog Konfirmasi Reset Mock Data */}
       <Dialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
         <DialogContent className="max-w-md p-5 sm:p-6">
-          <DialogHeader className="text-left pb-2">
+          <DialogHeader className="text-left pb-3 space-y-1">
             <div className="flex items-center gap-2.5">
               <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 shadow-xs">
                 <AlertTriangle className="w-5 h-5 text-amber-600" />
@@ -227,16 +227,16 @@ export function PengaturanProfilView({ user }: PengaturanProfilViewProps) {
             </div>
           </DialogHeader>
 
-          <div className="space-y-3 text-xs text-slate-600 pt-1">
+          <div className="space-y-3.5 text-xs text-slate-600 pt-1">
             <p className="leading-relaxed">
               Tindakan ini akan mengembalikan seluruh perubahan, persetujuan pembayaran, bukti transfer baru, dan pelunasan uang tunai ke <strong>data benih bawaan Kost Syantika</strong>.
             </p>
-            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-[11px] space-y-1 text-slate-600">
+            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-[11px] space-y-1.5 text-slate-600">
               <div className="flex items-center gap-1.5 font-semibold text-slate-800">
                 <Info className="w-3.5 h-3.5 text-emerald-600" />
                 <span>Kondisi Awal Setelah Reset:</span>
               </div>
-              <ul className="list-disc list-inside space-y-0.5 text-slate-600 pt-0.5">
+              <ul className="list-disc list-inside space-y-1 text-slate-600 pt-0.5">
                 <li>Kamar 102 & 107: Menunggu Verifikasi Bukti</li>
                 <li>Kamar 103, 106, 108: Lunas</li>
                 <li>Kamar 104: Ditolak (Perlu Unggah Ulang)</li>
@@ -245,19 +245,19 @@ export function PengaturanProfilView({ user }: PengaturanProfilViewProps) {
             </div>
           </div>
 
-          <DialogFooter className="pt-2 flex items-center gap-2">
+          <DialogFooter className="pt-4 flex items-center gap-2.5">
             <Button
               type="button"
               variant="outline"
               onClick={() => setIsResetDialogOpen(false)}
-              className="flex-1 h-9 text-xs font-semibold border-slate-200 text-slate-700"
+              className="flex-1 h-10 text-xs font-semibold border-slate-200 text-slate-700 cursor-pointer"
             >
               Batal
             </Button>
             <Button
               type="button"
               onClick={handleConfirmReset}
-              className="flex-1 h-9 text-xs font-bold bg-amber-600 hover:bg-amber-700 text-white shadow-xs"
+              className="flex-1 h-10 text-xs font-bold bg-amber-600 hover:bg-amber-700 text-white shadow-xs cursor-pointer"
             >
               Ya, Reset Data
             </Button>
