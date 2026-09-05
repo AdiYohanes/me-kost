@@ -1,9 +1,16 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { Tagihan, PaymentState, BuktiPembayaran } from "@/types/payment";
-import { Kamar, TambahPenghuniInput, KeluarkanPenghuniInput } from "@/types/kamar";
+import {
+  Kamar,
+  TambahPenghuniInput,
+  KeluarkanPenghuniInput,
+} from "@/types/kamar";
 import { MOCK_USERS } from "@/lib/mock-data";
-import { evaluasiPenerbitanH7, hitungStatusTagihan } from "@/lib/siklus-tagihan";
+import {
+  evaluasiPenerbitanH7,
+  hitungStatusTagihan,
+} from "@/lib/siklus-tagihan";
 
 export function generateInitialKamar(): Kamar[] {
   const penghuniAccounts = MOCK_USERS.filter((u) => u.role === "PENGHUNI");
@@ -27,9 +34,8 @@ export function generateInitialKamar(): Kamar[] {
   });
 }
 
-
 export const MOCK_RECEIPT_IMAGE =
-  "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='600' viewBox='0 0 400 600'><rect width='400' height='600' fill='%23f8fafc'/><rect x='20' y='20' width='360' height='560' rx='16' fill='white' stroke='%23e2e8f0' stroke-width='2'/><circle cx='200' cy='90' r='36' fill='%2310b981'/><path d='M188 90l8 8 16-16' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round' fill='none'/><text x='200' y='160' font-family='sans-serif' font-size='18' font-weight='bold' fill='%230f172a' text-anchor='middle'>TRANSFER BERHASIL</text><text x='200' y='190' font-family='sans-serif' font-size='13' fill='%2364748b' text-anchor='middle'>Me Kost</text><line x1='50' y1='220' x2='350' y2='220' stroke='%23e2e8f0' stroke-dasharray='4 4'/><text x='50' y='260' font-family='sans-serif' font-size='12' fill='%2364748b'>Penerima</text><text x='350' y='260' font-family='sans-serif' font-size='13' font-weight='bold' fill='%230f172a' text-anchor='end'>Ibu Hj. Syantika</text><text x='50' y='300' font-family='sans-serif' font-size='12' fill='%2364748b'>Bank Tujuan</text><text x='350' y='300' font-family='sans-serif' font-size='13' font-weight='bold' fill='%230f172a' text-anchor='end'>BCA 8830-192-881</text><rect x='50' y='360' width='300' height='60' rx='8' fill='%23f1f5f9'/><text x='200' y='395' font-family='sans-serif' font-size='11' fill='%23475569' text-anchor='middle'>Bukti Pembayaran Terverifikasi</text></svg>";
+  "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='600' viewBox='0 0 400 600'><rect width='400' height='600' fill='%23f8fafc'/><rect x='20' y='20' width='360' height='560' rx='16' fill='white' stroke='%23e2e8f0' stroke-width='2'/><circle cx='200' cy='90' r='36' fill='%2310b981'/><path d='M188 90l8 8 16-16' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round' fill='none'/><text x='200' y='160' font-family='sans-serif' font-size='18' font-weight='bold' fill='%230f172a' text-anchor='middle'>TRANSFER BERHASIL</text><text x='200' y='190' font-family='sans-serif' font-size='13' fill='%2364748b' text-anchor='middle'>Me Kost</text><line x1='50' y1='220' x2='350' y2='220' stroke='%23e2e8f0' stroke-dasharray='4 4'/><text x='50' y='260' font-family='sans-serif' font-size='12' fill='%2364748b'>Penerima</text><text x='350' y='260' font-family='sans-serif' font-size='13' font-weight='bold' fill='%230f172a' text-anchor='end'>Adi Yohanes</text><text x='50' y='300' font-family='sans-serif' font-size='12' fill='%2364748b'>Bank Tujuan</text><text x='350' y='300' font-family='sans-serif' font-size='13' font-weight='bold' fill='%230f172a' text-anchor='end'>BCA 8830-192-881</text><rect x='50' y='360' width='300' height='60' rx='8' fill='%23f1f5f9'/><text x='200' y='395' font-family='sans-serif' font-size='11' fill='%23475569' text-anchor='middle'>Bukti Pembayaran Terverifikasi</text></svg>";
 
 export function generateInitialTagihan(): Tagihan[] {
   const list: Tagihan[] = [];
@@ -199,14 +205,16 @@ export const usePaymentStore = create<PaymentState>()(
       getTagihanAktifByKamar: (kamarId: string) => {
         const { tagihanList, activePeriode } = get();
         const kamarBills = tagihanList.filter(
-          (t) => t.kamarId === kamarId || t.nomorKamar === kamarId
+          (t) => t.kamarId === kamarId || t.nomorKamar === kamarId,
         );
         if (kamarBills.length === 0) return undefined;
 
         // 1. Prioritaskan tagihan belum lunas terbaru (termasuk tagihan baru H-7 atau menunggak)
         const unfinalized = kamarBills
           .filter((t) => t.status !== "LUNAS")
-          .sort((a, b) => (b.tahun !== a.tahun ? b.tahun - a.tahun : b.bulan - a.bulan));
+          .sort((a, b) =>
+            b.tahun !== a.tahun ? b.tahun - a.tahun : b.bulan - a.bulan,
+          );
 
         if (unfinalized.length > 0) {
           return unfinalized[0];
@@ -214,7 +222,8 @@ export const usePaymentStore = create<PaymentState>()(
 
         // 2. Jika semua lunas, ambil tagihan periode aktif berjalan
         return kamarBills.find(
-          (t) => t.bulan === activePeriode.bulan && t.tahun === activePeriode.tahun
+          (t) =>
+            t.bulan === activePeriode.bulan && t.tahun === activePeriode.tahun,
         );
       },
 
@@ -225,12 +234,19 @@ export const usePaymentStore = create<PaymentState>()(
             (t) =>
               (t.kamarId === kamarId || t.nomorKamar === kamarId) &&
               (t.tahun < activePeriode.tahun ||
-                (t.tahun === activePeriode.tahun && t.bulan < activePeriode.bulan))
+                (t.tahun === activePeriode.tahun &&
+                  t.bulan < activePeriode.bulan)),
           )
-          .sort((a, b) => (b.tahun !== a.tahun ? b.tahun - a.tahun : b.bulan - a.bulan));
+          .sort((a, b) =>
+            b.tahun !== a.tahun ? b.tahun - a.tahun : b.bulan - a.bulan,
+          );
       },
 
-      uploadBuktiTransfer: (tagihanId: string, imageUrl: string, catatanPenghuni?: string) => {
+      uploadBuktiTransfer: (
+        tagihanId: string,
+        imageUrl: string,
+        catatanPenghuni?: string,
+      ) => {
         set((state) => {
           const updatedList = state.tagihanList.map((t) => {
             if (t.id !== tagihanId) return t;
@@ -271,7 +287,7 @@ export const usePaymentStore = create<PaymentState>()(
                   verifiedAt: new Date().toISOString(),
                   paidAt: t.paidAt || new Date().toISOString(),
                 }
-              : t
+              : t,
           ),
         }));
       },
@@ -285,7 +301,7 @@ export const usePaymentStore = create<PaymentState>()(
                   status: "DITOLAK",
                   alasanPenolakan: alasan,
                 }
-              : t
+              : t,
           ),
         }));
       },
@@ -304,21 +320,23 @@ export const usePaymentStore = create<PaymentState>()(
                   alasanPenolakan: undefined,
                   buktiPembayaran: undefined,
                 }
-              : t
+              : t,
           ),
         }));
       },
 
       updateNominalTagihan: (tagihanId: string, nominalBaru: number) => {
         set((state) => {
-          const existingIndex = state.tagihanList.findIndex((t) => t.id === tagihanId);
+          const existingIndex = state.tagihanList.findIndex(
+            (t) => t.id === tagihanId,
+          );
           let targetNomorKamar = "";
 
           let updatedTagihanList = state.tagihanList;
           if (existingIndex >= 0) {
             targetNomorKamar = state.tagihanList[existingIndex].nomorKamar;
             updatedTagihanList = state.tagihanList.map((t) =>
-              t.id === tagihanId ? { ...t, nominal: nominalBaru } : t
+              t.id === tagihanId ? { ...t, nominal: nominalBaru } : t,
             );
           } else {
             const match = tagihanId.match(/^tagihan-([^-]+)/);
@@ -332,7 +350,7 @@ export const usePaymentStore = create<PaymentState>()(
             ? state.kamarList.map((k) =>
                 k.nomorKamar === targetNomorKamar || k.id === targetNomorKamar
                   ? { ...k, tarifBulanan: nominalBaru }
-                  : k
+                  : k,
               )
             : state.kamarList;
 
@@ -347,14 +365,16 @@ export const usePaymentStore = create<PaymentState>()(
         bulan: number,
         tahun: number,
         periodeBulan: string,
-        batasBayar: string
+        batasBayar: string,
       ) => {
         set((state) => {
-          const penghuniAccounts = MOCK_USERS.filter((u) => u.role === "PENGHUNI");
+          const penghuniAccounts = MOCK_USERS.filter(
+            (u) => u.role === "PENGHUNI",
+          );
           const newTagihan: Tagihan[] = penghuniAccounts.map((acc) => {
             const nomorKamar = acc.nomorKamar || "101";
             const prevTagihan = state.tagihanList.find(
-              (t) => t.nomorKamar === nomorKamar
+              (t) => t.nomorKamar === nomorKamar,
             );
             const nominal = prevTagihan?.nominal || acc.tarifBulanan || 1500000;
 
@@ -383,7 +403,7 @@ export const usePaymentStore = create<PaymentState>()(
       tambahPenghuni: (input: TambahPenghuniInput) => {
         set((state) => {
           const targetKamar = state.kamarList.find(
-            (k) => k.id === input.kamarId || k.nomorKamar === input.kamarId
+            (k) => k.id === input.kamarId || k.nomorKamar === input.kamarId,
           );
           if (!targetKamar) return state;
 
@@ -408,24 +428,29 @@ export const usePaymentStore = create<PaymentState>()(
                     telepon: input.telepon?.trim(),
                   },
                 }
-              : k
+              : k,
           );
 
           // Cek apakah sudah ada tagihan pada periode aktif berjalan
           const activeIndex = state.tagihanList.findIndex(
             (t) =>
-              (t.kamarId === targetKamar.id || t.nomorKamar === targetKamar.nomorKamar) &&
+              (t.kamarId === targetKamar.id ||
+                t.nomorKamar === targetKamar.nomorKamar) &&
               t.bulan === state.activePeriode.bulan &&
-              t.tahun === state.activePeriode.tahun
+              t.tahun === state.activePeriode.tahun,
           );
 
-          const monthShort = state.activePeriode.periodeBulan.split(" ")[0].slice(0, 3);
+          const monthShort = state.activePeriode.periodeBulan
+            .split(" ")[0]
+            .slice(0, 3);
           const batasBayar = `${tglJatuhTempo} ${monthShort} ${state.activePeriode.tahun}`;
 
           const updatedTagihanList = [...state.tagihanList];
-          const existingTagihan = activeIndex >= 0 ? state.tagihanList[activeIndex] : null;
+          const existingTagihan =
+            activeIndex >= 0 ? state.tagihanList[activeIndex] : null;
           // Jika kamar sebelumnya KOSONG, tagihan yang ada adalah arsip tunggakan penghuni lama yang tidak boleh ditimpa
-          const isArchivedOldTenantBill = existingTagihan && targetKamar.statusHunian === "KOSONG";
+          const isArchivedOldTenantBill =
+            existingTagihan && targetKamar.statusHunian === "KOSONG";
 
           if (existingTagihan && !isArchivedOldTenantBill) {
             updatedTagihanList[activeIndex] = {
@@ -468,7 +493,7 @@ export const usePaymentStore = create<PaymentState>()(
                     ? { ...k.penghuni, email: emailBaru.trim().toLowerCase() }
                     : null,
                 }
-              : k
+              : k,
           ),
         }));
       },
@@ -476,7 +501,7 @@ export const usePaymentStore = create<PaymentState>()(
       keluarkanPenghuni: (input: KeluarkanPenghuniInput) => {
         set((state) => {
           const targetKamar = state.kamarList.find(
-            (k) => k.id === input.kamarId || k.nomorKamar === input.kamarId
+            (k) => k.id === input.kamarId || k.nomorKamar === input.kamarId,
           );
           if (!targetKamar) return state;
 
@@ -488,7 +513,7 @@ export const usePaymentStore = create<PaymentState>()(
                   tanggalMasuk: undefined,
                   penghuni: null,
                 }
-              : k
+              : k,
           );
 
           let updatedTagihanList = state.tagihanList;
@@ -533,7 +558,11 @@ export const usePaymentStore = create<PaymentState>()(
           const newTagihanToAdd: Tagihan[] = [];
           state.kamarList.forEach((kamar) => {
             if (kamar.statusHunian === "TERISI" && kamar.penghuni) {
-              const h7Check = evaluasiPenerbitanH7(kamar, updatedTagihanList, ref);
+              const h7Check = evaluasiPenerbitanH7(
+                kamar,
+                updatedTagihanList,
+                ref,
+              );
               if (h7Check.perluTerbit && h7Check.newTagihanData) {
                 const candBulan = h7Check.newTagihanData.bulan!;
                 const candTahun = h7Check.newTagihanData.tahun!;
@@ -584,6 +613,6 @@ export const usePaymentStore = create<PaymentState>()(
     {
       name: "kost-syantika-payments",
       storage: createJSONStorage(() => localStorage),
-    }
-  )
+    },
+  ),
 );

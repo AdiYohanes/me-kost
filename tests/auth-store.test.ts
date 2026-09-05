@@ -24,7 +24,7 @@ describe("useAuthStore", () => {
     expect(state.user).not.toBeNull();
     expect(state.user?.role).toBe("PEMILIK");
     expect(state.user?.username).toBe("pemilik");
-    expect(state.user?.name).toBe("Ibu Hj. Syantika");
+    expect(state.user?.name).toBe("Adi Yohanes");
   });
 
   it("berhasil login sebagai Penghuni Kamar 101 dengan kredensial valid", () => {

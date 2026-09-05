@@ -50,7 +50,8 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [compressedResult, setCompressedResult] = useState<HasilKompresi | null>(null);
+  const [compressedResult, setCompressedResult] =
+    useState<HasilKompresi | null>(null);
   const [isCompressing, setIsCompressing] = useState<boolean>(false);
   const [catatan, setCatatan] = useState<string>("");
   const [showFormUpload, setShowFormUpload] = useState<boolean>(false);
@@ -164,7 +165,9 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
       catatanPenghuni: catatan.trim() || undefined,
     });
 
-    toast.success("Bukti transfer berhasil dikirim. Menunggu verifikasi Pemilik Kost.");
+    toast.success(
+      "Bukti transfer berhasil dikirim. Menunggu verifikasi Pemilik Kost.",
+    );
     setPreviewUrl(null);
     setCompressedResult(null);
     setCatatan("");
@@ -190,13 +193,22 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
               <CreditCard className="w-4 h-4 text-zinc-700" />
               <span>Tagihan Kamar Anda</span>
             </CardTitle>
-            <Badge variant={badgeConfig.variant} className="text-xs font-medium">
+            <Badge
+              variant={badgeConfig.variant}
+              className="text-xs font-medium"
+            >
               {badgeConfig.label}
             </Badge>
           </div>
           <CardDescription className="text-xs text-zinc-500 mt-1">
-            Periode: <strong className="text-zinc-700 font-semibold">{tagihan?.periodeBulan || "September 2026"}</strong> • Batas Bayar:{" "}
-            <strong className="text-zinc-700 font-semibold">{tagihan?.batasBayar || "10 Sep 2026"}</strong>
+            Periode:{" "}
+            <strong className="text-zinc-700 font-semibold">
+              {tagihan?.periodeBulan || "September 2026"}
+            </strong>{" "}
+            • Batas Bayar:{" "}
+            <strong className="text-zinc-700 font-semibold">
+              {tagihan?.batasBayar || "10 Sep 2026"}
+            </strong>
           </CardDescription>
         </CardHeader>
 
@@ -204,8 +216,12 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
           {/* Nominal Box */}
           <div className="p-3.5 sm:p-4 rounded-lg bg-zinc-50 border border-zinc-200 flex items-center justify-between">
             <div>
-              <p className="text-xs text-zinc-500 font-medium">Nominal Sewa Bulanan</p>
-              <p className="text-2xl sm:text-3xl font-bold text-zinc-950 mt-0.5 tabular-nums">{formattedNominal}</p>
+              <p className="text-xs text-zinc-500 font-medium">
+                Nominal Sewa Bulanan
+              </p>
+              <p className="text-2xl sm:text-3xl font-bold text-zinc-950 mt-0.5 tabular-nums">
+                {formattedNominal}
+              </p>
             </div>
             <div className="text-right">
               <p className="text-xs text-zinc-400 font-medium">Jatuh Tempo</p>
@@ -233,7 +249,10 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
                 <span>Alasan Penolakan dari Pemilik Kost:</span>
               </div>
               <p className="text-rose-800 bg-white/90 p-2.5 rounded border border-rose-200 text-xs leading-relaxed font-normal">
-                &ldquo;{tagihan?.alasanPenolakan || "Bukti transfer tidak sesuai. Silakan unggah ulang."}&rdquo;
+                &ldquo;
+                {tagihan?.alasanPenolakan ||
+                  "Bukti transfer tidak sesuai. Silakan unggah ulang."}
+                &rdquo;
               </p>
             </div>
           )}
@@ -246,7 +265,8 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
                 <span>Tagihan Menunggak ({evaluasi.telatHari} Hari)</span>
               </div>
               <p className="text-red-700 text-xs leading-relaxed font-normal">
-                Batas waktu pembayaran sewa kamar telah terlewati. Mohon segera selesaikan pembayaran dan unggah bukti transfer.
+                Batas waktu pembayaran sewa kamar telah terlewati. Mohon segera
+                selesaikan pembayaran dan unggah bukti transfer.
               </p>
             </div>
           )}
@@ -344,7 +364,8 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
                 <span>Sedang Ditinjau Pemilik Kost</span>
               </div>
               <p className="text-xs text-amber-800/90 leading-relaxed">
-                Bukti transfer Anda telah diterima dan sedang menunggu verifikasi oleh Ibu Hj. Syantika.
+                Bukti transfer Anda telah diterima dan sedang menunggu
+                verifikasi oleh Adi Yohanes.
               </p>
 
               {tagihan?.buktiPembayaran?.imageUrl && (
@@ -359,9 +380,12 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
                       />
                     </div>
                     <div className="min-w-0">
-                      <p className="font-semibold text-zinc-900 text-xs truncate">Bukti Transfer Terkirim</p>
+                      <p className="font-semibold text-zinc-900 text-xs truncate">
+                        Bukti Transfer Terkirim
+                      </p>
                       <p className="text-xs text-zinc-500 truncate mt-0.5">
-                        {tagihan.buktiPembayaran.catatanPenghuni || "Tidak ada catatan"}
+                        {tagihan.buktiPembayaran.catatanPenghuni ||
+                          "Tidak ada catatan"}
                       </p>
                     </div>
                   </div>
@@ -399,13 +423,24 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
                 <span>Tagihan Periode Ini Telah Lunas</span>
               </div>
               <p className="text-xs text-emerald-800/90 leading-relaxed">
-                Terima kasih atas pembayaran tepat waktu! Pembayaran telah diverifikasi oleh Pemilik Kost.
+                Terima kasih atas pembayaran tepat waktu! Pembayaran telah
+                diverifikasi oleh Pemilik Kost.
               </p>
               <div className="flex items-center justify-between pt-1.5 text-xs text-emerald-950 border-t border-emerald-200/60">
-                <span>Metode: {tagihan?.metodePembayaran === "CASH" ? "Tunai (Cash)" : "Transfer Bank"}</span>
+                <span>
+                  Metode:{" "}
+                  {tagihan?.metodePembayaran === "CASH"
+                    ? "Tunai (Cash)"
+                    : "Transfer Bank"}
+                </span>
                 {tagihan?.paidAt && (
                   <span className="text-emerald-700 text-xs tabular-nums">
-                    Lunas: {new Date(tagihan.paidAt).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
+                    Lunas:{" "}
+                    {new Date(tagihan.paidAt).toLocaleDateString("id-ID", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })}
                   </span>
                 )}
               </div>
@@ -417,52 +452,54 @@ export function PenghuniTagihanCard({ user }: PenghuniTagihanCardProps) {
             status === "DITOLAK" ||
             status === "MENUNGGAK") &&
             !showFormUpload && (
-            <div className="space-y-2 pt-0.5">
-              <Button
-                type="button"
-                onClick={handleTriggerUpload}
-                disabled={isCompressing}
-                className="w-full h-9.5 gap-2 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-md shadow-xs cursor-pointer disabled:opacity-60"
-              >
-                {isCompressing ? (
-                  <>
-                    <Clock className="w-4 h-4 animate-spin" />
-                    <span>Mengompresi Foto...</span>
-                  </>
-                ) : (
-                  <>
-                    <UploadCloud className="w-4 h-4" />
-                    <span>
-                      {status === "DITOLAK"
-                        ? "Unggah Ulang Bukti Transfer"
-                        : "Unggah Bukti Transfer"}
-                    </span>
-                  </>
-                )}
-              </Button>
+              <div className="space-y-2 pt-0.5">
+                <Button
+                  type="button"
+                  onClick={handleTriggerUpload}
+                  disabled={isCompressing}
+                  className="w-full h-9.5 gap-2 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-md shadow-xs cursor-pointer disabled:opacity-60"
+                >
+                  {isCompressing ? (
+                    <>
+                      <Clock className="w-4 h-4 animate-spin" />
+                      <span>Mengompresi Foto...</span>
+                    </>
+                  ) : (
+                    <>
+                      <UploadCloud className="w-4 h-4" />
+                      <span>
+                        {status === "DITOLAK"
+                          ? "Unggah Ulang Bukti Transfer"
+                          : "Unggah Bukti Transfer"}
+                      </span>
+                    </>
+                  )}
+                </Button>
 
-              <BayarTunaiDialog
-                open={isTunaiDialogOpen}
-                onOpenChange={setIsTunaiDialogOpen}
-                trigger={
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full h-9.5 gap-2 text-xs font-medium border-zinc-200 hover:bg-zinc-50 text-zinc-800 rounded-md cursor-pointer"
-                  >
-                    <Banknote className="w-4 h-4 text-zinc-600" />
-                    Informasi Bayar Tunai (Cash)
-                  </Button>
-                }
-              />
-            </div>
-          )}
+                <BayarTunaiDialog
+                  open={isTunaiDialogOpen}
+                  onOpenChange={setIsTunaiDialogOpen}
+                  trigger={
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full h-9.5 gap-2 text-xs font-medium border-zinc-200 hover:bg-zinc-50 text-zinc-800 rounded-md cursor-pointer"
+                    >
+                      <Banknote className="w-4 h-4 text-zinc-600" />
+                      Informasi Bayar Tunai (Cash)
+                    </Button>
+                  }
+                />
+              </div>
+            )}
         </CardContent>
 
         <CardFooter className="p-4 sm:p-5 pt-0">
           <div className="w-full p-2.5 rounded-md bg-zinc-50 border border-zinc-200 flex items-center justify-between text-xs text-zinc-600">
             <span>Metode Tersedia:</span>
-            <span className="font-semibold text-zinc-900">Transfer Bank & Tunai</span>
+            <span className="font-semibold text-zinc-900">
+              Transfer Bank & Tunai
+            </span>
           </div>
         </CardFooter>
       </Card>

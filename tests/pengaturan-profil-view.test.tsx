@@ -15,7 +15,7 @@ vi.mock("next/navigation", () => ({
 const mockPemilik: UserSession = {
   id: "user-pemilik",
   username: "pemilik",
-  name: "Ibu Hj. Syantika",
+  name: "Adi Yohanes",
   role: "PEMILIK",
 };
 
@@ -38,9 +38,13 @@ describe("PengaturanProfilView", () => {
   it("merender info profil pengguna dan utilitas simulasi demo", () => {
     render(<PengaturanProfilView user={mockPemilik} />);
 
-    expect(screen.getAllByText(/Ibu Hj\. Syantika/i).length).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText(/Ibu Hj\. Syantika/i).length,
+    ).toBeGreaterThanOrEqual(1);
     expect(screen.getByText(/Pemilik Kost/i)).toBeInTheDocument();
-    expect(screen.getAllByText(/Reset Mock Data/i).length).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText(/Reset Mock Data/i).length,
+    ).toBeGreaterThanOrEqual(1);
   });
 
   it("merender info kamar untuk akun penghuni", () => {
@@ -48,14 +52,18 @@ describe("PengaturanProfilView", () => {
 
     expect(screen.getByText(/Siti Nurhaliza/i)).toBeInTheDocument();
     expect(screen.getAllByText(/Kamar 102/i).length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText(/Reset Mock Data/i).length).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText(/Reset Mock Data/i).length,
+    ).toBeGreaterThanOrEqual(1);
   });
 
   it("membuka konfirmasi dan mengeksekusi resetPayments saat tombol Reset Mock Data ditekan", () => {
     // Ubah status terlebih dahulu
     const tagihan101 = usePaymentStore.getState().getTagihanAktifByKamar("101");
     usePaymentStore.getState().markCashTagihan(tagihan101!.id, "Catatan demo");
-    expect(usePaymentStore.getState().getTagihanAktifByKamar("101")?.status).toBe("LUNAS");
+    expect(
+      usePaymentStore.getState().getTagihanAktifByKamar("101")?.status,
+    ).toBe("LUNAS");
 
     render(<PengaturanProfilView user={mockPemilik} />);
 
@@ -63,7 +71,9 @@ describe("PengaturanProfilView", () => {
     fireEvent.click(resetBtn);
 
     // Dialog konfirmasi terbuka
-    expect(screen.getByText(/Reset Data Demo ke Kondisi Awal/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Reset Data Demo ke Kondisi Awal/i),
+    ).toBeInTheDocument();
 
     const confirmResetBtn = screen.getByRole("button", {
       name: /Ya, Reset Data/i,
@@ -71,7 +81,11 @@ describe("PengaturanProfilView", () => {
     fireEvent.click(confirmResetBtn);
 
     // Memastikan tagihan 101 kembali ke BELUM_BAYAR
-    expect(usePaymentStore.getState().getTagihanAktifByKamar("101")?.status).toBe("BELUM_BAYAR");
-    expect(usePaymentStore.getState().getTagihanAktifByKamar("101")?.catatanPemilik).toBeUndefined();
+    expect(
+      usePaymentStore.getState().getTagihanAktifByKamar("101")?.status,
+    ).toBe("BELUM_BAYAR");
+    expect(
+      usePaymentStore.getState().getTagihanAktifByKamar("101")?.catatanPemilik,
+    ).toBeUndefined();
   });
 });

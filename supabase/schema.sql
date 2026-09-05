@@ -78,15 +78,28 @@ ALTER TABLE public.tagihan ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.bukti_pembayaran ENABLE ROW LEVEL SECURITY;
 
 -- Helper function: cek apakah pengguna saat ini adalah Pemilik Kost
-CREATE OR REPLACE FUNCTION public.is_pemilik()
-RETURNS BOOLEAN AS $$
+-- Disimpan dalam schema `private` agar tidak diekspos sebagai RPC REST API di PostgREST
+CREATE SCHEMA IF NOT EXISTS private;
+
+CREATE OR REPLACE FUNCTION private.is_pemilik()
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
 BEGIN
     RETURN EXISTS (
         SELECT 1 FROM public.users
         WHERE (auth_id = auth.uid() OR id = auth.uid()) AND role = 'PEMILIK'
     );
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$;
+
+GRANT USAGE ON SCHEMA private TO authenticated;
+GRANT EXECUTE ON FUNCTION private.is_pemilik() TO authenticated;
+
+-- Bersihkan fungsi lama di schema public jika masih ada
+DROP FUNCTION IF EXISTS public.is_pemilik();
 
 -- Policies untuk `kamar`:
 -- Penghuni hanya bisa membaca data kamar miliknya sendiri; Pemilik bisa membaca seluruh kamar.
@@ -94,15 +107,15 @@ CREATE POLICY "kamar_read_self_or_pemilik"
     ON public.kamar FOR SELECT
     TO authenticated
     USING (
-        public.is_pemilik() OR 
+        private.is_pemilik() OR 
         id = (SELECT kamar_id FROM public.users WHERE auth_id = auth.uid() OR id = auth.uid())
     );
 
 CREATE POLICY "kamar_all_pemilik"
     ON public.kamar FOR ALL
     TO authenticated
-    USING (public.is_pemilik())
-    WITH CHECK (public.is_pemilik());
+    USING (private.is_pemilik())
+    WITH CHECK (private.is_pemilik());
 
 -- Policies untuk `users`
 CREATE POLICY "users_read_self_or_pemilik"
@@ -112,7 +125,7 @@ CREATE POLICY "users_read_self_or_pemilik"
         auth_id = auth.uid() OR 
         id = auth.uid() OR 
         lower(email) = lower(auth.jwt() ->> 'email') OR 
-        public.is_pemilik()
+        private.is_pemilik()
     );
 
 CREATE POLICY "users_update_self_or_pemilik"
@@ -122,24 +135,24 @@ CREATE POLICY "users_update_self_or_pemilik"
         auth_id = auth.uid() OR 
         id = auth.uid() OR 
         lower(email) = lower(auth.jwt() ->> 'email') OR 
-        public.is_pemilik()
+        private.is_pemilik()
     )
     WITH CHECK (
         auth_id = auth.uid() OR 
         id = auth.uid() OR 
         lower(email) = lower(auth.jwt() ->> 'email') OR 
-        public.is_pemilik()
+        private.is_pemilik()
     );
 
 CREATE POLICY "users_insert_pemilik"
     ON public.users FOR INSERT
     TO authenticated
-    WITH CHECK (public.is_pemilik() OR auth_id = auth.uid() OR id = auth.uid());
+    WITH CHECK (private.is_pemilik() OR auth_id = auth.uid() OR id = auth.uid());
 
 CREATE POLICY "users_delete_pemilik"
     ON public.users FOR DELETE
     TO authenticated
-    USING (public.is_pemilik());
+    USING (private.is_pemilik());
 
 -- Policies untuk `tagihan`:
 -- Penghuni hanya bisa membaca tagihan untuk kamarnya; Pemilik memiliki hak penuh.
@@ -147,15 +160,15 @@ CREATE POLICY "tagihan_read_self_or_pemilik"
     ON public.tagihan FOR SELECT
     TO authenticated
     USING (
-        public.is_pemilik() OR 
+        private.is_pemilik() OR 
         kamar_id = (SELECT kamar_id FROM public.users WHERE auth_id = auth.uid() OR id = auth.uid())
     );
 
 CREATE POLICY "tagihan_all_pemilik"
     ON public.tagihan FOR ALL
     TO authenticated
-    USING (public.is_pemilik())
-    WITH CHECK (public.is_pemilik());
+    USING (private.is_pemilik())
+    WITH CHECK (private.is_pemilik());
 
 -- Policies untuk `bukti_pembayaran`:
 -- Penghuni hanya bisa melihat bukti miliknya; unggah hanya diperbolehkan pada tagihan yang belum lunas
@@ -163,7 +176,7 @@ CREATE POLICY "bukti_read_self_or_pemilik"
     ON public.bukti_pembayaran FOR SELECT
     TO authenticated
     USING (
-        public.is_pemilik() OR
+        private.is_pemilik() OR
         tagihan_id IN (
             SELECT id FROM public.tagihan 
             WHERE kamar_id = (SELECT kamar_id FROM public.users WHERE auth_id = auth.uid() OR id = auth.uid())
@@ -174,7 +187,7 @@ CREATE POLICY "bukti_insert_penghuni_or_pemilik"
     ON public.bukti_pembayaran FOR INSERT
     TO authenticated
     WITH CHECK (
-        public.is_pemilik() OR
+        private.is_pemilik() OR
         tagihan_id IN (
             SELECT id FROM public.tagihan 
             WHERE kamar_id = (SELECT kamar_id FROM public.users WHERE auth_id = auth.uid() OR id = auth.uid())
@@ -183,21 +196,35 @@ CREATE POLICY "bukti_insert_penghuni_or_pemilik"
     );
 
 -- 8. TRIGGER OTOMATIS: Transisi Status Tagihan Saat Bukti Diunggah
-CREATE OR REPLACE FUNCTION public.handle_bukti_pembayaran_insert()
-RETURNS TRIGGER AS $$
+-- Simpan fungsi trigger di dalam schema `private` agar tidak diekspos sebagai endpoint REST API (PostgREST RPC)
+CREATE SCHEMA IF NOT EXISTS private;
+
+CREATE OR REPLACE FUNCTION private.handle_bukti_pembayaran_insert()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
 BEGIN
     UPDATE public.tagihan
     SET status = 'MENUNGGU_VERIFIKASI'
     WHERE id = NEW.tagihan_id;
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$;
+
+-- Berikan izin akses schema private dan eksekusi fungsi ke authenticated untuk keperluan trigger PostgreSQL
+GRANT USAGE ON SCHEMA private TO authenticated;
+GRANT EXECUTE ON FUNCTION private.handle_bukti_pembayaran_insert() TO authenticated;
 
 DROP TRIGGER IF EXISTS trg_bukti_pembayaran_inserted ON public.bukti_pembayaran;
 CREATE TRIGGER trg_bukti_pembayaran_inserted
     AFTER INSERT ON public.bukti_pembayaran
     FOR EACH ROW
-    EXECUTE FUNCTION public.handle_bukti_pembayaran_insert();
+    EXECUTE FUNCTION private.handle_bukti_pembayaran_insert();
+
+-- Hapus fungsi lama di schema public jika masih ada
+DROP FUNCTION IF EXISTS public.handle_bukti_pembayaran_insert();
 
 -- 9. BUCKET SUPABASE STORAGE: bukti-pembayaran
 INSERT INTO storage.buckets (id, name, public)
@@ -209,7 +236,7 @@ CREATE POLICY "storage_upload_authenticated"
     TO authenticated
     WITH CHECK (bucket_id = 'bukti-pembayaran');
 
-CREATE POLICY "storage_select_public"
-    ON storage.objects FOR SELECT
-    TO public
-    USING (bucket_id = 'bukti-pembayaran');
+-- Catatan: Bucket 'bukti-pembayaran' bertipe public (public = true), sehingga berkas dapat diakses
+-- langsung via URL publik tanpa memerlukan policy SELECT pada storage.objects.
+-- Menghapus policy SELECT publik mencegah pengguna/klien me-list seluruh isi direktori berkas bukti transfer.
+DROP POLICY IF EXISTS "storage_select_public" ON storage.objects;

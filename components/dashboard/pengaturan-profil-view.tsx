@@ -159,7 +159,7 @@ export function PengaturanProfilView({ user }: PengaturanProfilViewProps) {
               <p className="font-bold text-sm text-zinc-950 tracking-wider mt-0.5 tabular-nums">
                 8830-192-881
               </p>
-              <p className="text-xs text-zinc-600 mt-0.5">a.n. Ibu Hj. Syantika</p>
+              <p className="text-xs text-zinc-600 mt-0.5">a.n. Adi Yohanes</p>
             </div>
             <span className="text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-md">
               Terkonfirmasi
@@ -181,7 +181,8 @@ export function PengaturanProfilView({ user }: PengaturanProfilViewProps) {
             </span>
           </div>
           <CardDescription className="text-xs text-zinc-500 mt-1">
-            Kembalikan seluruh data transaksi, unggahan bukti, dan status tagihan ke kondisi awal (seed).
+            Kembalikan seluruh data transaksi, unggahan bukti, dan status
+            tagihan ke kondisi awal (seed).
           </CardDescription>
         </CardHeader>
 
@@ -229,7 +230,9 @@ export function PengaturanProfilView({ user }: PengaturanProfilViewProps) {
 
           <div className="space-y-3.5 text-xs text-slate-600 pt-1">
             <p className="leading-relaxed">
-              Tindakan ini akan mengembalikan seluruh perubahan, persetujuan pembayaran, bukti transfer baru, dan pelunasan uang tunai ke <strong>data benih bawaan Me Kost</strong>.
+              Tindakan ini akan mengembalikan seluruh perubahan, persetujuan
+              pembayaran, bukti transfer baru, dan pelunasan uang tunai ke{" "}
+              <strong>data benih bawaan Me Kost</strong>.
             </p>
             <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1.5 text-slate-600">
               <div className="flex items-center gap-1.5 font-semibold text-slate-800">

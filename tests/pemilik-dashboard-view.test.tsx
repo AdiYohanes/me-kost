@@ -8,7 +8,7 @@ import { UserSession } from "@/types/auth";
 const mockPemilik: UserSession = {
   id: "usr-pemilik",
   username: "pemilik",
-  name: "Ibu Hj. Syantika",
+  name: "Adi Yohanes",
   role: "PEMILIK",
   phone: "0812-3456-7890",
 };
@@ -24,7 +24,9 @@ describe("PemilikDashboardView Integration", () => {
 
     // Header & Banner
     expect(screen.getByText(/Panel Pengelola Properti/i)).toBeInTheDocument();
-    expect(screen.getByText(/Selamat Datang, Ibu Hj\. Syantika/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Selamat Datang, Ibu Hj\. Syantika/i),
+    ).toBeInTheDocument();
 
     // Ringkasan Keuangan
     expect(screen.getByText(/Penerimaan Terkumpul/i)).toBeInTheDocument();
@@ -78,7 +80,9 @@ describe("PemilikDashboardView Integration", () => {
       target: { value: "Foto bukti buram dan nominal tidak terbaca." },
     });
 
-    const confirmBtn = screen.getByRole("button", { name: /Konfirmasi Tolak/i });
+    const confirmBtn = screen.getByRole("button", {
+      name: /Konfirmasi Tolak/i,
+    });
     fireEvent.click(confirmBtn);
 
     // Antrean berkurang menjadi 1
@@ -89,6 +93,8 @@ describe("PemilikDashboardView Integration", () => {
     // Cek store tagihan 102
     const tagihan102 = usePaymentStore.getState().getTagihanAktifByKamar("102");
     expect(tagihan102?.status).toBe("DITOLAK");
-    expect(tagihan102?.alasanPenolakan).toBe("Foto bukti buram dan nominal tidak terbaca.");
+    expect(tagihan102?.alasanPenolakan).toBe(
+      "Foto bukti buram dan nominal tidak terbaca.",
+    );
   });
 });

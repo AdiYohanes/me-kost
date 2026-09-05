@@ -74,13 +74,17 @@ export function BayarTunaiDialog({
                 <ShieldCheck className="w-3.5 h-3.5" />
                 Pemilik Kost
               </span>
-              <span className="text-xs text-slate-400 font-medium">Me Kost</span>
+              <span className="text-xs text-slate-400 font-medium">
+                Me Kost
+              </span>
             </div>
             <div>
-              <p className="text-sm font-bold text-slate-900">Ibu Hj. Syantika</p>
+              <p className="text-sm font-bold text-slate-900">Adi Yohanes</p>
               <div className="flex items-center gap-1.5 text-slate-600 mt-0.5">
                 <Phone className="w-3.5 h-3.5 text-emerald-600" />
-                <span className="font-semibold text-slate-800">{phoneNumber}</span>
+                <span className="font-semibold text-slate-800">
+                  {phoneNumber}
+                </span>
               </div>
             </div>
 
@@ -102,7 +106,7 @@ export function BayarTunaiDialog({
 
               <a
                 href={`https://wa.me/62${rawPhoneNumber.substring(1)}?text=${encodeURIComponent(
-                  "Halo Ibu Hj. Syantika, saya ingin konfirmasi janji temu untuk pembayaran sewa kamar kost secara tunai."
+                  "Halo Adi Yohanes, saya ingin konfirmasi janji temu untuk pembayaran sewa kamar kost secara tunai.",
                 )}`}
                 target="_blank"
                 rel="noreferrer"
@@ -121,8 +125,12 @@ export function BayarTunaiDialog({
                 <MapPin className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                 <span>Lokasi</span>
               </div>
-              <p className="font-semibold text-slate-800">Ruang Pengelola Kost</p>
-              <p className="text-xs text-slate-500 mt-0.5">Lantai 1, samping Ruang Tamu</p>
+              <p className="font-semibold text-slate-800">
+                Ruang Pengelola Kost
+              </p>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Lantai 1, samping Ruang Tamu
+              </p>
             </div>
 
             <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
@@ -137,11 +145,19 @@ export function BayarTunaiDialog({
 
           {/* Langkah Pembayaran */}
           <div className="p-3.5 rounded-xl bg-emerald-50/60 border border-emerald-100/80 space-y-2">
-            <p className="font-bold text-emerald-950 text-xs">Langkah Pembayaran Tunai:</p>
+            <p className="font-bold text-emerald-950 text-xs">
+              Langkah Pembayaran Tunai:
+            </p>
             <ol className="space-y-1.5 list-decimal list-inside text-emerald-900 text-xs leading-relaxed">
               <li>Siapkan uang tunai pas sesuai nominal sewa kamar Anda.</li>
-              <li>Temui Ibu Hj. Syantika di Ruang Pengelola Kost atau kirim pesan WhatsApp terlebih dahulu.</li>
-              <li>Setelah uang tunai diserahkan, Pemilik Kost akan menandai status tagihan Anda menjadi <strong>Lunas (Cash)</strong> di sistem.</li>
+              <li>
+                Temui Adi Yohanes di Ruang Pengelola Kost atau kirim pesan
+                WhatsApp terlebih dahulu.
+              </li>
+              <li>
+                Setelah uang tunai diserahkan, Pemilik Kost akan menandai status
+                tagihan Anda menjadi <strong>Lunas (Cash)</strong> di sistem.
+              </li>
             </ol>
           </div>
         </div>

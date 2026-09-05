@@ -48,7 +48,9 @@ describe("Supabase Authentication & Automated Room Linker", () => {
   describe("1. Penghuni Google OAuth Initiator", () => {
     it("memulai autentikasi Google OAuth dengan provider dan redirect URL yang benar", async () => {
       mockSignInWithOAuth.mockResolvedValueOnce({
-        data: { url: "https://accounts.google.com/o/oauth2/v2/auth?client_id=123" },
+        data: {
+          url: "https://accounts.google.com/o/oauth2/v2/auth?client_id=123",
+        },
         error: null,
       });
 
@@ -108,7 +110,9 @@ describe("Supabase Authentication & Automated Room Linker", () => {
           return {
             select: () => ({
               ilike: () => ({
-                maybeSingle: vi.fn().mockResolvedValue({ data: mockProfile, error: null }),
+                maybeSingle: vi
+                  .fn()
+                  .mockResolvedValue({ data: mockProfile, error: null }),
               }),
             }),
             update: mockUpdate,
@@ -118,12 +122,18 @@ describe("Supabase Authentication & Automated Room Linker", () => {
       });
 
       // @ts-expect-error test mock
-      const result = await verifyAndLinkPenghuniGoogleUser(mockSupabaseClient, "auth-google-uuid-99", "rizky@gmail.com");
+      const result = await verifyAndLinkPenghuniGoogleUser(
+        mockSupabaseClient,
+        "auth-google-uuid-99",
+        "rizky@gmail.com",
+      );
 
       expect(result.success).toBe(true);
       expect(result.profile?.nama).toBe("Rizky Ramadhan");
       expect(result.profile?.auth_id).toBe("auth-google-uuid-99");
-      expect(mockUpdate).toHaveBeenCalledWith({ auth_id: "auth-google-uuid-99" });
+      expect(mockUpdate).toHaveBeenCalledWith({
+        auth_id: "auth-google-uuid-99",
+      });
       expect(mockUpdateEq).toHaveBeenCalledWith("id", "usr-uuid-1");
     });
 
@@ -133,7 +143,9 @@ describe("Supabase Authentication & Automated Room Linker", () => {
           return {
             select: () => ({
               ilike: () => ({
-                maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+                maybeSingle: vi
+                  .fn()
+                  .mockResolvedValue({ data: null, error: null }),
               }),
             }),
           };
@@ -142,7 +154,11 @@ describe("Supabase Authentication & Automated Room Linker", () => {
       });
 
       // @ts-expect-error test mock
-      const result = await verifyAndLinkPenghuniGoogleUser(mockSupabaseClient, "auth-unknown-uuid", "calon@gmail.com");
+      const result = await verifyAndLinkPenghuniGoogleUser(
+        mockSupabaseClient,
+        "auth-unknown-uuid",
+        "calon@gmail.com",
+      );
 
       expect(result.success).toBe(false);
       expect(result.reason).toBe("unregistered");
@@ -165,7 +181,9 @@ describe("Supabase Authentication & Automated Room Linker", () => {
           return {
             select: () => ({
               ilike: () => ({
-                maybeSingle: vi.fn().mockResolvedValue({ data: inactiveProfile, error: null }),
+                maybeSingle: vi
+                  .fn()
+                  .mockResolvedValue({ data: inactiveProfile, error: null }),
               }),
             }),
           };
@@ -174,7 +192,11 @@ describe("Supabase Authentication & Automated Room Linker", () => {
       });
 
       // @ts-expect-error test mock
-      const result = await verifyAndLinkPenghuniGoogleUser(mockSupabaseClient, "auth-uuid", "mantan@gmail.com");
+      const result = await verifyAndLinkPenghuniGoogleUser(
+        mockSupabaseClient,
+        "auth-uuid",
+        "mantan@gmail.com",
+      );
 
       expect(result.success).toBe(false);
       expect(result.reason).toBe("inactive");
@@ -196,7 +218,9 @@ describe("Supabase Authentication & Automated Room Linker", () => {
           return {
             select: () => ({
               ilike: () => ({
-                maybeSingle: vi.fn().mockResolvedValue({ data: noRoomProfile, error: null }),
+                maybeSingle: vi
+                  .fn()
+                  .mockResolvedValue({ data: noRoomProfile, error: null }),
               }),
             }),
           };
@@ -205,7 +229,11 @@ describe("Supabase Authentication & Automated Room Linker", () => {
       });
 
       // @ts-expect-error test mock
-      const result = await verifyAndLinkPenghuniGoogleUser(mockSupabaseClient, "auth-uuid", "baru@gmail.com");
+      const result = await verifyAndLinkPenghuniGoogleUser(
+        mockSupabaseClient,
+        "auth-uuid",
+        "baru@gmail.com",
+      );
 
       expect(result.success).toBe(false);
       expect(result.reason).toBe("no_room");
@@ -225,7 +253,7 @@ describe("Supabase Authentication & Automated Room Linker", () => {
         id: "usr-pemilik-id",
         auth_id: "pemilik-auth-id",
         role: "PEMILIK",
-        nama: "Ibu Hj. Syantika",
+        nama: "Adi Yohanes",
         email: "pemilik@kostsyantika.com",
         telepon: "0812-3456-7890",
         status: "AKTIF",
@@ -236,7 +264,9 @@ describe("Supabase Authentication & Automated Room Linker", () => {
           return {
             select: () => ({
               or: () => ({
-                maybeSingle: vi.fn().mockResolvedValue({ data: mockOwnerProfile, error: null }),
+                maybeSingle: vi
+                  .fn()
+                  .mockResolvedValue({ data: mockOwnerProfile, error: null }),
               }),
             }),
           };
@@ -245,11 +275,15 @@ describe("Supabase Authentication & Automated Room Linker", () => {
       });
 
       // @ts-expect-error test mock
-      const res = await signInWithEmailPassword("pemilik@kostsyantika.com", "password123", mockSupabaseClient);
+      const res = await signInWithEmailPassword(
+        "pemilik@kostsyantika.com",
+        "password123",
+        mockSupabaseClient,
+      );
 
       expect(res.success).toBe(true);
       expect(res.session?.role).toBe("PEMILIK");
-      expect(res.session?.name).toBe("Ibu Hj. Syantika");
+      expect(res.session?.name).toBe("Adi Yohanes");
     });
 
     it("menolak jika kredensial salah", async () => {
@@ -259,7 +293,11 @@ describe("Supabase Authentication & Automated Room Linker", () => {
       });
 
       // @ts-expect-error test mock
-      const res = await signInWithEmailPassword("pemilik@kostsyantika.com", "salah", mockSupabaseClient);
+      const res = await signInWithEmailPassword(
+        "pemilik@kostsyantika.com",
+        "salah",
+        mockSupabaseClient,
+      );
 
       expect(res.success).toBe(false);
       expect(res.error).toBe("Invalid login credentials");
@@ -287,7 +325,9 @@ describe("Supabase Authentication & Automated Room Linker", () => {
           return {
             select: () => ({
               or: () => ({
-                maybeSingle: vi.fn().mockResolvedValue({ data: tenantProfile, error: null }),
+                maybeSingle: vi
+                  .fn()
+                  .mockResolvedValue({ data: tenantProfile, error: null }),
               }),
             }),
           };
@@ -296,7 +336,11 @@ describe("Supabase Authentication & Automated Room Linker", () => {
       });
 
       // @ts-expect-error test mock
-      const res = await signInWithEmailPassword("penghuni@gmail.com", "secret", mockSupabaseClient);
+      const res = await signInWithEmailPassword(
+        "penghuni@gmail.com",
+        "secret",
+        mockSupabaseClient,
+      );
 
       expect(res.success).toBe(false);
       expect(res.error).toContain("khusus untuk Pemilik Kost");
@@ -339,11 +383,15 @@ describe("Supabase Authentication & Automated Room Linker", () => {
             select: () => ({
               or: () => ({
                 // fetchUserProfile (cek apakah pemilik)
-                maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+                maybeSingle: vi
+                  .fn()
+                  .mockResolvedValue({ data: null, error: null }),
               }),
               ilike: () => ({
                 // verifyAndLinkTenantGoogleUser
-                maybeSingle: vi.fn().mockResolvedValue({ data: mockTenantProfile, error: null }),
+                maybeSingle: vi
+                  .fn()
+                  .mockResolvedValue({ data: mockTenantProfile, error: null }),
               }),
             }),
             update: () => ({
@@ -354,11 +402,15 @@ describe("Supabase Authentication & Automated Room Linker", () => {
         return {};
       });
 
-      const request = new Request("http://localhost:3000/auth/callback?code=oauth-valid-code");
+      const request = new Request(
+        "http://localhost:3000/auth/callback?code=oauth-valid-code",
+      );
       const response = await GET(request);
 
       expect(response.status).toBe(307); // NextResponse.redirect
-      expect(response.headers.get("location")).toBe("http://localhost:3000/dashboard");
+      expect(response.headers.get("location")).toBe(
+        "http://localhost:3000/dashboard",
+      );
     });
 
     it("menghapus sesi dan mengarahkan ke /login?error=unregistered saat email Google belum terdaftar", async () => {
@@ -376,10 +428,14 @@ describe("Supabase Authentication & Automated Room Linker", () => {
           return {
             select: () => ({
               or: () => ({
-                maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+                maybeSingle: vi
+                  .fn()
+                  .mockResolvedValue({ data: null, error: null }),
               }),
               ilike: () => ({
-                maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+                maybeSingle: vi
+                  .fn()
+                  .mockResolvedValue({ data: null, error: null }),
               }),
             }),
           };
@@ -387,7 +443,9 @@ describe("Supabase Authentication & Automated Room Linker", () => {
         return {};
       });
 
-      const request = new Request("http://localhost:3000/auth/callback?code=oauth-unregistered-code");
+      const request = new Request(
+        "http://localhost:3000/auth/callback?code=oauth-unregistered-code",
+      );
       const response = await GET(request);
 
       expect(response.status).toBe(307);
@@ -402,7 +460,9 @@ describe("Supabase Authentication & Automated Room Linker", () => {
       const response = await GET(request);
 
       expect(response.status).toBe(307);
-      expect(response.headers.get("location")).toBe("http://localhost:3000/login?error=no_code");
+      expect(response.headers.get("location")).toBe(
+        "http://localhost:3000/login?error=no_code",
+      );
     });
   });
 
@@ -440,7 +500,9 @@ describe("Supabase Authentication & Automated Room Linker", () => {
           return {
             select: () => ({
               or: () => ({
-                maybeSingle: vi.fn().mockResolvedValue({ data: persistedProfile, error: null }),
+                maybeSingle: vi
+                  .fn()
+                  .mockResolvedValue({ data: persistedProfile, error: null }),
               }),
             }),
           };

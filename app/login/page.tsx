@@ -127,7 +127,7 @@ function LoginForm() {
   };
 
   const waHref = `https://wa.me/6281234567890?text=${encodeURIComponent(
-    `Halo Ibu Hj. Syantika (Pemilik Kost), saya ingin mendaftarkan email Google saya (${unregisteredEmail}) untuk kamar kost di Kost Syantika.`
+    `Halo Adi Yohanes (Pemilik Kost), saya ingin mendaftarkan email Google saya (${unregisteredEmail}) untuk kamar kost di Kost Syantika.`,
   )}`;
 
   return (
@@ -187,7 +187,12 @@ function LoginForm() {
                       Akun Google Belum Terdaftar
                     </p>
                     <p className="text-amber-800 leading-relaxed">
-                      Email Google <strong className="font-semibold text-amber-950">{unregisteredEmail}</strong> belum terdaftar pada kamar Kost Syantika manapun. Silakan hubungi Pemilik Kost untuk mendaftarkan kamar Anda.
+                      Email Google{" "}
+                      <strong className="font-semibold text-amber-950">
+                        {unregisteredEmail}
+                      </strong>{" "}
+                      belum terdaftar pada kamar Kost Syantika manapun. Silakan
+                      hubungi Pemilik Kost untuk mendaftarkan kamar Anda.
                     </p>
                   </div>
                 </div>
@@ -241,7 +246,9 @@ function LoginForm() {
             >
               <GoogleIcon className="w-4 h-4" />
               <span>
-                {isLoadingGoogle ? "Menghubungkan..." : "Lanjutkan dengan Google"}
+                {isLoadingGoogle
+                  ? "Menghubungkan..."
+                  : "Lanjutkan dengan Google"}
               </span>
             </Button>
             <p className="text-[11px] text-zinc-500 text-center">
@@ -314,9 +321,7 @@ function LoginForm() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-0 top-0 h-10 w-10 flex items-center justify-center text-zinc-400 hover:text-zinc-700 transition-colors cursor-pointer"
                   aria-label={
-                    showPassword
-                      ? "Sembunyikan password"
-                      : "Tampilkan password"
+                    showPassword ? "Sembunyikan password" : "Tampilkan password"
                   }
                 >
                   {showPassword ? (
@@ -334,9 +339,7 @@ function LoginForm() {
               disabled={isLoading}
             >
               <LogIn className="w-4 h-4" />
-              <span>
-                {isLoading ? "Memproses..." : "Masuk ke Dashboard"}
-              </span>
+              <span>{isLoading ? "Memproses..." : "Masuk ke Dashboard"}</span>
             </Button>
           </form>
         </CardContent>

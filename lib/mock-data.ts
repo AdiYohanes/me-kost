@@ -5,7 +5,7 @@ export const MOCK_USERS: MockUserAccount[] = [
     id: "usr-pemilik",
     username: "pemilik",
     password: "123456",
-    name: "Ibu Hj. Syantika",
+    name: "Adi Yohanes",
     role: "PEMILIK",
     phone: "0812-3456-7890",
   },
