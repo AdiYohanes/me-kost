@@ -258,7 +258,6 @@ describe("Supabase Tagihan Service (lib/supabase/tagihan.ts)", () => {
       expect(mockTagihanUpdate).toHaveBeenCalledWith(
         expect.objectContaining({
           status: "MENUNGGU_VERIFIKASI",
-          metode_pembayaran: "TRANSFER",
         })
       );
     });

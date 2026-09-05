@@ -317,7 +317,6 @@ export async function uploadBuktiTransferSupabase(
       .from("tagihan")
       .update({
         status: "MENUNGGU_VERIFIKASI",
-        metode_pembayaran: "TRANSFER",
         alasan_penolakan: null,
       })
       .eq("id", params.tagihanId);
@@ -377,6 +376,7 @@ export async function tolakBuktiPembayaranSupabase(
     .from("tagihan")
     .update({
       status: "DITOLAK",
+      metode_pembayaran: null,
       alasan_penolakan: alasanPenolakan.trim(),
     })
     .eq("id", tagihanId);

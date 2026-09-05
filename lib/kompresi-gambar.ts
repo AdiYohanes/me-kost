@@ -51,7 +51,7 @@ export function buatStoragePathBukti(
   const suffix =
     uniqueSuffix ||
     (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
-      ? crypto.randomUUID().slice(0, 8)
+      ? crypto.randomUUID()
       : Date.now().toString(36));
 
   return `kamar-${cleanNomor}/${tahun}-${duaDigitBulan}-${suffix}.webp`;
@@ -85,6 +85,34 @@ export function hitungDimensiProporsional(
 }
 
 /**
+ * Membuat objek HasilKompresi fallback untuk lingkungan peramban terbatas / pengujian.
+ */
+function buatHasilFallback(
+  file: File,
+  dataUrl: string,
+  width = 800,
+  height = 600
+): HasilKompresi {
+  const fallbackBlob = new Blob([file], { type: "image/webp" });
+  const compressedFile = new File(
+    [fallbackBlob],
+    file.name.replace(/\.[^/.]+$/, "") + ".webp",
+    { type: "image/webp" }
+  );
+  return {
+    file: compressedFile,
+    blob: fallbackBlob,
+    dataUrl,
+    width,
+    height,
+    originalSizeBytes: file.size,
+    compressedSizeBytes: fallbackBlob.size,
+    kompresiRasioPersen: 0,
+    format: "image/webp",
+  };
+}
+
+/**
  * Mengompresi file foto bukti transfer di sisi klien menggunakan HTML5 Canvas.
  * Menghasilkan file WebP (~100-200 KB) dengan dimensi maksimal 1280px.
  */
@@ -92,11 +120,7 @@ export async function kompresGambarBukti(
   file: File,
   options: KompresiOptions = {}
 ): Promise<HasilKompresi> {
-  const {
-    maxDimension = 1280,
-    quality = 0.8,
-    targetFormat = "image/webp",
-  } = options;
+  const { maxDimension = 1280, quality = 0.8 } = options;
 
   if (!file || !file.type.startsWith("image/")) {
     throw new Error("Berkas yang dipilih harus berupa gambar (JPG, PNG, WebP).");
@@ -128,23 +152,7 @@ export async function kompresGambarBukti(
 
       // Jika berada di lingkungan jsdom tanpa mock Canvas 2D aktif, langsung selesaikan secara sinkron
       if (isJsdom && !has2DContext) {
-        const fallbackBlob = new Blob([file], { type: targetFormat });
-        const compressedFile = new File(
-          [fallbackBlob],
-          file.name.replace(/\.[^/.]+$/, "") + ".webp",
-          { type: targetFormat }
-        );
-        resolve({
-          file: compressedFile,
-          blob: fallbackBlob,
-          dataUrl,
-          width: 800,
-          height: 600,
-          originalSizeBytes,
-          compressedSizeBytes: fallbackBlob.size,
-          kompresiRasioPersen: 0,
-          format: targetFormat,
-        });
+        resolve(buatHasilFallback(file, dataUrl));
         return;
       }
 
@@ -154,23 +162,7 @@ export async function kompresGambarBukti(
       const safeFallback = () => {
         if (isSettled) return;
         isSettled = true;
-        const fallbackBlob = new Blob([file], { type: targetFormat });
-        const compressedFile = new File(
-          [fallbackBlob],
-          file.name.replace(/\.[^/.]+$/, "") + ".webp",
-          { type: targetFormat }
-        );
-        resolve({
-          file: compressedFile,
-          blob: fallbackBlob,
-          dataUrl,
-          width: 800,
-          height: 600,
-          originalSizeBytes,
-          compressedSizeBytes: fallbackBlob.size,
-          kompresiRasioPersen: 0,
-          format: targetFormat,
-        });
+        resolve(buatHasilFallback(file, dataUrl));
       };
 
       // Timeout pengaman jika Image.onload tidak terpicu
@@ -199,23 +191,7 @@ export async function kompresGambarBukti(
 
         if (!ctx) {
           // Fallback jika tidak ada context 2D
-          const fallbackBlob = new Blob([file], { type: targetFormat });
-          const compressedFile = new File(
-            [fallbackBlob],
-            file.name.replace(/\.[^/.]+$/, "") + ".webp",
-            { type: targetFormat }
-          );
-          resolve({
-            file: compressedFile,
-            blob: fallbackBlob,
-            dataUrl,
-            width: targetWidth,
-            height: targetHeight,
-            originalSizeBytes,
-            compressedSizeBytes: fallbackBlob.size,
-            kompresiRasioPersen: 0,
-            format: targetFormat,
-          });
+          resolve(buatHasilFallback(file, dataUrl, targetWidth, targetHeight));
           return;
         }
 
@@ -223,7 +199,7 @@ export async function kompresGambarBukti(
         ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
 
         // 3. Konversi ke WebP
-        const outputFormat = targetFormat;
+        const outputFormat = "image/webp";
         let compressedDataUrl = "";
         try {
           compressedDataUrl = canvas.toDataURL(outputFormat, quality);
@@ -272,23 +248,14 @@ export async function kompresGambarBukti(
           );
         } else {
           // Fallback jika toBlob tidak tersedia di lingkungan tertentu
-          const fallbackBlob = new Blob([file], { type: outputFormat });
-          const outputFileName = file.name.replace(/\.[^/.]+$/, "") + ".webp";
-          const compressedFile = new File([fallbackBlob], outputFileName, {
-            type: outputFormat,
-          });
-
-          resolve({
-            file: compressedFile,
-            blob: fallbackBlob,
-            dataUrl: compressedDataUrl || dataUrl,
-            width: targetWidth,
-            height: targetHeight,
-            originalSizeBytes,
-            compressedSizeBytes: fallbackBlob.size,
-            kompresiRasioPersen: 0,
-            format: outputFormat,
-          });
+          resolve(
+            buatHasilFallback(
+              file,
+              compressedDataUrl || dataUrl,
+              targetWidth,
+              targetHeight
+            )
+          );
         }
       };
 

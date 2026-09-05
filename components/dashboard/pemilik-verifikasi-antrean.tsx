@@ -24,23 +24,16 @@ import {
 } from "@/lib/supabase/tagihan";
 
 export function PemilikVerifikasiAntrean() {
-  const { tagihanList, activePeriode, approveTagihan, rejectTagihan } =
-    usePaymentStore();
+  const { tagihanList, approveTagihan, rejectTagihan } = usePaymentStore();
 
   const [selectedTagihanForLightbox, setSelectedTagihanForLightbox] =
     useState<Tagihan | null>(null);
   const [selectedTagihanForReject, setSelectedTagihanForReject] =
     useState<Tagihan | null>(null);
 
-  const currentBulan = activePeriode?.bulan ?? 9;
-  const currentTahun = activePeriode?.tahun ?? 2026;
-
-  // Ambil seluruh tagihan aktif yang berstatus MENUNGGU_VERIFIKASI
+  // Ambil seluruh tagihan yang berstatus MENUNGGU_VERIFIKASI lintas siklus mandiri
   const antreanVerifikasi = tagihanList.filter(
-    (t) =>
-      t.status === "MENUNGGU_VERIFIKASI" &&
-      t.bulan === currentBulan &&
-      t.tahun === currentTahun
+    (t) => t.status === "MENUNGGU_VERIFIKASI"
   );
 
   const handleApprove = (tagihan: Tagihan) => {
@@ -166,7 +159,7 @@ export function PemilikVerifikasiAntrean() {
                       </div>
                     </div>
 
-                    {/* Thumbnail & Tenant Note */}
+                    {/* Thumbnail & Catatan Penghuni */}
                     <div className="flex items-center gap-3 p-3 bg-zinc-50/80 rounded-lg border border-zinc-200/80 hover:bg-zinc-50 transition-colors">
                       {tagihan.buktiPembayaran && (
                         <div
