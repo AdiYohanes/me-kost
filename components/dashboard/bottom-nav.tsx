@@ -77,9 +77,9 @@ export function BottomNav({ role, activeTab, onTabChange }: BottomNavProps) {
   return (
     <nav
       aria-label="Navigasi Utama Bawah"
-      className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/80 shadow-[0_-4px_20px_rgba(0,0,0,0.04)] safe-bottom"
+      className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-xs border-t border-zinc-200 safe-bottom"
     >
-      <div className="max-w-md mx-auto px-4 h-16 flex items-center justify-around">
+      <div className="max-w-md mx-auto px-4 h-14 flex items-center justify-around">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -89,27 +89,33 @@ export function BottomNav({ role, activeTab, onTabChange }: BottomNavProps) {
               key={tab.id}
               type="button"
               onClick={() => onTabChange(tab.id)}
-              className={`relative flex flex-col items-center justify-center flex-1 h-full py-1 transition-all select-none cursor-pointer touch-manipulation group ${
+              className={`relative flex flex-col items-center justify-center flex-1 h-full py-1 transition-colors select-none cursor-pointer touch-manipulation group ${
                 isActive
-                  ? "text-emerald-700 font-bold"
-                  : "text-slate-600 hover:text-slate-800 font-medium"
+                  ? "text-zinc-950 font-semibold"
+                  : "text-zinc-400 hover:text-zinc-700 font-medium"
               }`}
             >
-              <div
-                className={`relative flex items-center justify-center w-12 h-7.5 rounded-full transition-all ${
-                  isActive
-                    ? "bg-emerald-100/80 text-emerald-700 scale-105"
-                    : "text-slate-600 group-hover:bg-slate-100/80"
-                }`}
-              >
-                <Icon className="w-4 h-4" />
+              {/* Active top hairline indicator */}
+              {isActive && (
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-emerald-600 rounded-full" />
+              )}
+              <div className="relative flex items-center justify-center w-8 h-6 transition-transform">
+                <Icon
+                  className={`w-4 h-4 transition-colors ${
+                    isActive ? "text-emerald-600 stroke-[2.2]" : "text-zinc-400 group-hover:text-zinc-600 stroke-[1.75]"
+                  }`}
+                />
                 {tab.badge !== null && (
-                  <span className="absolute -top-1 -right-1 px-1.5 py-0.2 min-w-[16px] h-4 rounded-full bg-amber-500 text-[10px] font-bold text-white flex items-center justify-center shadow-xs animate-pulse">
+                  <span className="absolute -top-1 -right-2 px-1 min-w-[15px] h-3.5 rounded-full bg-amber-500 text-[10px] font-bold text-white font-mono tabular-nums flex items-center justify-center">
                     {tab.badge}
                   </span>
                 )}
               </div>
-              <span className="text-[10px] tracking-tight mt-1">
+              <span
+                className={`text-[10px] tracking-tight mt-0.5 ${
+                  isActive ? "text-zinc-950 font-semibold" : "text-zinc-400 group-hover:text-zinc-600"
+                }`}
+              >
                 {tab.label}
               </span>
             </button>

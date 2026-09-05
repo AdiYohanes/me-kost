@@ -44,33 +44,32 @@ export function PenghuniDashboardView({
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       {/* Greeting & Room Card */}
-      <Card className="border-emerald-100 bg-linear-to-br from-emerald-500/10 via-white to-emerald-50/50 card-shadow overflow-hidden relative">
-        <div className="absolute top-0 right-0 -mt-3 -mr-3 w-20 h-20 bg-emerald-500/10 rounded-full blur-lg pointer-events-none" />
-        <CardHeader className="p-5 pb-3">
+      <Card className="card-shadow border-zinc-200 bg-white overflow-hidden">
+        <CardHeader className="p-4 sm:p-5 pb-3.5 border-b border-zinc-100">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 flex items-center gap-1">
-              <DoorClosed className="w-3.5 h-3.5" />
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-700 flex items-center gap-1.5">
+              <DoorClosed className="w-3.5 h-3.5 text-zinc-700" />
               Kamar {user.nomorKamar}
             </span>
             <Badge
               variant="outline"
-              className="text-[10px] border-emerald-300 text-emerald-800 font-semibold"
+              className="text-[10px] font-mono border-zinc-200 text-zinc-800 font-semibold"
             >
               Penghuni Aktif
             </Badge>
           </div>
-          <CardTitle className="text-lg font-black text-slate-900 mt-1">
+          <CardTitle className="text-base sm:text-lg font-bold text-zinc-950 mt-1">
             Halo, {user.name}
           </CardTitle>
-          <CardDescription className="text-xs text-slate-600 mt-1">
+          <CardDescription className="text-xs text-zinc-600 mt-0.5">
             {user.tipeKamar || "Kamar Kost Syantika"}
           </CardDescription>
         </CardHeader>
-        <CardContent className="p-5 pt-0">
-          <div className="flex items-center gap-2.5 p-3.5 bg-white/90 rounded-xl border border-emerald-100/80 text-xs text-slate-700 shadow-2xs">
+        <CardContent className="p-4 sm:p-5 pt-3">
+          <div className="flex items-center gap-2 p-3 bg-zinc-50 rounded-lg border border-zinc-200 text-xs text-zinc-700">
             <Calendar className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span>
-              Periode Sewa Aktif: <strong>{currentPeriodeLabel}</strong>
+            <span className="font-mono">
+              Periode Sewa Aktif: <strong className="text-zinc-950">{currentPeriodeLabel}</strong>
             </span>
           </div>
         </CardContent>

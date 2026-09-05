@@ -175,15 +175,15 @@ export function PemilikDaftarKamar() {
 
   return (
     <div className="space-y-3">
-      <Card className="card-shadow">
-        <CardHeader className="p-5 pb-3.5">
+      <Card className="card-shadow border-zinc-200 bg-white overflow-hidden">
+        <CardHeader className="p-4 sm:p-5 pb-3.5 border-b border-zinc-100">
           <div className="flex items-center justify-between gap-2">
             <div>
-              <CardTitle className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
-                <Users className="w-4 h-4 text-emerald-600" />
+              <CardTitle className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-700 flex items-center gap-1.5">
+                <Users className="w-3.5 h-3.5 text-zinc-700" />
                 <span>Daftar Unit Kamar</span>
               </CardTitle>
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-[11px] font-mono text-zinc-500 mt-0.5">
                 Unit 101 - 108 Kost Syantika • Periode {currentPeriodeLabel}
               </p>
             </div>
@@ -193,26 +193,26 @@ export function PemilikDaftarKamar() {
                 variant="outline"
                 size="sm"
                 onClick={() => setIsBuatPeriodeOpen(true)}
-                className="h-8 px-2.5 text-xs font-semibold text-emerald-700 border-emerald-300 hover:bg-emerald-50 gap-1.5 cursor-pointer"
+                className="h-8 px-2.5 text-xs font-medium text-zinc-800 border-zinc-200 hover:bg-zinc-50 gap-1.5 rounded-md cursor-pointer"
               >
-                <CalendarPlus className="w-3.5 h-3.5" />
+                <CalendarPlus className="w-3.5 h-3.5 text-emerald-600" />
                 <span>Periode Baru</span>
               </Button>
-              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">
+              <span className="text-[11px] font-mono font-medium px-2 py-0.5 rounded bg-zinc-100 text-zinc-700 border border-zinc-200">
                 {filteredList.length} Kamar
               </span>
             </div>
           </div>
 
           {/* Filter Status Pills */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 pt-3 no-scrollbar">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-3 no-scrollbar">
             <button
               type="button"
               onClick={() => setActiveFilter("SEMUA")}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+              className={`px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors cursor-pointer border ${
                 activeFilter === "SEMUA"
-                  ? "bg-slate-900 text-white shadow-xs"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200/80"
+                  ? "bg-zinc-900 text-white border-zinc-900 font-semibold"
+                  : "bg-zinc-50 text-zinc-600 hover:bg-zinc-100 border-zinc-200/80"
               }`}
             >
               Semua ({tagihanAktif.length})
@@ -221,10 +221,10 @@ export function PemilikDaftarKamar() {
             <button
               type="button"
               onClick={() => setActiveFilter("LUNAS")}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+              className={`px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors cursor-pointer border ${
                 activeFilter === "LUNAS"
-                  ? "bg-emerald-600 text-white shadow-xs"
-                  : "bg-slate-100 text-slate-600 hover:bg-emerald-50 hover:text-emerald-700"
+                  ? "bg-emerald-600 text-white border-emerald-600 font-semibold"
+                  : "bg-zinc-50 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 border-zinc-200"
               }`}
             >
               Lunas ({countLunas})
@@ -233,10 +233,10 @@ export function PemilikDaftarKamar() {
             <button
               type="button"
               onClick={() => setActiveFilter("BELUM_BAYAR")}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+              className={`px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors cursor-pointer border ${
                 activeFilter === "BELUM_BAYAR"
-                  ? "bg-slate-700 text-white shadow-xs"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200/80"
+                  ? "bg-zinc-700 text-white border-zinc-700 font-semibold"
+                  : "bg-zinc-50 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 border-zinc-200"
               }`}
             >
               Belum Bayar ({countBelumBayar})
@@ -245,10 +245,10 @@ export function PemilikDaftarKamar() {
             <button
               type="button"
               onClick={() => setActiveFilter("MENUNGGU_VERIFIKASI")}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+              className={`px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors cursor-pointer border ${
                 activeFilter === "MENUNGGU_VERIFIKASI"
-                  ? "bg-amber-600 text-white shadow-xs"
-                  : "bg-slate-100 text-slate-600 hover:bg-amber-50 hover:text-amber-700"
+                  ? "bg-amber-600 text-white border-amber-600 font-semibold"
+                  : "bg-zinc-50 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 border-zinc-200"
               }`}
             >
               Menunggu Verifikasi ({countPending})
@@ -258,10 +258,10 @@ export function PemilikDaftarKamar() {
               <button
                 type="button"
                 onClick={() => setActiveFilter("DITOLAK")}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                className={`px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors cursor-pointer border ${
                   activeFilter === "DITOLAK"
-                    ? "bg-rose-600 text-white shadow-xs"
-                    : "bg-slate-100 text-slate-600 hover:bg-rose-50 hover:text-rose-700"
+                    ? "bg-rose-600 text-white border-rose-600 font-semibold"
+                    : "bg-zinc-50 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 border-zinc-200"
                 }`}
               >
                 Ditolak ({countDitolak})
@@ -270,34 +270,34 @@ export function PemilikDaftarKamar() {
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-3 pt-0">
+        <CardContent className="space-y-2.5 p-4 sm:p-5 pt-4">
           {filteredList.length === 0 ? (
-            <div className="py-8 text-center text-slate-500 text-xs rounded-xl bg-slate-50 border border-slate-100">
-              <Filter className="w-5 h-5 mx-auto mb-1 text-slate-400" />
+            <div className="py-8 text-center text-zinc-500 text-xs rounded-lg bg-zinc-50 border border-zinc-200">
+              <Filter className="w-4 h-4 mx-auto mb-1 text-zinc-400" />
               <p>Tidak ada kamar dengan filter status ini.</p>
             </div>
           ) : (
             filteredList.map((tagihan) => (
               <div
                 key={tagihan.id}
-                className="p-3.5 sm:p-4 rounded-xl bg-slate-50/70 border border-slate-200/80 hover:border-slate-300 transition-colors space-y-3"
+                className="p-3 sm:p-3.5 rounded-lg bg-white border border-zinc-200 hover:border-zinc-300 transition-colors space-y-2.5"
               >
                 <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-3">
-                    <span className="w-9 h-9 rounded-lg bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shadow-xs shrink-0">
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-8 h-8 rounded bg-zinc-900 text-white font-mono font-bold text-xs flex items-center justify-center shrink-0">
                       {tagihan.nomorKamar}
                     </span>
                     <div>
-                      <p className="text-xs font-bold text-slate-900 leading-tight">
+                      <p className="text-xs font-bold text-zinc-950 leading-tight">
                         {tagihan.penghuniNama}
                       </p>
-                      <div className="flex items-center gap-1.5 text-[11px] text-slate-500 mt-0.5">
-                        <span>{formatRupiah(tagihan.nominal)} / bln</span>
+                      <div className="flex items-center gap-1.5 text-[11px] text-zinc-500 mt-0.5">
+                        <span className="font-mono tabular-nums">{formatRupiah(tagihan.nominal)} / bln</span>
                         <span>•</span>
                         <button
                           type="button"
                           onClick={() => setSelectedTagihanForTarif(tagihan)}
-                          className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-emerald-700 hover:text-emerald-800 hover:underline cursor-pointer"
+                          className="inline-flex items-center gap-0.5 text-[10px] font-medium text-emerald-700 hover:text-emerald-800 hover:underline cursor-pointer"
                           aria-label={`Ubah Tarif Kamar ${tagihan.nomorKamar}`}
                         >
                           <Edit3 className="w-2.5 h-2.5" />
@@ -313,8 +313,8 @@ export function PemilikDaftarKamar() {
                 </div>
 
                 {/* Baris Aksi Kontekstual */}
-                <div className="flex items-center justify-between pt-2.5 border-t border-slate-200/60 text-[11px]">
-                  <span className="text-[10px] text-slate-400">
+                <div className="flex items-center justify-between pt-2 border-t border-zinc-100 text-[11px]">
+                  <span className="text-[10px] font-mono text-zinc-400">
                     Jatuh tempo: {tagihan.batasBayar}
                   </span>
 
@@ -324,7 +324,7 @@ export function PemilikDaftarKamar() {
                         type="button"
                         size="sm"
                         onClick={() => setSelectedTagihanForLightbox(tagihan)}
-                        className="h-8 px-2.5 text-xs font-bold bg-amber-600 hover:bg-amber-700 text-white gap-1 cursor-pointer"
+                        className="h-7.5 px-2.5 text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-white gap-1 rounded-md cursor-pointer"
                       >
                         <Eye className="w-3 h-3" />
                         <span>Periksa Bukti</span>
@@ -338,7 +338,7 @@ export function PemilikDaftarKamar() {
                         variant="outline"
                         size="sm"
                         onClick={() => setSelectedTagihanForCash(tagihan)}
-                        className="h-8 px-2.5 text-xs font-semibold text-emerald-700 border-emerald-300 hover:bg-emerald-50 gap-1.5 cursor-pointer"
+                        className="h-7.5 px-2.5 text-xs font-medium text-zinc-800 border-zinc-200 hover:bg-zinc-50 gap-1.5 rounded-md cursor-pointer"
                       >
                         <Banknote className="w-3.5 h-3.5 text-emerald-600" />
                         <span>Tandai Lunas (Cash)</span>

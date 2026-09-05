@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Building2, LogOut, ShieldCheck, DoorClosed } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { useAuthStore } from "@/lib/store/use-auth-store";
 import { UserSession } from "@/types/auth";
 
@@ -28,29 +27,29 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
   const isPemilik = user.role === "PEMILIK";
 
   return (
-    <header className="flex items-center justify-between pt-1 sm:pt-1.5 pb-4 mb-2 border-b border-slate-200/70">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-md shadow-emerald-600/20 shrink-0">
-          <Building2 className="w-5 h-5" />
+    <header className="flex items-center justify-between pt-1 sm:pt-1.5 pb-3.5 mb-2 border-b border-zinc-200">
+      <div className="flex items-center gap-2.5">
+        <div className="w-8 h-8 rounded-lg bg-zinc-950 flex items-center justify-center text-white shrink-0 shadow-2xs">
+          <Building2 className="w-4 h-4 text-emerald-400" />
         </div>
         <div className="space-y-0.5">
           <div className="flex items-center gap-1.5">
-            <h1 className="text-base font-black tracking-tight text-slate-900 leading-none">
+            <h1 className="text-sm font-black tracking-tight text-zinc-950 leading-none">
               Kost Syantika
             </h1>
             {isPemilik ? (
-              <Badge variant="lunas" className="text-[10px] py-0 px-1.5 h-4 gap-0.5">
-                <ShieldCheck className="w-2.5 h-2.5" />
-                Pemilik Kost
-              </Badge>
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-mono font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                <span>Pemilik Kost</span>
+              </span>
             ) : (
-              <Badge variant="outline" className="text-[10px] py-0 px-1.5 h-4 border-emerald-300 text-emerald-800 font-semibold gap-0.5">
-                <DoorClosed className="w-2.5 h-2.5" />
-                Kamar {user.nomorKamar}
-              </Badge>
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-mono font-bold bg-zinc-100 text-zinc-800 border border-zinc-200">
+                <DoorClosed className="w-3 h-3 text-zinc-600" />
+                <span>Kamar {user.nomorKamar}</span>
+              </span>
             )}
           </div>
-          <p className="text-[11px] font-medium text-slate-500 truncate max-w-[170px] sm:max-w-[220px]">
+          <p className="text-xs text-zinc-500 font-medium truncate max-w-[170px] sm:max-w-[220px]">
             {user.name}
           </p>
         </div>
@@ -60,7 +59,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
         variant="outline"
         size="sm"
         onClick={handleLogout}
-        className="text-xs text-rose-600 border-rose-200 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-300 gap-1.5 h-9 px-3 font-medium cursor-pointer"
+        className="text-xs text-zinc-700 border-zinc-200 hover:bg-zinc-100 hover:text-zinc-950 gap-1.5 h-8 px-2.5 font-medium rounded-md cursor-pointer transition-colors"
       >
         <LogOut className="w-3.5 h-3.5" />
         <span>Keluar</span>

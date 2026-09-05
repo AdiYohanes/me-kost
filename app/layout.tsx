@@ -57,7 +57,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Kost Syantika" />
       </head>
-      <body className="min-h-full flex flex-col font-sans bg-slate-50 text-slate-900 selection:bg-emerald-100 selection:text-emerald-900">
+      <body className="min-h-full flex flex-col font-sans bg-zinc-50 text-zinc-950">
         {children}
         <Toaster position="top-center" richColors closeButton />
       </body>

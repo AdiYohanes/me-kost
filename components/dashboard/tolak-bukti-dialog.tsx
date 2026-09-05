@@ -53,20 +53,20 @@ function TolakBuktiForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-3.5 pt-1">
       {/* Info Penghuni & Kamar */}
-      <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between text-xs">
-        <div className="flex items-center gap-1.5 font-bold text-slate-800">
+      <div className="p-2.5 rounded-lg bg-zinc-50 border border-zinc-200 flex items-center justify-between text-xs">
+        <div className="flex items-center gap-1.5 font-bold text-zinc-900">
           <DoorClosed className="w-4 h-4 text-emerald-600" />
           <span>Kamar {tagihan.nomorKamar}</span>
         </div>
-        <div className="flex items-center gap-1.5 text-slate-600 font-medium">
-          <User className="w-3.5 h-3.5 text-slate-400" />
+        <div className="flex items-center gap-1.5 text-zinc-600 font-medium">
+          <User className="w-3.5 h-3.5 text-zinc-400" />
           <span>{tagihan.penghuniNama}</span>
         </div>
       </div>
 
       {/* Quick Template Chips */}
       <div className="space-y-1.5">
-        <label className="text-[11px] font-semibold text-slate-600 flex items-center gap-1">
+        <label className="text-[11px] font-mono font-medium text-zinc-600 flex items-center gap-1">
           <Sparkles className="w-3 h-3 text-amber-500" />
           <span>Pilihan Alasan Cepat:</span>
         </label>
@@ -76,7 +76,7 @@ function TolakBuktiForm({
               key={idx}
               type="button"
               onClick={() => handleSelectTemplate(tpl)}
-              className="text-[10px] px-2.5 py-1 rounded-lg border border-slate-200 bg-white hover:bg-rose-50 hover:border-rose-200 hover:text-rose-700 transition-colors text-slate-600 text-left cursor-pointer"
+              className="text-[10px] font-mono px-2.5 py-1 rounded-md border border-zinc-200 bg-white hover:bg-zinc-100 hover:border-zinc-300 hover:text-zinc-950 transition-colors text-zinc-700 text-left cursor-pointer"
             >
               {tpl}
             </button>
@@ -88,10 +88,10 @@ function TolakBuktiForm({
       <div className="space-y-1">
         <label
           htmlFor="alasan-penolakan-input"
-          className="text-xs font-semibold text-slate-800 flex items-center justify-between"
+          className="text-xs font-semibold text-zinc-800 flex items-center justify-between"
         >
           <span>Alasan Penolakan (Wajib)</span>
-          <span className="text-[10px] text-slate-400 font-normal">
+          <span className="text-[10px] font-mono text-zinc-400 font-normal">
             {alasan.length} karakter
           </span>
         </label>
@@ -101,26 +101,26 @@ function TolakBuktiForm({
           value={alasan}
           onChange={(e) => setAlasan(e.target.value)}
           placeholder="Tuliskan alasan penolakan agar penghuni memahami perbaikan yang perlu dilakukan..."
-          className="w-full text-xs p-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all resize-none placeholder:text-slate-400 text-slate-800 bg-white"
+          className="w-full text-xs p-3 rounded-lg border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition-all resize-none placeholder:text-zinc-400 text-zinc-900 bg-white"
         />
-        <p className="text-[10px] text-slate-400 leading-tight">
+        <p className="text-[10px] text-zinc-500 leading-tight">
           Catatan ini akan tampil di layar tagihan Penghuni beserta form untuk unggah ulang bukti transfer.
         </p>
       </div>
 
-      <DialogFooter className="pt-4 flex items-center gap-2.5">
+      <DialogFooter className="pt-3 flex items-center gap-2">
         <Button
           type="button"
           variant="outline"
           onClick={onClose}
-          className="flex-1 h-10 text-xs font-semibold border-slate-200 text-slate-700 cursor-pointer"
+          className="flex-1 h-9 text-xs font-medium border-zinc-200 text-zinc-700 hover:bg-zinc-50 rounded-md cursor-pointer"
         >
           Batal
         </Button>
         <Button
           type="submit"
           disabled={!isReasonValid}
-          className="flex-1 h-10 text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white disabled:opacity-40 disabled:cursor-not-allowed shadow-xs cursor-pointer"
+          className="flex-1 h-9 text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white disabled:opacity-40 disabled:cursor-not-allowed rounded-md shadow-xs cursor-pointer"
         >
           Konfirmasi Tolak
         </Button>

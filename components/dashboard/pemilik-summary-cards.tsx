@@ -1,8 +1,6 @@
 "use client";
 
 import React from "react";
-import { CheckCircle2, Clock, XCircle, Wallet, TrendingUp } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 import { usePaymentStore } from "@/lib/store/use-payment-store";
 
 export function formatRupiah(amount: number): string {
@@ -40,72 +38,75 @@ export function PemilikSummaryCards() {
     0
   );
 
+  const percentage = Math.round((totalPenerimaan / (totalPotensi || 1)) * 100);
+
   return (
-    <div className="space-y-4">
-      {/* Kartu Utama: Penerimaan Terkumpul & Estimasi Potensi */}
-      <Card className="border-emerald-200/80 bg-linear-to-br from-emerald-600 via-emerald-700 to-teal-800 text-white shadow-md shadow-emerald-900/10 overflow-hidden relative">
-        <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-white/10 rounded-full blur-xl pointer-events-none" />
-        <CardContent className="p-5 relative">
-          <div className="flex items-center justify-between pb-3 border-b border-emerald-500/30">
-            <div className="flex items-center gap-2 text-xs font-semibold text-emerald-100">
-              <Wallet className="w-4 h-4 text-emerald-200" />
-              <span>Penerimaan Terkumpul</span>
-            </div>
-            <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/40 text-emerald-100">
-              {currentLabel}
+    <div className="space-y-3">
+      {/* High-Density Ledger Card: Penerimaan Terkumpul */}
+      <div className="rounded-xl border border-zinc-200 bg-white p-4 sm:p-5 card-shadow">
+        <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
+            <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">
+              Penerimaan Terkumpul
+            </span>
+          </div>
+          <span className="text-xs font-mono font-bold px-2 py-0.5 rounded border border-zinc-200 bg-zinc-50 text-zinc-700">
+            {currentLabel}
+          </span>
+        </div>
+
+        <div className="mt-3.5">
+          <div className="flex items-baseline justify-between gap-2">
+            <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-zinc-950 tabular-nums">
+              {formatRupiah(totalPenerimaan)}
+            </h2>
+            <span className="text-xs font-bold font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/70 shrink-0">
+              {percentage}% Lunas
             </span>
           </div>
 
-          <div className="mt-4">
-            <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
-              {formatRupiah(totalPenerimaan)}
-            </h2>
-            <div className="flex items-center gap-1.5 mt-2 text-xs text-emerald-100/90 font-medium">
-              <TrendingUp className="w-3.5 h-3.5 text-emerald-300" />
-              <span>
-                Dari potensi {formatRupiah(totalPotensi)} ({Math.round((totalPenerimaan / (totalPotensi || 1)) * 100)}%)
-              </span>
-            </div>
+          <div className="w-full bg-zinc-100 h-1.5 rounded-full overflow-hidden mt-3">
+            <div
+              className="bg-emerald-600 h-full rounded-full transition-all duration-500"
+              style={{ width: `${percentage}%` }}
+            />
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Grid 3 Metrik: Lunas, Belum Lunas, Perlu Verifikasi */}
-      <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
-        <div className="p-3.5 sm:p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex flex-col items-center justify-center text-center gap-1">
-          <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center mb-0.5">
-            <CheckCircle2 className="w-4 h-4" />
+          <div className="flex items-center justify-between mt-2 text-xs text-zinc-500 font-medium">
+            <span>Target: {formatRupiah(totalPotensi)}</span>
+            <span>Total 8 Kamar</span>
           </div>
-          <span className="text-lg sm:text-xl font-black text-emerald-600 leading-tight">
-            {kamarLunas}
-          </span>
-          <span className="text-[11px] font-medium text-slate-500">
-            Kamar Lunas
-          </span>
         </div>
 
-        <div className="p-3.5 sm:p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex flex-col items-center justify-center text-center gap-1">
-          <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center mb-0.5">
-            <XCircle className="w-4 h-4 text-slate-500" />
+        {/* 3-Column Structured Ledger Row */}
+        <div className="grid grid-cols-3 gap-0 mt-4 pt-3.5 border-t border-zinc-100 text-center divide-x divide-zinc-100">
+          <div className="px-2 py-1">
+            <span className="text-lg sm:text-xl font-black text-emerald-600 block tabular-nums leading-tight">
+              {kamarLunas}
+            </span>
+            <span className="text-xs font-medium text-zinc-500 mt-0.5 block">
+              Kamar Lunas
+            </span>
           </div>
-          <span className="text-lg sm:text-xl font-black text-slate-800 leading-tight">
-            {kamarBelumLunas}
-          </span>
-          <span className="text-[11px] font-medium text-slate-500">
-            Belum Lunas
-          </span>
-        </div>
 
-        <div className="p-3.5 sm:p-4 rounded-2xl bg-white border border-amber-200/80 bg-amber-50/40 shadow-xs flex flex-col items-center justify-center text-center gap-1">
-          <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center mb-0.5">
-            <Clock className="w-4 h-4" />
+          <div className="px-2 py-1">
+            <span className="text-lg sm:text-xl font-black text-zinc-800 block tabular-nums leading-tight">
+              {kamarBelumLunas}
+            </span>
+            <span className="text-xs font-medium text-zinc-500 mt-0.5 block">
+              Belum Lunas
+            </span>
           </div>
-          <span className="text-lg sm:text-xl font-black text-amber-600 leading-tight">
-            {perluVerifikasi}
-          </span>
-          <span className="text-[11px] font-semibold text-amber-800">
-            Perlu Verifikasi
-          </span>
+
+          <div className="px-2 py-1">
+            <span className="text-lg sm:text-xl font-black text-amber-600 block tabular-nums leading-tight">
+              {perluVerifikasi}
+            </span>
+            <span className="text-xs font-bold text-amber-800 mt-0.5 block">
+              Perlu Verifikasi
+            </span>
+          </div>
         </div>
       </div>
     </div>

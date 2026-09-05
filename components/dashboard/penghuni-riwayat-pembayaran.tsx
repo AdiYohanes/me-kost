@@ -42,25 +42,25 @@ export function PenghuniRiwayatPembayaran({ user }: PenghuniRiwayatPembayaranPro
 
   return (
     <>
-      <Card className="card-shadow">
-        <CardHeader className="p-5 pb-3.5">
+      <Card className="card-shadow border-zinc-200 bg-white overflow-hidden">
+        <CardHeader className="p-4 sm:p-5 pb-3.5 border-b border-zinc-100">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
-              <History className="w-4 h-4 text-emerald-600" />
+            <CardTitle className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-700 flex items-center gap-1.5">
+              <History className="w-3.5 h-3.5 text-zinc-700" />
               Riwayat Pembayaran
             </CardTitle>
-            <Badge variant="outline" className="text-[10px] text-slate-600 border-slate-200">
+            <Badge variant="outline" className="text-[10px] font-mono text-zinc-600 border-zinc-200">
               {riwayatList.length} Bulan Terdahulu
             </Badge>
           </div>
-          <CardDescription className="text-xs mt-1">
+          <CardDescription className="text-[11px] font-mono text-zinc-500 mt-1">
             Catatan pelunasan sewa bulanan kamar Anda di Kost Syantika
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="p-5 pt-0 space-y-3">
+        <CardContent className="p-4 sm:p-5 pt-4 space-y-2.5">
           {riwayatList.length === 0 ? (
-            <div className="p-8 rounded-xl bg-slate-50 border border-slate-100 text-center text-xs text-slate-500">
+            <div className="p-8 rounded-lg bg-zinc-50 border border-zinc-200 text-center text-xs text-zinc-500 font-mono">
               Belum ada riwayat pembayaran sebelumnya.
             </div>
           ) : (
@@ -76,11 +76,11 @@ export function PenghuniRiwayatPembayaran({ user }: PenghuniRiwayatPembayaranPro
               return (
                 <div
                   key={tagihan.id}
-                  className="p-3.5 sm:p-4 rounded-xl bg-slate-50/80 hover:bg-slate-100/80 border border-slate-100 transition-colors flex items-center justify-between gap-3"
+                  className="p-3 sm:p-3.5 rounded-lg bg-white hover:bg-zinc-50 border border-zinc-200 transition-colors flex items-center justify-between gap-3"
                 >
-                  <div className="space-y-1 min-w-0">
+                  <div className="space-y-0.5 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-slate-900 truncate">
+                      <span className="text-xs font-bold text-zinc-900 truncate">
                         {tagihan.periodeBulan}
                       </span>
                       <Badge variant="lunas" className="text-[10px] py-0 px-1.5 h-4">
@@ -88,8 +88,8 @@ export function PenghuniRiwayatPembayaran({ user }: PenghuniRiwayatPembayaranPro
                       </Badge>
                     </div>
 
-                    <div className="flex items-center gap-2 text-[11px] text-slate-500">
-                      <span className="font-semibold text-slate-700">
+                    <div className="flex items-center gap-2 text-[11px] text-zinc-500 font-mono">
+                      <span className="font-semibold text-zinc-800 tabular-nums">
                         {formatIDR(tagihan.nominal)}
                       </span>
                       <span>•</span>
@@ -98,7 +98,7 @@ export function PenghuniRiwayatPembayaran({ user }: PenghuniRiwayatPembayaranPro
                       </span>
                     </div>
 
-                    <p className="text-[10px] text-slate-400">
+                    <p className="text-[10px] text-zinc-400 font-mono">
                       Lunas pada {formattedDate}
                     </p>
                   </div>
@@ -110,14 +110,14 @@ export function PenghuniRiwayatPembayaran({ user }: PenghuniRiwayatPembayaranPro
                         variant="outline"
                         size="sm"
                         onClick={() => setSelectedTagihan(tagihan)}
-                        className="h-8 text-xs font-medium gap-1.5 px-2.5 border-slate-200 text-slate-700 hover:text-emerald-700 hover:border-emerald-200 cursor-pointer"
+                        className="h-7 text-xs font-medium gap-1 px-2 border-zinc-200 text-zinc-700 hover:bg-zinc-50 rounded-md cursor-pointer"
                       >
-                        <Eye className="w-3.5 h-3.5" />
+                        <Eye className="w-3 h-3" />
                         <span>Lihat Bukti</span>
                       </Button>
                     ) : (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-medium text-slate-500 bg-white px-2.5 py-1 rounded-md border border-slate-200">
-                        <Banknote className="w-3.5 h-3.5 text-slate-400" />
+                      <span className="inline-flex items-center gap-1 text-[10px] font-medium text-zinc-600 bg-zinc-50 px-2 py-0.5 rounded border border-zinc-200">
+                        <Banknote className="w-3 h-3 text-zinc-400" />
                         Tunai
                       </span>
                     )}

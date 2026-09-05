@@ -1,235 +1,232 @@
 ---
 name: Kost Syantika
-description: Modern Clean Fintech design system for mobile-first boarding house rent payment management.
+description: High-Density Architectural Ledger design system for precision boarding house rent management.
 colors:
-  primary: "#04A552"
-  primary-hover: "#038E46"
-  primary-muted: "#E8F8EF"
+  primary: "#059669"
+  primary-hover: "#047857"
+  primary-muted: "#ECFDF5"
   primary-foreground: "#FFFFFF"
-  accent-amber: "#F59E0B"
-  accent-amber-subtle: "#FEF3C7"
+  accent-amber: "#D97706"
+  accent-amber-subtle: "#FFFBEB"
   accent-amber-text: "#92400E"
-  accent-rose: "#E11D48"
-  accent-rose-subtle: "#FFE4E6"
-  accent-rose-text: "#9F1239"
-  neutral-bg: "#F8FAFC"
+  accent-rose: "#DC2626"
+  accent-rose-subtle: "#FEF2F2"
+  accent-rose-text: "#991B1B"
+  neutral-bg: "#FAFAFA"
   neutral-surface: "#FFFFFF"
-  neutral-text: "#0F172A"
-  neutral-muted: "#64748B"
-  neutral-border: "#E2E8F0"
+  neutral-text: "#09090B"
+  neutral-muted: "#71717A"
+  neutral-border: "#E4E4E7"
 typography:
   display:
     fontFamily: "Plus Jakarta Sans, sans-serif"
     fontSize: "1.25rem"
     fontWeight: 800
-    lineHeight: 1.25
+    lineHeight: 1.2
   headline:
     fontFamily: "Plus Jakarta Sans, sans-serif"
-    fontSize: "1.125rem"
+    fontSize: "1rem"
     fontWeight: 700
     lineHeight: 1.3
   title:
     fontFamily: "Plus Jakarta Sans, sans-serif"
-    fontSize: "1rem"
+    fontSize: "0.875rem"
     fontWeight: 700
     lineHeight: 1.35
   body:
     fontFamily: "Plus Jakarta Sans, sans-serif"
-    fontSize: "0.875rem"
+    fontSize: "0.8125rem"
     fontWeight: 400
-    lineHeight: 1.5
+    lineHeight: 1.45
   label:
-    fontFamily: "Plus Jakarta Sans, sans-serif"
+    fontFamily: "Plus Jakarta Sans, monospace, sans-serif"
     fontSize: "0.75rem"
     fontWeight: 600
-    lineHeight: 1.4
+    lineHeight: 1.3
+  caption:
+    fontFamily: "Plus Jakarta Sans, monospace, sans-serif"
+    fontSize: "0.6875rem"
+    fontWeight: 500
+    lineHeight: 1.3
+  nano:
+    fontFamily: "Plus Jakarta Sans, monospace, sans-serif"
+    fontSize: "0.625rem"
+    fontWeight: 600
+    lineHeight: 1.2
 rounded:
-  sm: "8px"
-  md: "12px"
-  lg: "16px"
-  xl: "24px"
+  sm: "4px"
+  md: "8px"
+  lg: "12px"
+  xl: "16px"
   full: "9999px"
 spacing:
   xs: "4px"
   sm: "8px"
-  md: "16px"
-  lg: "24px"
-  xl: "32px"
+  md: "12px"
+  lg: "16px"
+  xl: "24px"
 components:
   button-primary:
     backgroundColor: "{colors.primary}"
     textColor: "{colors.primary-foreground}"
     rounded: "{rounded.md}"
-    height: "44px"
-    padding: "10px 16px"
+    height: "40px"
+    padding: "8px 14px"
   button-primary-hover:
     backgroundColor: "{colors.primary-hover}"
   button-destructive:
-    backgroundColor: "{colors.accent-rose}"
-    textColor: "{colors.primary-foreground}"
+    backgroundColor: "{colors.accent-rose-subtle}"
+    textColor: "{colors.accent-rose-text}"
     rounded: "{rounded.md}"
-    height: "44px"
-    padding: "10px 16px"
+    height: "40px"
+    padding: "8px 14px"
   button-outline:
     backgroundColor: "{colors.neutral-surface}"
-    textColor: "{colors.primary}"
+    textColor: "{colors.neutral-text}"
     rounded: "{rounded.md}"
-    height: "44px"
-    padding: "10px 16px"
+    height: "40px"
+    padding: "8px 14px"
   card-surface:
     backgroundColor: "{colors.neutral-surface}"
     textColor: "{colors.neutral-text}"
     rounded: "{rounded.lg}"
-    padding: "20px"
+    padding: "16px"
   badge-lunas:
     backgroundColor: "{colors.primary-muted}"
     textColor: "{colors.primary}"
-    rounded: "{rounded.full}"
-    padding: "2px 10px"
+    rounded: "{rounded.sm}"
+    padding: "2px 8px"
   badge-pending:
     backgroundColor: "{colors.accent-amber-subtle}"
     textColor: "{colors.accent-amber-text}"
-    rounded: "{rounded.md}"
-    padding: "4px 10px"
+    rounded: "{rounded.sm}"
+    padding: "2px 8px"
   input-text:
     backgroundColor: "{colors.neutral-surface}"
     textColor: "{colors.neutral-text}"
     rounded: "{rounded.md}"
-    height: "44px"
-    padding: "8px 14px"
+    height: "40px"
+    padding: "6px 12px"
 ---
 
 # Design System: Kost Syantika
 
 ## Overview
 
-**Creative North Star: "Modern Clean Fintech"**
+**Creative North Star: "High-Density Architectural Ledger"**
 
-Kost Syantika menerapkan bahasa visual Modern Clean Fintech yang dirancang khusus untuk kenyamanan perangkat genggam (mobile-first). Antarmuka memadukan latar kanvas netral yang tenang dengan aksen Syantika Emerald yang segar, menciptakan rasa aman, transparan, dan teratur dalam setiap tahapan transaksi sewa kamar kost.
+Kost Syantika mengadopsi identitas visual baru bertajuk High-Density Architectural Ledger. Desain ini menggantikan gaya rounded fintech santai dengan estetika buku besar arsitektural yang berdisiplin tinggi, monokromatik terstruktur, dan berfokus mutlak pada keterbacaan data numerik serta verifikasi transaksi yang cepat.
 
-Pendekatan estetika ini menolak secara tegas tampilan formulir birokratis abu-abu, tabel spreadsheet kaku yang padat, serta spanduk promosi komersial yang berisik. Seluruh pengalaman dioptimalkan untuk kecepatan pemindaian data finansial, peninjauan bukti transfer, dan tindakan verifikasi dengan satu tangan tanpa friksi kognitif.
+Estetika ini mereduksi elemen dekoratif, gradien warna tebal, serta bayangan membulat. Sebagai gantinya, sistem menggunakan garis hairline 1px presisi, penataan kisi grid rapat (*high-density*), perataan angka tabular monospaced, serta aksen warna fungsional tunggal (Signal Emerald) yang hanya menyala saat terjadi verifikasi atau aksi afirmatif penting.
 
 **Key Characteristics:**
-- Ergonomi kontrol ramah jempol (*thumb-friendly* minimum tinggi 40–44px dengan micro-scale saat ditekan).
-- Palet Syantika Emerald yang segar dengan kontras rasio tinggi yang memenuhi standar WCAG.
-- Elevasi bertingkat lembut (*ambient tinted glow*) di atas kanvas Slate-50 yang bersih.
-- Status badge bernuansa halus (*soft-tinted*) yang informatif tanpa membebani hirarki visual kartu.
-- Kepatuhan total terhadap terminologi domain resmi Kost Syantika.
+- Tata letak kisi buku besar rapat (*high-density grid*) dengan garis pemisah hairline 1px yang tegas.
+- Angka numerik dan nominal diformat tabular (`tabular-nums` / mono) untuk perbandingan cepat.
+- Palet monokromatik netral Zinc/Slate dingin dengan satu aksen primer fungsional (Signal Emerald).
+- Sudut struktural terukur (radius 4px untuk chip dan 8–12px untuk kartu) tanpa membulat berlebihan.
+- Kepatuhan mutlak pada terminologi resmi `CONTEXT.md` tanpa kompromi.
 
 ## Colors
 
-Palet warna difokuskan pada ketegasan identitas finansial modern dengan aksen fungsional yang intuitif.
+Palet didominasi oleh skala monokromatik abu-abu netral dengan aksen warna sinyal murni untuk status operasional.
 
 ### Primary
-- **Syantika Emerald** (`#04A552` / hover `#038E46` / muted `#E8F8EF`): Warna identitas utama sistem. Digunakan secara eksklusif untuk aksi afirmatif kunci (Setujui, Bayar, Simpan), status Lunas, dan indikator navigasi aktif.
+- **Signal Emerald** (`#059669` / hover `#047857` / subtle `#ECFDF5`): Warna sinyal keberhasilan dan verifikasi. Digunakan untuk tombol Setujui Pembayaran, status Lunas, dan indikator aktif utama.
 
 ### Secondary
-- **Amber Alert** (`#F59E0B` / subtle `#FEF3C7` / text `#92400E`): Warna aksen penanda atensi dan antrean. Digunakan pada badge Menunggu Verifikasi, badge nomor kamar pada kartu antrean, serta indikator lencana belum tertangani.
+- **Signal Amber** (`#D97706` / subtle `#FFFBEB` / text `#92400E`): Warna sinyal perhatian. Digunakan eksklusif untuk status Menunggu Verifikasi dan antrean bukti transfer baru.
 
 ### Tertiary
-- **Crimson Rose** (`#E11D48` / subtle `#FFE4E6` / text `#9F1239`): Warna aksen penolakan dan peringatan. Digunakan untuk tombol Tolak Bukti, status Ditolak, pesan kesalahan validasi, serta dialog pembatalan.
+- **Signal Crimson** (`#DC2626` / subtle `#FEF2F2` / text `#991B1B`): Warna sinyal penolakan atau pembatalan. Digunakan untuk tombol Tolak dan status Ditolak.
 
 ### Neutral
-- **Slate Canvas** (`#F8FAFC`): Latar belakang aplikasi menyeluruh yang sejuk dan menenangkan mata.
-- **Pure White** (`#FFFFFF`): Permukaan kontainer kartu, lembar dialog modal, input formulir, dan bilah navigasi bawah.
-- **Midnight Slate** (`#0F172A`): Warna tipografi utama untuk keterbacaan tajam pada nominal uang, nama penghuni, dan judul kartu.
-- **Muted Slate** (`#64748B` / `#94A3B8`): Teks sekunder, label penjelas, tanggal unggah, dan placeholder input.
-- **Subtle Mist** (`#E2E8F0`): Garis batas tepi (*border*) pemisah seksi dan kontainer bukti transfer.
+- **Ledger Canvas** (`#FAFAFA`): Latar kanvas dasar yang sangat bersih dan kontras.
+- **Pure Surface** (`#FFFFFF`): Permukaan modul kartu, dialog, dan baris tabel transaksi.
+- **Deep Ink** (`#09090B`): Teks utama, judul metrik, dan nominal rupiah.
+- **Muted Zinc** (`#71717A`): Label penjelas, metadata waktu, tanggal periode, dan placeholder.
+- **Hairline Border** (`#E4E4E7`): Garis kisi pembatas 1px presisi di seluruh komponen.
 
 ### Named Rules
-**The Emerald Reserve Rule.** Warna Syantika Emerald (#04A552) dikhususkan murni untuk aksi sukses atau afirmatif (Setujui, Bayar, Status Lunas, Sesi Aktif) dan tidak pernah dipakai untuk elemen netral, latar umum, atau dekorasi pasif semata.
+**The Single-Accent Doctrine.** Warna Signal Emerald hanya boleh digunakan pada elemen yang mewakili aksi afirmatif atau status berhasil. Lebih dari 90% permukaan visual adalah monokromatik terstruktur.
 
 ## Typography
 
 **Display Font:** Plus Jakarta Sans (`var(--font-jakarta)`, dengan fallback `sans-serif`)
 **Body Font:** Plus Jakarta Sans (`var(--font-jakarta)`, dengan fallback `sans-serif`)
-**Label Font:** Plus Jakarta Sans (`var(--font-jakarta)`, dengan fallback `sans-serif`)
+**Label & Tabular Font:** Plus Jakarta Sans / Monospace (`tabular-nums`)
 
-**Character:** Tipografi geometris modern yang bersih dan proporsional dengan kemampuan keterbacaan tinggi pada layar ponsel beresolusi tinggi maupun padat piksel.
+**Character:** Tipografi fungsional, tegas, dan berbobot seimbang dengan dukungan perataan angka tabular yang akurat untuk pembacaan nominal sewa dan tanggal.
 
 ### Hierarchy
-- **Display** (800 / ExtraBold, `1.25rem` / 20px, line-height `1.25`): Header saldo ringkasan dan nominal utama dashboard.
-- **Headline** (700 / Bold, `1.125rem` / 18px, line-height `1.3`): Judul kartu utama, nama seksi antrean, dan judul modal.
-- **Title** (700 / Bold, `1rem` / 16px, line-height `1.35`): Nama penghuni pada item antrean dan sub-judul daftar kamar.
-- **Body** (400 / Regular & 500 / Medium, `0.875rem` / 14px, line-height `1.5`): Catatan bukti penghuni, rincian biaya sewa, dan paragraf instruksi.
-- **Label** (600 / SemiBold & 700 / Bold, `0.75rem` / 12px, line-height `1.4`): Nomor kamar pada badge, teks status pembayaran, label navigasi bawah, dan tombol aksi.
+- **Display** (800 / ExtraBold, `1.25rem` / 20px, line-height `1.2`): Ringkasan total penerimaan kas dan metrik utama.
+- **Headline** (700 / Bold, `1rem` / 16px, line-height `1.3`): Judul modul, nama seksi antrean verifikasi, dan judul dialog.
+- **Title** (700 / Bold, `0.875rem` / 14px, line-height `1.35`): Nama penghuni, nomor kamar, dan baris judul tagihan.
+- **Body** (400 / Regular, `0.8125rem` / 13px, line-height `1.45`): Catatan bukti penghuni, rincian fasilitas kamar, dan pesan konfirmasi.
+- **Label** (600 / SemiBold, `0.75rem` / 12px, line-height `1.3`): Status pembayaran, tanggal unggah, navigasi, dan tombol aksi.
+- **Caption** (500 / Medium, `0.6875rem` / 11px, line-height `1.3`): Metadata transaksi, timestamp unggah, dan tanggal jatuh tempo.
+- **Nano** (600 / SemiBold, `0.625rem` / 10px, line-height `1.2`): Counter badge antrean dan label status mikro.
 
 ### Named Rules
-**The Scan-First Metric Rule.** Nominal rupiah dan nomor kamar wajib berbobot tegas (`font-bold` atau `font-black`) dengan posisi konsisten agar verifikator dapat mencocokkan nominal dalam waktu kurang dari 1 detik.
+**The Tabular Precision Rule.** Seluruh angka nominal rupiah, persentase keterisian, dan tanggal transaksi wajib menggunakan fitur `tabular-nums` atau monospaced agar kolom angka selalu sejajar secara vertikal.
 
 ## Layout
 
-Tata letak mengadopsi model ponsel terpusat (*mobile viewport container*) dengan batas lebar maksimum `max-w-md` (~390px hingga 448px) yang selalu berpusat horizontal (`mx-auto`) di desktop.
+Model tata letak menggunakan kisi berdensitas tinggi (*high-density structure*) yang meminimalkan ruang kosong tak berfaedah demi efisiensi visual pada perangkat mobile (`max-w-md mx-auto`).
 
-- **Rhythm Spacing:** Skala kelipatan 4px/8px (spasi mikro 4px, standar 8px/12px, antar-komponen 16px/20px, seksi utama 24px/32px).
-- **Safe-Area Insets:** Mengakomodasi bilah status dan gestur beranda iOS/Android melalui kelas `.safe-top` dan `.safe-bottom`.
-- **Navigation Shelf:** Bilah Navigasi Bawah (*Bottom Navigation*) mengambang permanen di bagian bawah layar setinggi 64px dengan efek kabur latar belakang (*backdrop-blur-md*) dan batas atas tipis.
+- **Grid Spacing:** Spasi terukur kelipatan 4px/8px/12px/16px (p-3 sm:p-4 untuk kartu modul).
+- **Hairline Dividers:** Pemisahan seksi menggunakan garis batas 1px solid `#E4E4E7` tanpa bayangan kabur.
+- **Compact Bottom Shelf:** Navigasi bawah dirancang tipis (tinggi 56px) dengan batas hairline atas dan indikator tab minimalis.
 
 ## Elevation & Depth
 
-Sistem mengusung filosofi *Tactile & Ambient Depth*. Permukaan datar secara default dengan batas garis 1px halus, lalu diangkat menggunakan bayangan berpendar hijau emerald lembut (*ambient tinted glow*).
+Sistem menganut filosofi *Flat-by-Default Structural Depth*. Kedalaman ruang diciptakan melalui kontras permukaan dan garis batas hairline 1px, bukan melalui bayangan buram berat.
 
 ### Shadow Vocabulary
-- **Ambient Card Shadow** (`box-shadow: 0 4px 20px -2px rgba(4, 165, 82, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.04)`): Elevasi standar untuk seluruh kontainer kartu di atas latar kanvas.
-- **Elevated Floating Shadow** (`box-shadow: 0 10px 25px -3px rgba(4, 165, 82, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)`): Digunakan saat kartu sedang aktif disentuh, modal dialog, atau menu popover.
-- **Nav Shelf Shadow** (`box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.04)`): Memisahkan bilah navigasi bawah dari konten gulir di baliknya.
+- **Flat Surface** (`box-shadow: none`, `border: 1px solid #E4E4E7`): Tampilan default untuk seluruh kartu dan baris data.
+- **Micro Hairline Lift** (`box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03)`): Digunakan untuk tombol aksi dan input saat melayang (*hover*).
+- **Modal Overlay Lift** (`box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08)`): Digunakan khusus untuk dialog modal dan pratinjau bukti layar penuh.
 
 ### Named Rules
-**The Tinted Atmosphere Rule.** Bayangan elevasi kartu menggunakan dispersi warna emerald tipis (6%–10% opacity) yang memancarkan kesan segar, meniadakan bayangan hitam legam pekat yang membuat UI terasa kusam.
+**The Zero-Blur Rule.** Dilarang menggunakan bayangan ber-blur besar (`blur > 10px`) pada kontainer data di halaman operasional. Batas visual ditentukan oleh garis 1px dan kontras bidang.
 
 ## Shapes
 
-Bahasa bentuk mengedepankan kurva ramah sentuhan (*friendly rounded geometry*) yang harmonis di seluruh elemen.
+Bentuk geometris mengedepankan presisi sudut yang lebih tegas dan rapi:
 
-- **Small Radius** (`8px` / `rounded-lg`): Kapsul badge nomor kamar, badge status pending, dan thumbnail bukti transfer.
-- **Medium Radius** (`12px` / `rounded-xl`): Tombol aksi verifikasi, kontrol formulir, dan input teks.
-- **Large Radius** (`16px`–`24px` / `rounded-2xl`–`rounded-3xl`): Kontainer kartu utama dan panel dialog konfirmasi.
-- **Pill Geometry** (`9999px` / `rounded-full`): Lencana status lunas dan kapsul indikator tab aktif pada navigasi bawah.
-- **Document Aspect Ratio:** Thumbnail foto bukti transfer menggunakan proporsi dokumen struk (lebar 56px x tinggi 64px) dengan radius 8px dan indikator ikon perbesaran di pojok.
+- **Micro Radius** (`4px` / `rounded`): Lencana status lunas, pending, dan nomor kamar.
+- **Control Radius** (`8px` / `rounded-lg`): Tombol aksi, thumbnail struk transfer, dan bidang input.
+- **Card Radius** (`12px` / `rounded-xl`): Kontainer kartu modul data dan panel dialog.
+- **Full Pill** (`9999px` / `rounded-full`): Avatar inisial dan dot indikator antrean.
 
 ## Components
 
-Setiap komponen dirancang dengan fokus sentuhan ergonomis dan kejelasan respon status.
-
 ### Buttons
-- **Shape:** Sudut membulat modern (`12px` / `rounded-xl`), tinggi ergonomis 40px (`h-10`) hingga 44px (`h-11`).
-- **Primary:** Latar Syantika Emerald (`#04A552`), teks putih, shadow tipis emerald, transisi `active:scale-[0.98]`.
-- **Destructive (Tolak):** Latar Crimson Rose lembut (`bg-rose-50/80`), teks rose pekat (`text-rose-700`), border halus (`border-rose-200/90`).
-- **Outline / Ghost:** Border emerald halus dengan latar putih atau transparan, teks emerald pekat.
+- **Shape:** Radius `8px` (`rounded-lg`), tinggi terukur 40px (`h-10`).
+- **Primary:** Latar Signal Emerald solid (`#059669`), teks putih, active scale `scale-[0.98]`.
+- **Destructive:** Latar Signal Crimson lembut (`#FEF2F2`), teks crimson pekat (`#991B1B`), border `border-red-200`.
+- **Outline / Ledger:** Latar putih, border hairline `#E4E4E7`, hover `#F4F4F5`.
 
 ### Badges & Chips
-- **Lunas:** Kapsul hijau muda (`bg-emerald-100 text-emerald-800 border-emerald-200`).
-- **Menunggu Verifikasi:** Kapsul kuning amber lembut (`bg-amber-100 text-amber-800 border-amber-200`).
-- **Ditolak:** Kapsul merah muda (`bg-rose-100 text-rose-800 border-rose-200`).
-- **Nomor Kamar:** Kapsul amber modern (`bg-amber-50 text-amber-800 border-amber-200/80 font-bold`).
+- **Lunas:** Latar `#ECFDF5`, teks `#059669`, border `border-emerald-200`, radius 4px.
+- **Menunggu Verifikasi:** Latar `#FFFBEB`, teks `#92400E`, border `border-amber-200`, radius 4px.
+- **Ditolak:** Latar `#FEF2F2`, teks `#991B1B`, border `border-red-200`, radius 4px.
 
-### Cards & Containers
-- **Corner Style:** Radius `16px` (`rounded-2xl`).
-- **Background:** Pure White (`#FFFFFF`).
-- **Border:** Garis batas halus `border-slate-200/80` atau `border-emerald-950/10`.
-- **Shadow Strategy:** Ambient Card Shadow (`card-shadow`).
-- **Internal Padding:** 16px hingga 20px (`p-4` sm:`p-5`).
-
-### Inputs & Fields
-- **Style:** Tinggi 44px (`h-11`), radius `12px` (`rounded-xl`), border `border-slate-200`, latar putih.
-- **Focus State:** Ring emerald bercahaya (`focus-visible:ring-2 focus-visible:ring-emerald-500`).
+### Cards & Modules
+- **Struktur:** Latar `#FFFFFF`, border `border-zinc-200`, padding 16px, sudut 12px, bayangan rata (*flat*).
 
 ### Navigation
-- **Bottom Navigation Bar:** Bilah terpasang di bawah setinggi 64px, latar `bg-white/95 backdrop-blur-md`, pembagian proporsional 3 tab sesuai peran pengguna dengan badge notifikasi antrean berbentuk lingkaran amber berdenyut halus.
-
-### Signature Component: Proof Thumbnail Card
-- Kartu item antrean verifikasi yang memadukan thumbnail struk interaktif dengan tombol perbesaran layar penuh (*lightbox zoom*), kutipan catatan penghuni, serta aksi berdampingan Tolak dan Setujui.
+- **Bilah Bawah:** Tinggi 56px, latar `#FFFFFF/98` dengan border atas `border-zinc-200`, tab aktif ditandai garis aksen minimalis.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** sediakan target sentuh minimal 40px (`h-10`) hingga 44px (`h-11`) untuk seluruh tombol aksi utama guna kenyamanan navigasi satu jempol.
-- **Do** tampilkan nominal uang menggunakan utilitas `formatRupiah` dengan bobot `font-bold` atau `font-black`.
-- **Do** wajibkan pengisian Alasan Penolakan saat Pemilik Kost menolak bukti transfer penghuni.
-- **Do** pertahankan selektor pengujian Vitest (`Antrean Verifikasi Bukti`, `Setujui`, `Tolak`, `Lihat Bukti`) pada setiap perombakan visual.
+- **Do** gunakan perataan angka tabular (`tabular-nums`) untuk seluruh nominal uang dan nomor unit kamar.
+- **Do** gunakan garis pemisah hairline 1px tegas untuk mengelompokkan data yang padat.
+- **Do** jaga tinggi tombol aksi pada ukuran ergonomis 40px (`h-10`) untuk kemudahan sentuhan satu tangan.
+- **Do** patuhi terminologi resmi `CONTEXT.md` (`Pemilik Kost`, `Penghuni`, `Kamar`, `Tagihan`, `Bukti Pembayaran`).
 
 ### Don't:
-- **Don't** gunakan warna primer Emerald untuk elemen pasif, teks biasa, atau status netral ("The Emerald Reserve Rule").
-- **Don't** menduplikasi nomor kamar dan nama dalam badge tebal yang bertumpuk dalam satu baris.
-- **Don't** memakai bayangan hitam pekat (*heavy black drop shadow*) yang membuat UI ponsel terasa kusam dan berat.
-- **Don't** melanggar batas terminologi domain resmi di `CONTEXT.md` dengan memakai kata seperti Admin, Tenant, Room, Invoice, atau Bill.
+- **Don't** menggunakan bayangan warna-warni berpendar atau blur besar yang mengaburkan batas tabel data ("The Zero-Blur Rule").
+- **Don't** menyebarkan warna hijau/emerald di banyak tempat tanpa nilai aksi afirmatif ("The Single-Accent Doctrine").
+- **Don't** menggunakan sudut membulat balon berlebihan (seperti 24px–32px) yang memboroskan area layar mobile.
+- **Don't** menggunakan sinonim generik seperti Admin, Tenant, Room, Invoice, atau Bill.

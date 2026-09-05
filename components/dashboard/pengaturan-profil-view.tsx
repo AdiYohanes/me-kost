@@ -67,75 +67,75 @@ export function PengaturanProfilView({ user }: PengaturanProfilViewProps) {
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
+    <div className="space-y-4 animate-in fade-in duration-200">
       {/* Profil Header Card */}
-      <Card className="border-emerald-100 bg-linear-to-br from-emerald-500/10 via-white to-emerald-50/50 card-shadow overflow-hidden">
-        <CardHeader className="p-5 pb-3.5">
+      <Card className="card-shadow border-zinc-200 bg-white overflow-hidden">
+        <CardHeader className="p-4 sm:p-5 pb-3.5 border-b border-zinc-100">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 flex items-center gap-1">
-              <User className="w-3.5 h-3.5" />
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-700 flex items-center gap-1.5">
+              <User className="w-3.5 h-3.5 text-zinc-700" />
               Profil Akun
             </span>
             {isPemilik ? (
-              <Badge variant="lunas" className="text-[10px] gap-1">
+              <Badge variant="lunas" className="text-[10px] font-mono gap-1">
                 <ShieldCheck className="w-3 h-3" />
                 <span>Pemilik Kost</span>
               </Badge>
             ) : (
               <Badge
                 variant="outline"
-                className="text-[10px] border-emerald-300 text-emerald-800 font-semibold gap-1"
+                className="text-[10px] font-mono border-zinc-200 text-zinc-800 font-semibold gap-1"
               >
-                <DoorClosed className="w-3 h-3" />
+                <DoorClosed className="w-3 h-3 text-zinc-500" />
                 <span>Kamar {user.nomorKamar}</span>
               </Badge>
             )}
           </div>
-          <CardTitle className="text-lg font-black text-slate-900 mt-1">
+          <CardTitle className="text-base font-bold text-zinc-950 mt-1">
             {user.name}
           </CardTitle>
-          <CardDescription className="text-xs text-slate-500 mt-1">
+          <CardDescription className="text-[11px] font-mono text-zinc-500 mt-0.5">
             Username: @{user.username} • Kost Syantika
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="p-5 pt-0 space-y-3 text-xs">
+        <CardContent className="p-4 sm:p-5 pt-4 space-y-3 text-xs">
           {isPemilik ? (
-            <div className="p-3.5 rounded-xl bg-white/90 border border-emerald-100/80 space-y-2 shadow-2xs">
-              <div className="flex items-center justify-between text-slate-700">
-                <span className="text-slate-500">Total Properti:</span>
-                <span className="font-bold text-slate-900">8 Unit Kamar</span>
+            <div className="p-3 rounded-lg bg-zinc-50 border border-zinc-200 space-y-2">
+              <div className="flex items-center justify-between text-zinc-700">
+                <span className="text-zinc-500">Total Properti:</span>
+                <span className="font-bold text-zinc-950 font-mono">8 Unit Kamar</span>
               </div>
-              <div className="flex items-center justify-between text-slate-700">
-                <span className="text-slate-500">Lokasi:</span>
-                <span className="font-semibold text-slate-800">
+              <div className="flex items-center justify-between text-zinc-700">
+                <span className="text-zinc-500">Lokasi:</span>
+                <span className="font-medium text-zinc-900">
                   Ruang Pengelola, Lantai 1
                 </span>
               </div>
-              <div className="flex items-center justify-between text-slate-700">
-                <span className="text-slate-500">Jam Layanan:</span>
-                <span className="font-semibold text-slate-800">
+              <div className="flex items-center justify-between text-zinc-700">
+                <span className="text-zinc-500">Jam Layanan:</span>
+                <span className="font-mono text-zinc-900">
                   08:00 - 20:00 WIB
                 </span>
               </div>
             </div>
           ) : (
-            <div className="p-3.5 rounded-xl bg-white/90 border border-emerald-100/80 space-y-2 shadow-2xs">
-              <div className="flex items-center justify-between text-slate-700">
-                <span className="text-slate-500">Unit Kamar:</span>
-                <span className="font-bold text-slate-900">
+            <div className="p-3 rounded-lg bg-zinc-50 border border-zinc-200 space-y-2">
+              <div className="flex items-center justify-between text-zinc-700">
+                <span className="text-zinc-500">Unit Kamar:</span>
+                <span className="font-bold font-mono text-zinc-950">
                   Kamar {user.nomorKamar}
                 </span>
               </div>
-              <div className="flex items-center justify-between text-slate-700">
-                <span className="text-slate-500">Fasilitas Tipe:</span>
-                <span className="font-semibold text-slate-800">
+              <div className="flex items-center justify-between text-zinc-700">
+                <span className="text-zinc-500">Fasilitas Tipe:</span>
+                <span className="font-medium text-zinc-900">
                   {user.tipeKamar || "Kamar AC, Kamar Mandi Dalam"}
                 </span>
               </div>
-              <div className="flex items-center justify-between text-slate-700">
-                <span className="text-slate-500">Tarif Sewa Bulanan:</span>
-                <span className="font-bold text-emerald-700">
+              <div className="flex items-center justify-between text-zinc-700">
+                <span className="text-zinc-500">Tarif Sewa Bulanan:</span>
+                <span className="font-bold font-mono text-emerald-700 tabular-nums">
                   {formatRupiah(user.tarifBulanan || 1500000)} / bln
                 </span>
               </div>
@@ -145,23 +145,23 @@ export function PengaturanProfilView({ user }: PengaturanProfilViewProps) {
       </Card>
 
       {/* Info Rekening Kost Card */}
-      <Card className="card-shadow">
-        <CardHeader className="p-5 pb-3.5">
-          <CardTitle className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
-            <CreditCard className="w-4 h-4 text-emerald-600" />
+      <Card className="card-shadow border-zinc-200 bg-white overflow-hidden">
+        <CardHeader className="p-4 sm:p-5 pb-3 border-b border-zinc-100">
+          <CardTitle className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-700 flex items-center gap-1.5">
+            <CreditCard className="w-3.5 h-3.5 text-zinc-700" />
             <span>Rekening Resmi Kost Syantika</span>
           </CardTitle>
         </CardHeader>
-        <CardContent className="p-5 pt-0 space-y-2 text-xs">
-          <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between shadow-2xs">
+        <CardContent className="p-4 sm:p-5 pt-3 space-y-2 text-xs">
+          <div className="p-3 rounded-lg bg-zinc-50 border border-zinc-200 flex items-center justify-between">
             <div>
-              <p className="text-[11px] text-slate-500 font-medium">Bank BCA</p>
-              <p className="font-mono font-bold text-sm text-slate-900 tracking-wider mt-0.5">
+              <p className="text-[11px] font-mono text-zinc-500 font-medium">Bank BCA</p>
+              <p className="font-mono font-bold text-sm text-zinc-950 tracking-wider mt-0.5 tabular-nums">
                 8830-192-881
               </p>
-              <p className="text-[11px] text-slate-600 mt-0.5">a.n. Ibu Hj. Syantika</p>
+              <p className="text-[11px] text-zinc-600 mt-0.5">a.n. Ibu Hj. Syantika</p>
             </div>
-            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100/80 px-2.5 py-1 rounded-md">
+            <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
               Terkonfirmasi
             </span>
           </div>
@@ -169,30 +169,30 @@ export function PengaturanProfilView({ user }: PengaturanProfilViewProps) {
       </Card>
 
       {/* Utilitas & Simulasi Demo */}
-      <Card className="card-shadow border-amber-200/80 bg-amber-50/20">
-        <CardHeader className="p-5 pb-3">
-          <div className="flex items-center justify-between mb-1">
-            <CardTitle className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4 text-amber-600" />
+      <Card className="card-shadow border-zinc-200 bg-white overflow-hidden">
+        <CardHeader className="p-4 sm:p-5 pb-3 border-b border-zinc-100">
+          <div className="flex items-center justify-between mb-0.5">
+            <CardTitle className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-700 flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-amber-600" />
               <span>Utilitas & Simulasi Demo</span>
             </CardTitle>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-100 text-amber-800">
+            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">
               Demo Tool
             </span>
           </div>
-          <CardDescription className="text-xs text-slate-600 leading-relaxed mt-1">
+          <CardDescription className="text-[11px] text-zinc-500 leading-relaxed mt-1">
             Kembalikan seluruh data transaksi, unggahan bukti, verifikasi, dan status tagihan ke kondisi awal data benih (seed).
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="p-5 pt-0 space-y-3">
+        <CardContent className="p-4 sm:p-5 pt-4 space-y-2.5">
           <Button
             type="button"
             variant="outline"
             onClick={() => setIsResetDialogOpen(true)}
-            className="w-full h-10 text-xs font-bold text-amber-800 border-amber-300 bg-amber-50 hover:bg-amber-100 hover:text-amber-900 gap-2 shadow-2xs cursor-pointer"
+            className="w-full h-9.5 text-xs font-semibold text-amber-900 border-amber-300 bg-amber-50/70 hover:bg-amber-100 hover:text-amber-950 gap-2 rounded-md cursor-pointer"
           >
-            <RotateCcw className="w-4 h-4 text-amber-700" />
+            <RotateCcw className="w-3.5 h-3.5 text-amber-700" />
             <span>Reset Mock Data ke Kondisi Awal</span>
           </Button>
 
@@ -200,7 +200,7 @@ export function PengaturanProfilView({ user }: PengaturanProfilViewProps) {
             type="button"
             variant="outline"
             onClick={handleLogout}
-            className="w-full h-10 text-xs font-semibold text-rose-600 border-rose-200 hover:bg-rose-50 hover:text-rose-700 gap-1.5 cursor-pointer"
+            className="w-full h-9.5 text-xs font-medium text-rose-700 border-zinc-200 hover:bg-rose-50 hover:border-rose-200 gap-1.5 rounded-md cursor-pointer"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>Keluar dari Akun (Logout)</span>

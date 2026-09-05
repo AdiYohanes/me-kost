@@ -45,37 +45,36 @@ export function PemilikDashboardView({
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       {/* Welcome Banner Card */}
-      <Card className="border-emerald-100 bg-linear-to-br from-emerald-500/10 via-white to-emerald-50/50 card-shadow overflow-hidden relative">
-        <div className="absolute top-0 right-0 -mt-3 -mr-3 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl pointer-events-none" />
-        <CardHeader className="p-5 pb-3">
+      <Card className="card-shadow border-zinc-200 bg-white overflow-hidden">
+        <CardHeader className="p-4 sm:p-5 pb-3.5 border-b border-zinc-100">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5" />
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-700 flex items-center gap-1.5">
+              <ShieldCheck className="w-3.5 h-3.5 text-zinc-700" />
               Panel Pengelola Properti
             </span>
-            <Badge variant="lunas" className="text-[10px]">
+            <Badge variant="lunas" className="text-[10px] font-mono">
               Sesi Aktif
             </Badge>
           </div>
-          <CardTitle className="text-lg font-black text-slate-900 mt-1">
+          <CardTitle className="text-base sm:text-lg font-bold text-zinc-950 mt-1">
             Selamat Datang, {user.name}
           </CardTitle>
-          <CardDescription className="text-xs text-slate-600 mt-1">
+          <CardDescription className="text-xs text-zinc-600 mt-0.5">
             Pantau ringkasan keuangan dan verifikasi bukti pembayaran sewa 8 kamar Kost Syantika untuk periode {currentPeriodeLabel}.
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="p-5 pt-0">
-          <div className="p-3.5 bg-white/90 rounded-xl border border-emerald-100/80 flex items-center justify-between text-xs text-slate-700 shadow-2xs">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-                <Building2 className="w-4 h-4" />
+        <CardContent className="p-4 sm:p-5 pt-3">
+          <div className="p-3 bg-zinc-50 rounded-lg border border-zinc-200 flex items-center justify-between text-xs text-zinc-700">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded bg-zinc-900 text-white flex items-center justify-center shrink-0">
+                <Building2 className="w-3.5 h-3.5" />
               </div>
-              <span className="font-semibold text-slate-800">
+              <span className="font-semibold text-zinc-900">
                 8 Unit Kamar Aktif (101 - 108)
               </span>
             </div>
-            <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200/60">
+            <span className="text-[11px] font-mono font-medium text-zinc-700 bg-white px-2 py-0.5 rounded border border-zinc-200">
               {currentPeriodeLabel}
             </span>
           </div>
