@@ -116,46 +116,39 @@ export function PemilikVerifikasiAntrean() {
                     key={tagihan.id}
                     className="p-4 bg-white rounded-xl border border-slate-200/90 shadow-xs space-y-3 hover:border-amber-300 transition-colors"
                   >
-                    {/* Header Item: Kamar, Nama, Nominal */}
+                    {/* Header Item: Kamar, Nama, Waktu, Nominal */}
                     <div className="flex items-start justify-between gap-2.5">
-                      <div className="flex items-center gap-3">
-                        <div className="flex flex-col items-center justify-center w-11 h-11 rounded-xl bg-amber-500 text-white shadow-xs shrink-0">
-                          <span className="text-[8px] uppercase tracking-wider font-semibold opacity-90 leading-tight">
-                            Kamar
-                          </span>
-                          <span className="text-xs font-black leading-none">
-                            {tagihan.nomorKamar}
-                          </span>
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-1.5">
-                            <p className="text-xs font-bold text-slate-900 leading-tight">
-                              Kamar {tagihan.nomorKamar} • {tagihan.penghuniNama}
-                            </p>
-                          </div>
-                          <p className="text-[10px] text-slate-500 flex items-center gap-1 mt-1">
-                            <Calendar className="w-3 h-3 text-slate-400" />
+                      <div className="flex items-start gap-3 min-w-0">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200/80 shrink-0">
+                          Kamar {tagihan.nomorKamar}
+                        </span>
+                        <div className="min-w-0">
+                          <h4 className="text-sm font-bold text-slate-900 leading-snug truncate">
+                            {tagihan.penghuniNama}
+                          </h4>
+                          <p className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
+                            <Calendar className="w-3 h-3 text-slate-400 shrink-0" />
                             <span>Unggah: {formattedUploadTime}</span>
                           </p>
                         </div>
                       </div>
 
                       <div className="text-right shrink-0">
-                        <span className="text-xs font-black text-slate-900 block">
+                        <span className="text-sm sm:text-base font-black text-slate-900 block">
                           {formatRupiah(tagihan.nominal)}
                         </span>
-                        <Badge variant="pending" className="text-[9px] py-0 px-1.5 h-4 mt-0.5">
-                          Perlu Verifikasi
-                        </Badge>
+                        <span className="text-[10px] text-slate-500 font-medium">
+                          Sewa Bulanan
+                        </span>
                       </div>
                     </div>
 
                     {/* Thumbnail & Tenant Note */}
-                    <div className="flex items-center gap-3 p-3 bg-slate-50/90 rounded-xl border border-slate-100">
+                    <div className="flex items-center gap-3.5 p-3.5 bg-slate-50/80 rounded-xl border border-slate-200/70 hover:bg-slate-50 transition-colors">
                       {tagihan.buktiPembayaran && (
                         <div
                           onClick={() => setSelectedTagihanForLightbox(tagihan)}
-                          className="w-14 h-14 rounded-lg border border-slate-200 overflow-hidden bg-slate-900/5 shrink-0 cursor-pointer relative group"
+                          className="w-14 h-16 rounded-lg border border-slate-200 overflow-hidden bg-slate-100 shrink-0 cursor-pointer relative group shadow-xs"
                           title="Klik untuk memperbesar bukti transfer"
                         >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -164,19 +157,19 @@ export function PemilikVerifikasiAntrean() {
                             alt={`Thumbnail bukti kamar ${tagihan.nomorKamar}`}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                           />
-                          <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
-                            <Eye className="w-3.5 h-3.5" />
+                          <div className="absolute right-1 bottom-1 bg-black/60 text-white rounded-full p-1 backdrop-blur-xs flex items-center justify-center">
+                            <Eye className="w-3 h-3" />
                           </div>
                         </div>
                       )}
 
-                      <div className="text-[11px] text-slate-600 flex-1 min-w-0">
+                      <div className="text-xs text-slate-600 flex-1 min-w-0">
                         {tagihan.buktiPembayaran?.catatanPenghuni ? (
-                          <p className="line-clamp-2 italic text-slate-700">
+                          <p className="line-clamp-2 italic text-slate-700 font-medium leading-relaxed">
                             &ldquo;{tagihan.buktiPembayaran.catatanPenghuni}&rdquo;
                           </p>
                         ) : (
-                          <p className="text-slate-400">
+                          <p className="text-slate-400 text-[11px] italic">
                             Tidak ada catatan tambahan dari penghuni.
                           </p>
                         )}
@@ -185,24 +178,24 @@ export function PemilikVerifikasiAntrean() {
                           variant="link"
                           size="sm"
                           onClick={() => setSelectedTagihanForLightbox(tagihan)}
-                          className="h-auto p-0 text-[10px] text-emerald-600 font-semibold gap-1 mt-1.5 cursor-pointer"
+                          className="h-auto p-0 text-[11px] text-emerald-600 font-bold hover:text-emerald-700 gap-1.5 mt-1.5 cursor-pointer inline-flex items-center"
                         >
-                          <Eye className="w-3 h-3" />
+                          <Eye className="w-3.5 h-3.5" />
                           <span>Lihat Bukti Ukuran Penuh</span>
                         </Button>
                       </div>
                     </div>
 
                     {/* Actions: Tolak vs Setujui */}
-                    <div className="flex items-center gap-2.5 pt-2.5 border-t border-slate-100">
+                    <div className="flex items-center gap-3 pt-3 border-t border-slate-100/80">
                       <Button
                         type="button"
                         variant="outline"
                         size="sm"
                         onClick={() => setSelectedTagihanForReject(tagihan)}
-                        className="flex-1 h-9 text-xs font-semibold text-rose-600 border-rose-200 hover:bg-rose-50 hover:border-rose-300 gap-1.5 cursor-pointer"
+                        className="flex-1 h-10 text-xs font-bold text-rose-700 bg-rose-50/80 hover:bg-rose-100 border-rose-200/90 gap-2 rounded-xl active:scale-[0.98] transition-all cursor-pointer"
                       >
-                        <XCircle className="w-3.5 h-3.5" />
+                        <XCircle className="w-4 h-4 text-rose-600" />
                         <span>Tolak</span>
                       </Button>
 
@@ -210,9 +203,9 @@ export function PemilikVerifikasiAntrean() {
                         type="button"
                         size="sm"
                         onClick={() => handleApprove(tagihan)}
-                        className="flex-1 h-9 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 shadow-xs cursor-pointer"
+                        className="flex-1 h-10 text-xs font-bold bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white gap-2 rounded-xl shadow-sm shadow-emerald-600/25 hover:shadow-md hover:shadow-emerald-600/30 active:scale-[0.98] transition-all cursor-pointer"
                       >
-                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <CheckCircle2 className="w-4 h-4 text-white" />
                         <span>Setujui</span>
                       </Button>
                     </div>
