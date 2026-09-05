@@ -20,6 +20,9 @@ describe("PemilikVerifikasiAntrean", () => {
     expect(screen.getByText(/Kamar 107/i)).toBeInTheDocument();
     expect(screen.getByText(/Dewi Lestari/i)).toBeInTheDocument();
 
+    // Label penjelas nominal Sewa Bulanan ter-render
+    expect(screen.getAllByText(/Sewa Bulanan/i).length).toBe(2);
+
     // Tombol Setujui dan Tolak tersedia untuk masing-masing
     expect(screen.getAllByRole("button", { name: /Setujui/i }).length).toBe(2);
     expect(screen.getAllByRole("button", { name: /Tolak/i }).length).toBe(2);
