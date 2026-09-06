@@ -113,12 +113,29 @@ pnpm run build
 
 ---
 
-## 📱 PWA (Install di Smartphone)
+## 📱 Cara Memasang di Smartphone (PWA)
 
-1. Buka URL aplikasi di browser smartphone (Safari di iOS atau Chrome di Android).
-2. Tekan menu **Share** (iOS) atau titik tiga (Android).
-3. Pilih **"Add to Home Screen"** (*Tambahkan ke Layar Utama*).
-4. Me Kost akan terpasang sebagai aplikasi standalone dengan pengalaman layar penuh tanpa bar alamat browser.
+Aplikasi **Me Kost** berbasis Progressive Web App (PWA), sehingga dapat di-install langsung ke layar ponsel tanpa perlu mengunduh dari Google Play Store atau Apple App Store.
+
+### 🤖 Untuk Pengguna Android (Google Chrome)
+1. Buka URL aplikasi di peramban **Google Chrome**.
+2. Ketuk ikon **titik tiga (⋮)** di pojok kanan atas layar.
+3. Pilih opsi **"Instal aplikasi"** atau **"Tambahkan ke Layar Utama"** (*Add to Home screen*).
+4. Ketuk **Instal**.
+5. Ikon **Me Kost** akan otomatis muncul di menu aplikasi/Homescreen HP Anda dan dapat dibuka secara *full-screen* seperti aplikasi Android bawaan.
+
+### 🍏 Untuk Pengguna iPhone / iPad (Safari)
+1. Buka URL aplikasi di peramban **Safari** *(wajib menggunakan Safari)*.
+2. Ketuk ikon **Share / Bagikan** (ikon kotak dengan tanda panah ke atas di bagian bawah layar).
+3. Gulir ke bawah, lalu pilih menu **"Add to Home Screen"** (*Tambahkan ke Layar Utama*).
+4. Ketuk **Add** di pojok kanan atas.
+5. Ikon **Me Kost** akan langsung terpasang di Homescreen iPhone Anda.
+
+### ✨ Keunggulan PWA Me Kost
+- **Tanpa Unduh App Store/Play Store**: Menghemat ruang penyimpanan HP.
+- **Tampilan Standalone**: Bersih dan bebas dari bilah URL/tab browser.
+- **Selalu Terbarui**: Pembaruan fitur otomatis diterima tanpa perlu update manual di store.
+- **Realtime Notification & Sync**: Terintegrasi langsung dengan Supabase Realtime untuk pembaruan status pembayaran seketika.
 
 ---
 
