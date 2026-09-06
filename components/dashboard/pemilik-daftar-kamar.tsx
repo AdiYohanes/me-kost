@@ -654,51 +654,18 @@ export function PemilikDaftarKamar() {
                   key={kamar.id}
                   className="p-3 sm:p-3.5 rounded-lg bg-white border border-zinc-200 hover:border-zinc-300 transition-colors space-y-2.5"
                 >
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2.5">
-                      <span className="w-8 h-8 rounded-lg bg-zinc-900 text-white font-bold text-xs flex items-center justify-center shrink-0 tabular-nums">
-                        {kamar.nomorKamar}
-                      </span>
-                      <div>
-                        <p className="text-sm font-bold text-zinc-950 leading-tight">
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                        <span className="w-8 h-8 rounded-lg bg-zinc-900 text-white font-bold text-xs flex items-center justify-center shrink-0 tabular-nums">
+                          {kamar.nomorKamar}
+                        </span>
+                        <p className="text-sm font-bold text-zinc-950 leading-tight truncate">
                           {penghuniNama}
                         </p>
-                        <div className="flex items-center gap-1.5 text-xs text-zinc-500 mt-0.5">
-                          <span className="tabular-nums font-medium">
-                            {formatRupiah(nominalSewa)} / bln
-                          </span>
-                          <span>•</span>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setSelectedTagihanForTarif(
-                                tagihan || {
-                                  id: `tagihan-${kamar.nomorKamar}`,
-                                  kamarId: kamar.id,
-                                  nomorKamar: kamar.nomorKamar,
-                                  penghuniId: kamar.penghuni?.id || "",
-                                  penghuniNama,
-                                  periodeBulan: currentPeriodeLabel,
-                                  tahun: currentTahun,
-                                  bulan: currentBulan,
-                                  nominal: nominalSewa,
-                                  batasBayar: batasBayarText,
-                                  status: "BELUM_BAYAR",
-                                }
-                              )
-                            }
-                            className="inline-flex items-center gap-0.5 text-xs font-semibold text-emerald-700 hover:text-emerald-800 hover:underline cursor-pointer"
-                            aria-label={`Ubah Tarif Kamar ${kamar.nomorKamar}`}
-                          >
-                            <Edit3 className="w-2.5 h-2.5" />
-                            <span>Ubah Tarif</span>
-                          </button>
-                        </div>
                       </div>
-                    </div>
 
-                    <div className="flex flex-col items-end gap-1 shrink-0">
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1.5 shrink-0">
                         <Badge
                           variant="outline"
                           className="text-xs font-medium text-emerald-700 bg-emerald-50 border-emerald-200"
@@ -708,11 +675,44 @@ export function PemilikDaftarKamar() {
                         {renderBadgeStatus(tagihan)}
                       </div>
                     </div>
+
+                    {/* Tarif & Ubah Tarif */}
+                    <div className="flex items-center gap-1.5 text-xs text-zinc-500 pl-10.5">
+                      <span className="tabular-nums font-medium text-zinc-700">
+                        {formatRupiah(nominalSewa)} / bln
+                      </span>
+                      <span className="text-zinc-300">•</span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setSelectedTagihanForTarif(
+                            tagihan || {
+                              id: `tagihan-${kamar.nomorKamar}`,
+                              kamarId: kamar.id,
+                              nomorKamar: kamar.nomorKamar,
+                              penghuniId: kamar.penghuni?.id || "",
+                              penghuniNama,
+                              periodeBulan: currentPeriodeLabel,
+                              tahun: currentTahun,
+                              bulan: currentBulan,
+                              nominal: nominalSewa,
+                              batasBayar: batasBayarText,
+                              status: "BELUM_BAYAR",
+                            }
+                          )
+                        }
+                        className="inline-flex items-center gap-0.5 text-xs font-semibold text-emerald-700 hover:text-emerald-800 hover:underline cursor-pointer"
+                        aria-label={`Ubah Tarif Kamar ${kamar.nomorKamar}`}
+                      >
+                        <Edit3 className="w-2.5 h-2.5" />
+                        <span>Ubah Tarif</span>
+                      </button>
+                    </div>
                   </div>
 
                   {/* Info Email Google & Aksi Cepat Ubah Email */}
                   <div className="flex items-center justify-between text-xs text-zinc-600 bg-zinc-50/80 px-2.5 py-1.5 rounded-md border border-zinc-100">
-                    <div className="flex items-center gap-1.5 truncate">
+                    <div className="flex items-center gap-1.5 min-w-0 flex-1">
                       <Mail className="w-3 h-3 text-zinc-400 shrink-0" />
                       <span className="truncate text-zinc-600">
                         {penghuniEmail || "Belum ada email Google"}
@@ -729,80 +729,84 @@ export function PemilikDaftarKamar() {
                     </button>
                   </div>
 
-                  {/* Baris Aksi Kontekstual */}
+                  {/* Baris Jatuh Tempo & Pengingat WA */}
                   <div className="flex items-center justify-between pt-2 border-t border-zinc-100 text-xs">
-                    <span className="text-xs text-zinc-400 font-normal">
+                    <span className="text-xs text-zinc-500 font-medium">
                       Jatuh tempo: {batasBayarText}
                     </span>
 
-                    <div className="flex items-center gap-2">
-                      {waUrl && (
-                        <a
-                          href={waUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label={`Hubungi Kamar ${kamar.nomorKamar} via WhatsApp`}
-                          className="inline-flex items-center justify-center whitespace-nowrap transition-all h-7.5 px-2.5 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white gap-1.5 rounded-md cursor-pointer shadow-xs"
-                        >
-                          <MessageCircle className="w-3.5 h-3.5" />
-                          <span>{isMenunggak ? "Tegur WA" : "Pengingat WA"}</span>
-                        </a>
-                      )}
-                      {tagihan?.status === "MENUNGGU_VERIFIKASI" && (
-                        <Button
-                          type="button"
-                          size="sm"
-                          onClick={() => setSelectedTagihanForLightbox(tagihan)}
-                          className="h-7.5 px-2.5 text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-white gap-1 rounded-md cursor-pointer"
-                        >
-                          <Eye className="w-3 h-3" />
-                          <span>Periksa Bukti</span>
-                        </Button>
-                      )}
+                    {waUrl && (
+                      <a
+                        href={waUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`Hubungi Kamar ${kamar.nomorKamar} via WhatsApp`}
+                        className="inline-flex items-center justify-center whitespace-nowrap transition-all h-7 px-2.5 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white gap-1 rounded-md cursor-pointer shadow-xs shrink-0"
+                      >
+                        <MessageCircle className="w-3.5 h-3.5" />
+                        <span>{isMenunggak ? "Tegur WA" : "Pengingat WA"}</span>
+                      </a>
+                    )}
+                  </div>
 
-                      {(!tagihan ||
-                        tagihan.status === "BELUM_BAYAR" ||
-                        tagihan.status === "DITOLAK") && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            setSelectedTagihanForCash(
-                              tagihan || {
-                                id: `tagihan-${kamar.nomorKamar}`,
-                                kamarId: kamar.id,
-                                nomorKamar: kamar.nomorKamar,
-                                penghuniId: kamar.penghuni?.id || "",
-                                penghuniNama,
-                                periodeBulan: currentPeriodeLabel,
-                                tahun: currentTahun,
-                                bulan: currentBulan,
-                                nominal: nominalSewa,
-                                batasBayar: batasBayarText,
-                                status: "BELUM_BAYAR",
-                              }
-                            )
-                          }
-                          className="h-7.5 px-2.5 text-xs font-medium text-zinc-800 border-zinc-200 hover:bg-zinc-50 gap-1.5 rounded-md cursor-pointer"
-                        >
-                          <Banknote className="w-3.5 h-3.5 text-emerald-600" />
-                          <span>Tandai Lunas (Cash)</span>
-                        </Button>
-                      )}
-
+                  {/* Tombol Aksi di Bawah (Flex Row) */}
+                  <div className="flex items-center gap-2 pt-0.5">
+                    {tagihan?.status === "MENUNGGU_VERIFIKASI" && (
                       <Button
                         type="button"
-                        variant="ghost"
                         size="sm"
-                        onClick={() => setSelectedKamarForKeluarkan(kamar)}
-                        className="h-7.5 px-2 text-xs font-medium text-rose-600 hover:bg-rose-50 hover:text-rose-700 gap-1 rounded-md cursor-pointer"
-                        aria-label={`Keluarkan Penghuni Kamar ${kamar.nomorKamar}`}
+                        onClick={() => setSelectedTagihanForLightbox(tagihan)}
+                        className="flex-1 h-8 px-2.5 text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-white gap-1.5 rounded-md cursor-pointer justify-center"
                       >
-                        <UserMinus className="w-3 h-3" />
-                        <span>Keluarkan Penghuni</span>
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>Periksa Bukti</span>
                       </Button>
-                    </div>
+                    )}
+
+                    {(!tagihan ||
+                      tagihan.status === "BELUM_BAYAR" ||
+                      tagihan.status === "DITOLAK") && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          setSelectedTagihanForCash(
+                            tagihan || {
+                              id: `tagihan-${kamar.nomorKamar}`,
+                              kamarId: kamar.id,
+                              nomorKamar: kamar.nomorKamar,
+                              penghuniId: kamar.penghuni?.id || "",
+                              penghuniNama,
+                              periodeBulan: currentPeriodeLabel,
+                              tahun: currentTahun,
+                              bulan: currentBulan,
+                              nominal: nominalSewa,
+                              batasBayar: batasBayarText,
+                              status: "BELUM_BAYAR",
+                            }
+                          )
+                        }
+                        className="flex-1 h-8 px-2.5 text-xs font-medium text-zinc-800 border-zinc-200 hover:bg-zinc-50 gap-1.5 rounded-md cursor-pointer justify-center"
+                      >
+                        <Banknote className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Tandai Lunas (Cash)</span>
+                      </Button>
+                    )}
+
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setSelectedKamarForKeluarkan(kamar)}
+                      className={`${
+                        tagihan?.status === "LUNAS" ? "w-full" : "flex-1"
+                      } h-8 px-2 text-xs font-medium text-rose-600 bg-rose-50/50 hover:bg-rose-100/70 hover:text-rose-700 border border-rose-100 hover:border-rose-200 gap-1.5 rounded-md cursor-pointer justify-center`}
+                      aria-label={`Keluarkan Penghuni Kamar ${kamar.nomorKamar}`}
+                    >
+                      <UserMinus className="w-3.5 h-3.5" />
+                      <span>Keluarkan Penghuni</span>
+                    </Button>
                   </div>
                 </div>
               );
