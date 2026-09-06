@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Users,
   Banknote,
@@ -9,6 +9,7 @@ import {
   Eye,
   CalendarPlus,
   Filter,
+  ChevronDown,
   Edit3,
   UserPlus,
   UserMinus,
@@ -80,6 +81,26 @@ export function PemilikDaftarKamar() {
   const [selectedTagihanForTarif, setSelectedTagihanForTarif] =
     useState<Tagihan | null>(null);
   const [isBuatPeriodeOpen, setIsBuatPeriodeOpen] = useState(false);
+  const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsFilterDropdownOpen(false);
+      }
+    };
+
+    if (isFilterDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isFilterDropdownOpen]);
 
   // Modal State untuk Manajemen Kamar (Issue 03)
   const [selectedKamarForTambah, setSelectedKamarForTambah] =
@@ -130,6 +151,59 @@ export function PemilikDaftarKamar() {
       }
     }
   });
+
+  const filterOptions = [
+    {
+      id: "SEMUA" as const,
+      label: "Semua",
+      count: sortedKamarList.length,
+      color: "bg-zinc-900",
+      ariaLabel: `Semua (${sortedKamarList.length})`,
+    },
+    {
+      id: "BUTUH_VERIFIKASI" as const,
+      label: "Butuh Verifikasi",
+      count: countPending,
+      color: "bg-amber-500",
+      ariaLabel: `Butuh Verifikasi (${countPending})`,
+    },
+    {
+      id: "H3" as const,
+      label: "Mendekati Jatuh Tempo (H-3)",
+      count: countH3,
+      color: "bg-amber-500",
+      ariaLabel: `Mendekati Jatuh Tempo (H-3) (${countH3})`,
+    },
+    {
+      id: "MENUNGGAK" as const,
+      label: "Menunggak",
+      count: countMenunggak,
+      color: "bg-rose-500",
+      ariaLabel: `Menunggak (${countMenunggak})`,
+    },
+    {
+      id: "LUNAS" as const,
+      label: "Lunas",
+      count: countLunas,
+      color: "bg-emerald-500",
+      ariaLabel: `Lunas (${countLunas})`,
+    },
+    {
+      id: "KOSONG" as const,
+      label: "Kamar Kosong",
+      count: countKosong,
+      color: "bg-slate-500",
+      ariaLabel: `Kamar Kosong (${countKosong})`,
+    },
+  ];
+
+  const currentOption =
+    filterOptions.find(
+      (opt) =>
+        opt.id === activeFilter ||
+        (opt.id === "BUTUH_VERIFIKASI" &&
+          activeFilter === "MENUNGGU_VERIFIKASI")
+    ) || filterOptions[0];
 
   const filteredList = sortedKamarList.filter((kamar) => {
     if (activeFilter === "SEMUA") return true;
@@ -367,7 +441,7 @@ export function PemilikDaftarKamar() {
 
   return (
     <div className="space-y-3">
-      <Card className="card-shadow border-zinc-200 bg-white overflow-hidden">
+      <Card className="card-shadow border-zinc-200 bg-white">
         <CardHeader className="p-4 sm:p-5 pb-3.5 border-b border-zinc-100">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-2">
             <div className="flex items-center justify-between sm:justify-start sm:gap-3">
@@ -397,86 +471,78 @@ export function PemilikDaftarKamar() {
             </Button>
           </div>
 
-          {/* Filter Status Pills (Issue 04) */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-3 no-scrollbar">
+          {/* Filter Status Dropdown */}
+          <div className="relative pt-3" ref={dropdownRef}>
             <button
               type="button"
-              onClick={() => setActiveFilter("SEMUA")}
-              aria-label={`Semua (${sortedKamarList.length})`}
-              className={`px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors cursor-pointer border ${
-                activeFilter === "SEMUA"
-                  ? "bg-zinc-900 text-white border-zinc-900 font-semibold"
-                  : "bg-zinc-50 text-zinc-600 hover:bg-zinc-100 border-zinc-200/80"
-              }`}
+              onClick={() => setIsFilterDropdownOpen((prev) => !prev)}
+              aria-label={`Filter Status: ${currentOption.label} (${currentOption.count})`}
+              aria-expanded={isFilterDropdownOpen}
+              aria-haspopup="true"
+              className="w-full flex items-center justify-between px-3 py-2 rounded-lg border border-zinc-200 bg-zinc-50/80 hover:bg-zinc-100 text-xs font-medium text-zinc-800 transition-colors cursor-pointer"
             >
-              Semua ({sortedKamarList.length})
+              <div className="flex items-center gap-2 min-w-0">
+                <Filter className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
+                <span className="text-zinc-500 font-normal shrink-0">Filter Status:</span>
+                <span className="font-semibold text-zinc-900 truncate">
+                  {currentOption.label} ({currentOption.count})
+                </span>
+              </div>
+              <ChevronDown
+                className={`w-4 h-4 text-zinc-500 transition-transform duration-200 shrink-0 ${
+                  isFilterDropdownOpen ? "rotate-180" : ""
+                }`}
+              />
             </button>
 
-            <button
-              type="button"
-              onClick={() => setActiveFilter("BUTUH_VERIFIKASI")}
-              aria-label={`Butuh Verifikasi (${countPending})`}
-              className={`px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors cursor-pointer border ${
-                activeFilter === "BUTUH_VERIFIKASI" ||
-                activeFilter === "MENUNGGU_VERIFIKASI"
-                  ? "bg-amber-600 text-white border-amber-600 font-semibold"
-                  : "bg-zinc-50 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 border-zinc-200"
+            {/* Dropdown Menu Popover */}
+            <div
+              className={`absolute left-0 right-0 top-full mt-1.5 z-30 bg-white border border-zinc-200 rounded-xl shadow-lg p-1.5 transition-all duration-150 origin-top space-y-1 ${
+                isFilterDropdownOpen
+                  ? "opacity-100 scale-100 pointer-events-auto"
+                  : "opacity-0 scale-95 pointer-events-none"
               }`}
             >
-              Butuh Verifikasi ({countPending})
-            </button>
+              {filterOptions.map((opt) => {
+                const isSelected =
+                  opt.id === activeFilter ||
+                  (opt.id === "BUTUH_VERIFIKASI" &&
+                    activeFilter === "MENUNGGU_VERIFIKASI");
 
-            <button
-              type="button"
-              onClick={() => setActiveFilter("H3")}
-              aria-label={`Mendekati Jatuh Tempo (H-3) (${countH3})`}
-              className={`px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors cursor-pointer border ${
-                activeFilter === "H3"
-                  ? "bg-amber-600 text-white border-amber-600 font-semibold"
-                  : "bg-zinc-50 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 border-zinc-200"
-              }`}
-            >
-              Mendekati Jatuh Tempo (H-3) ({countH3})
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveFilter("MENUNGGAK")}
-              aria-label={`Menunggak (${countMenunggak})`}
-              className={`px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors cursor-pointer border ${
-                activeFilter === "MENUNGGAK"
-                  ? "bg-rose-600 text-white border-rose-600 font-semibold"
-                  : "bg-zinc-50 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 border-zinc-200"
-              }`}
-            >
-              Menunggak ({countMenunggak})
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveFilter("LUNAS")}
-              aria-label={`Lunas (${countLunas})`}
-              className={`px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors cursor-pointer border ${
-                activeFilter === "LUNAS"
-                  ? "bg-emerald-600 text-white border-emerald-600 font-semibold"
-                  : "bg-zinc-50 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 border-zinc-200"
-              }`}
-            >
-              Lunas ({countLunas})
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveFilter("KOSONG")}
-              aria-label={`Kamar Kosong (${countKosong})`}
-              className={`px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors cursor-pointer border ${
-                activeFilter === "KOSONG"
-                  ? "bg-slate-700 text-white border-slate-700 font-semibold"
-                  : "bg-zinc-50 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 border-zinc-200"
-              }`}
-            >
-              Kamar Kosong ({countKosong})
-            </button>
+                return (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => {
+                      setActiveFilter(opt.id);
+                      setIsFilterDropdownOpen(false);
+                    }}
+                    aria-label={opt.ariaLabel}
+                    className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-xs transition-colors cursor-pointer text-left ${
+                      isSelected
+                        ? "bg-zinc-100 text-zinc-900 font-semibold"
+                        : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 font-medium"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`w-2 h-2 rounded-full shrink-0 ${opt.color}`}
+                      />
+                      <span>{opt.label}</span>
+                    </div>
+                    <span
+                      className={`text-xs font-semibold px-2 py-0.5 rounded tabular-nums ${
+                        isSelected
+                          ? "bg-zinc-900 text-white"
+                          : "bg-zinc-100 text-zinc-600"
+                      }`}
+                    >
+                      {opt.count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </CardHeader>
 
