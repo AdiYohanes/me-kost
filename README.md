@@ -139,6 +139,20 @@ Aplikasi **Me Kost** berbasis Progressive Web App (PWA), sehingga dapat di-insta
 
 ---
 
+## ⚡ Supabase Keep-Alive (Anti Auto-Pause)
+
+Paket gratis Supabase secara otomatis menonaktifkan (*pause*) project jika tidak ada aktivitas selama 7 hari. Repositori ini telah dilengkapi dengan **GitHub Actions Cron Workflow** otomatis (`.github/workflows/supabase-keep-alive.yml`) yang melakukan *ping* query database setiap 3 hari sekali.
+
+### Langkah Aktivasi di GitHub:
+1. Buka repositori Anda di GitHub $\rightarrow$ **Settings** $\rightarrow$ **Secrets and variables** $\rightarrow$ **Actions**.
+2. Klik tombol **New repository secret**, lalu tambahkan:
+   - `NEXT_PUBLIC_SUPABASE_URL`: URL project Supabase Anda (misal `https://xxxx.supabase.co`).
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Kunci anonim publik Supabase Anda.
+   - *(Opsional)* `APP_URL`: URL web deploy Anda (misal `https://kost-syantika.vercel.app`) untuk memicu endpoint `/api/keep-alive`.
+3. Buka tab **Actions** di GitHub $\rightarrow$ pilih workflow **Supabase Keep-Alive** $\rightarrow$ klik **Run workflow** untuk menguji secara instan.
+
+---
+
 ## 📄 Lisensi
 
 Didistribusikan di bawah Lisensi MIT. Bebas digunakan, dipelajari, dan dikembangkan untuk keperluan pribadi maupun bisnis kost Anda.

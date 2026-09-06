@@ -1,0 +1,67 @@
+name: Supabase Keep-Alive
+
+on:
+  schedule:
+    # Berjalan otomatis setiap 3 hari sekali pada pukul 00:00 UTC (07:00 WIB)
+    - cron: '0 0 */3 * *'
+  workflow_dispatch: # Mengizinkan tombol manual "Run workflow" di tab Actions GitHub
+
+jobs:
+  ping:
+    name: Prevent Supabase Project Auto-Pause
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Ping Supabase & Web App
+        env:
+          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY || secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || secrets.SUPABASE_ANON_KEY }}
+          APP_URL: ${{ secrets.APP_URL }}
+        run: |
+          echo "========================================================"
+          echo "🚀 Memulai Supabase Keep-Alive Ping..."
+          echo "Waktu eksekusi: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          echo "========================================================"
+
+          if [ -z "$SUPABASE_URL" ] && [ -z "$APP_URL" ]; then
+            echo "❌ Error: Secret belum disetel di GitHub Secrets!"
+            echo "Harap buka GitHub -> Settings -> Secrets and variables -> Actions, lalu tambahkan salah satu:"
+            echo "  1. NEXT_PUBLIC_SUPABASE_URL dan NEXT_PUBLIC_SUPABASE_ANON_KEY"
+            echo "  2. ATAU APP_URL (contoh: https://me-kost.vercel.app)"
+            exit 1
+          fi
+
+          # 1. Ping via APP_URL /api/keep-alive jika disetel
+          if [ -n "$APP_URL" ]; then
+            CLEAN_APP_URL="${APP_URL%/}"
+            echo "🌐 Mengirim ping ke App Endpoint: $CLEAN_APP_URL/api/keep-alive"
+            HTTP_APP=$(curl -s -o app_res.json -w "%{http_code}" "$CLEAN_APP_URL/api/keep-alive" || echo "000")
+            echo "HTTP Status: $HTTP_APP"
+            cat app_res.json || true
+            echo ""
+          fi
+
+          # 2. Ping langsung ke Supabase REST API PostgREST
+          if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_KEY" ]; then
+            CLEAN_SB_URL="${SUPABASE_URL%/}"
+            echo "⚡ Mengirim query langsung ke Supabase: $CLEAN_SB_URL/rest/v1/kamar?select=id&limit=1"
+            HTTP_SB=$(curl -s -o sb_res.json -w "%{http_code}" \
+              -H "apikey: $SUPABASE_KEY" \
+              -H "Authorization: Bearer $SUPABASE_KEY" \
+              "$CLEAN_SB_URL/rest/v1/kamar?select=id&limit=1" || echo "000")
+
+            echo "HTTP Status: $HTTP_SB"
+            cat sb_res.json || true
+            echo ""
+
+            if [ "$HTTP_SB" -ge 200 ] && [ "$HTTP_SB" -lt 400 ]; then
+              echo "✅ SUKSES: Supabase database menerima query aktif. Database tidak akan ter-pause!"
+            else
+              echo "⚠️ HTTP Status: $HTTP_SB (Request tetap tercatat sebagai traffic aktif ke Supabase)."
+            fi
+          fi
+
+          echo "========================================================"
+          echo "🎉 Selesai!"
+          echo "========================================================"
