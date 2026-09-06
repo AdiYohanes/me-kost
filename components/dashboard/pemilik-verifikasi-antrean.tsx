@@ -127,27 +127,28 @@ export function PemilikVerifikasiAntrean() {
                     className="p-3.5 sm:p-4 bg-white rounded-lg border border-zinc-200 hover:border-zinc-300 transition-colors space-y-3"
                   >
                     {/* Header Item: Kamar, Nama, Waktu, Nominal */}
-                    <div className="flex items-start justify-between gap-2.5">
-                      <div className="flex items-start gap-2.5 min-w-0">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-zinc-100 text-zinc-900 border border-zinc-200 shrink-0 tabular-nums">
-                          Kamar {tagihan.nomorKamar}
-                        </span>
-                        <div className="min-w-0">
-                          <h4 className="text-sm font-bold text-zinc-950 leading-snug truncate">
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-zinc-100 text-zinc-900 border border-zinc-200 shrink-0 tabular-nums">
+                            Kamar {tagihan.nomorKamar}
+                          </span>
+                          <h4 className="text-sm font-bold text-zinc-950 truncate">
                             {tagihan.penghuniNama}
                           </h4>
-                          <p className="text-xs text-zinc-500 flex items-center gap-1 mt-0.5">
-                            <Calendar className="w-3 h-3 text-zinc-400 shrink-0" />
-                            <span>Unggah: {formattedUploadTime}</span>
-                          </p>
                         </div>
-                      </div>
 
-                      <div className="text-right shrink-0">
-                        <span className="text-sm font-bold text-zinc-950 block tabular-nums">
+                        <span className="text-sm font-bold text-zinc-950 block tabular-nums shrink-0">
                           {formatRupiah(tagihan.nominal)}
                         </span>
-                        <span className="text-xs text-zinc-400 font-medium">
+                      </div>
+
+                      <div className="flex items-center justify-between gap-2 text-xs text-zinc-500">
+                        <p className="flex items-center gap-1 whitespace-nowrap">
+                          <Calendar className="w-3 h-3 text-zinc-400 shrink-0" />
+                          <span>Unggah: {formattedUploadTime}</span>
+                        </p>
+                        <span className="text-xs text-zinc-400 font-medium shrink-0">
                           Sewa Bulanan
                         </span>
                       </div>
